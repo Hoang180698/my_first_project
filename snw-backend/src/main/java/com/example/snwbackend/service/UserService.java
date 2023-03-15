@@ -32,11 +32,10 @@ public class UserService {
 
     // Tạo User
     public UserDto createUser(UpsertUserRequest request) {
-        Optional<User> user = userRepository.findByEmail(request.getEmail());
-        if (user == null) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException("This email is already used");
         }
-        User user1 = User.builder()
+        User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .address(request.getAddress())
@@ -44,8 +43,8 @@ public class UserService {
                 .avatar(request.getAvatar())
                 .phone(request.getPhone())
                 .build();
-        userRepository.save(user1);
-        return userMapper.toUserDto(user1);
+        userRepository.save(user);
+        return userMapper.toUserDto(user);
     }
 
     // Update User
