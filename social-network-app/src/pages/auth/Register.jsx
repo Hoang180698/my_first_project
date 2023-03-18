@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, Navigate, useNavigate} from 'react-router-dom'
 import { useRegisterMutation } from '../../app/services/auth.service'
-import styles from "./Auth.module.css";
+import style from "./Auth.module.css";
 
 function Register() {
   const [register] = useRegisterMutation();
@@ -38,9 +38,9 @@ function Register() {
       <div className="container">
         <div className="row justify-content-center p-2">
           <form className="col-md-4 border my-3 p-3" onSubmit={handleSubmit}>
-            <h1 className="text-center text-upercase py-3">Hoagram</h1>
+            <h1 className={`${style.h1} text-center text-upercase py-3`}>Hoagram</h1>
             <div className="form-group my-3 d-flex justify-content-center">
-              <h2 className="text-center">
+              <h2 className={`${style.h2} text-center`}>
                 Đăng ký để xem ảnh và video từ bạn bè.
               </h2>
             </div>
@@ -50,7 +50,7 @@ function Register() {
                 type="text"
                 placeholder="Email"
                 required
-                className="form-control"
+                className={`${style.input} form-control`}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
@@ -59,7 +59,7 @@ function Register() {
                 type="text"
                 placeholder="Tên"
                 required
-                className="form-control"
+                className={`${style.input} form-control`}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
@@ -68,7 +68,7 @@ function Register() {
                 type="password"
                 placeholder="Mật khẩu"
                 required
-                className="form-control"
+                className={`${style.input} form-control`}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
@@ -77,7 +77,7 @@ function Register() {
                 type="password"
                 placeholder="Nhập lại mật khẩu"
                 required
-                className="form-control"
+                className={`${style.input} form-control`}
                 onChange={(e) => setPassConfirm(e.target.value)}
               />
             </div>
@@ -90,7 +90,7 @@ function Register() {
           <div className="row justify-content-center p-2">
             <form className="col-md-4 border my-3 p-3">
               <div className="d-flex justify-content-center">
-                <h3 text-center>
+                <h3 text-center className={`${style.h3}`}>
                   Bạn đã có tài khoản? <Link to={"../login"}>Đăng nhập</Link>
                 </h3>
               </div>

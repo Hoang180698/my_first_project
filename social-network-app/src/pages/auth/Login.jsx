@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../app/services/auth.service";
+import style from "./Auth.module.css";
 
 
 function Login() {
@@ -37,7 +38,7 @@ function Login() {
         <div className="container">
           <div className="row justify-content-center p-2">
             <form className="col-md-3 border my-3 p-3" onSubmit={handleSubmit}>
-              <h1 className="text-center text-upercase py-3">Hoagram</h1>
+              <h1 className={`${style.h1} text-center text-upercase py-3`}>Hoagram</h1>
               <div className="form-group my-3 d-flex justify-content-center">
               </div>
               <div className="form-group my-3 d-flex justify-content-center">
@@ -45,7 +46,7 @@ function Login() {
                   type="text"
                   placeholder="Email"
                   required
-                  className="form-control"
+                  className={`${style.input} form-control`}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
@@ -54,7 +55,7 @@ function Login() {
                   type="password"
                   placeholder="Mật khẩu"
                   required
-                  className="form-control"
+                  className={`${style.input} form-control`}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
@@ -65,15 +66,15 @@ function Login() {
               </div>
               <hr className="mx-5 mt-4" />
               <div className="d-flex justify-content-center">
-                  <h3 text-center>
-                    <Link style={{color: "rgb(96, 96, 162)"}} to={"#"}>Quên mật khẩu?</Link>
+                  <h3 text-center className={`${style.h3}`}>
+                    <Link style={{color: "rgb(122, 122, 202)"}} to={"#"}>Quên mật khẩu?</Link>
                   </h3>
                 </div>
             </form>
             <div className="row justify-content-center p-2">
               <form className="col-md-3 border my-3 p-3">
                 <div className="d-flex justify-content-center">
-                  <h3 text-center>
+                  <h3 text-center className={`${style.h3}`}>
                     Bạn chưa có tài khoản? <Link to={"../register"}>Đăng ký</Link>
                   </h3>
                 </div>

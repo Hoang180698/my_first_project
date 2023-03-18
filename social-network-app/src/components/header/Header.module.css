@@ -1,0 +1,10 @@
+img {
+    overflow-clip-margin: content-box;
+    overflow: clip;
+    display: block;
+}
+.logo {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 30px;
+    display: contents;
+}

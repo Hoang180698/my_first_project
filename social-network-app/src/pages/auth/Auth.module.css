@@ -1,35 +1,33 @@
-input{
-    border-top: 1px solid ;
+.input{
     max-width: 320px;
 }
 
-input[type="text"]
+.input[type="text"]
 {
     font-size:14px;
     background-color:rgb(245, 245, 245);
-    color: rgb(96, 96, 162);
 }
 
-input[type="password"]
+.input[type="password"]
 {
     font-size:14px;
     background-color:rgb(245, 245, 245);
 }
-h2{
+.h2{
     font-size: 17px;
     color: #AAA;
 }
 .authBtn{
     width: 300px;
 }
-h3{
+.h3{
     font-size: 14px;
     font-weight: 400;
 }
-a {
+.a {
     text-decoration: none;
 }
-h1{
+.h1{
     font-family: 'Brush Script MT', cursive;
 }
 
