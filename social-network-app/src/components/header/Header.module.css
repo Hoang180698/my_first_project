@@ -1,10 +1,15 @@
-img {
-    overflow-clip-margin: content-box;
-    overflow: clip;
-    display: block;
-}
 .logo {
     font-family: 'Brush Script MT', cursive;
     font-size: 30px;
     display: contents;
+    margin-left: 100px;
+    font-weight: 500;
 }
+
+.avatar {
+    vertical-align: middle;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+ }

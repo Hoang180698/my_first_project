@@ -16,6 +16,7 @@
 .h2{
     font-size: 17px;
     color: #AAA;
+    max-width: 320px;
 }
 .authBtn{
     width: 300px;
@@ -29,5 +30,11 @@
 }
 .h1{
     font-family: 'Brush Script MT', cursive;
+}
+.fp:hover{
+    color: #379bd4;
+}
+.fp{
+    color: rgb(6, 6, 158);
 }
 

@@ -1,24 +1,24 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { logout } from "../../app/slices/auth.slice";
 import styles from "./Header.module.css";
 
 function Header() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const handleLogout = () => {
-        dispatch(logout());
-    }
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   return (
     <>
-      <header>
-        <nav className="navbar navbar-expand-lg navbar-light px-3 border">
+      <header className="border-bottom">
+        <nav className="navbar navbar-expand-lg navbar-light px-3">
           <div className="container-fluid">
-            <a className={`${styles.logo} navbar-brand`} href="#">
+            <Link to={"/"} className={`${styles.logo} navbar-brand`}>
               Hoagram
-            </a>
+            </Link>
             <button
               className="navbar-toggler"
               type="button"
@@ -32,28 +32,26 @@ function Header() {
               <span></span>
               <span></span>
             </button>
+
+            {/* Link */}
             <div
               className="collapse navbar-collapse justify-content-between"
               id="navbarSupportedContent"
             >
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li className="nav-item mx-3">
-                  <NavLink
-                    to={"/"}
-                    className="nav-link"
-                  >
+                  <NavLink to={"/"} className="nav-link">
                     <i className="fa-solid fa-house"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
-                  <NavLink 
-                    to={"/search"} className="nav-link">
+                  <NavLink to={"/search"} className="nav-link">
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
                   <NavLink to={"/messenge"} className="nav-link">
-                    <i className="fa-regular fa-comment"></i>
+                    <i class="fa-regular fa-message"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
@@ -67,22 +65,26 @@ function Header() {
                   </NavLink>
                 </li>
               </ul>
-              <ul className="navbar-nav ms-auto">
-                {" "}
-                <li className="nav-item dropdown">
+
+              {/* avatar */}
+
+              <div className="navbar-nav ms-auto mx-2 dropdown">
                   <a
-                    className="nav-link dropdown-toggle"
+                    className="nav-link"
                     href="#"
                     id="navbarDropdown"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    Dropdown
+                    <img
+                      className={styles.avatar}
+                      src="../../public/user.jpg"
+                    />
                   </a>
                   <ul
-                    className="dropdown-menu"
-                    aria-labelledby="navbarDropdown"
+                    className="dropdown-menu dropdown-menu-lg-end"
+                    aria-labelledby="dropdownMenu2"
                   >
                     <li>
                       <a className="dropdown-item" href="#">
@@ -98,13 +100,16 @@ function Header() {
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <button onClick={handleLogout} className="dropdown-item" href="#">
-                        Đăng xuất
+                      <button
+                        onClick={handleLogout}
+                        className="dropdown-item"
+                        href="#"
+                      >
+                        Log out
                       </button>
                     </li>
                   </ul>
-                </li>
-              </ul>
+              </div>
             </div>
           </div>
         </nav>

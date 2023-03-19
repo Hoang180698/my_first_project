@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Link, Navigate, useNavigate} from 'react-router-dom'
-import { useRegisterMutation } from '../../app/services/auth.service'
+import React, { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../../app/services/auth.service";
 import style from "./Auth.module.css";
 
 function Register() {
@@ -14,93 +14,95 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if(password !== passConfirm ) {
+    if (password !== passConfirm) {
       alert("Mật khẩu nhập lại chưa chính xác");
       return;
     }
     register({ email, name, password })
-        .unwrap()
-        .then(() => {
-            alert("Đăng ký thành công");
+      .unwrap()
+      .then(() => {
+        alert("Đăng ký thành công");
 
-            setTimeout(() => {
-                navigate("/login")
-            }, 1500)
-        })
-        .catch((err) => {
-            alert(err);
-        });
-};
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  };
 
   return (
     <>
-    <div id="wrapper">
-      <div className="container">
-        <div className="row justify-content-center p-2">
-          <form className="col-md-4 border my-3 p-3" onSubmit={handleSubmit}>
-            <h1 className={`${style.h1} text-center text-upercase py-3`}>Hoagram</h1>
-            <div className="form-group my-3 d-flex justify-content-center">
-              <h2 className={`${style.h2} text-center`}>
-                Đăng ký để xem ảnh và video từ bạn bè.
-              </h2>
-            </div>
-            <hr className="mx-5 py-2" />
-            <div className="form-group my-3 d-flex justify-content-center">
-              <input
-                type="text"
-                placeholder="Email"
-                required
-                className={`${style.input} form-control`}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group my-3 d-flex justify-content-center">
-              <input
-                type="text"
-                placeholder="Tên"
-                required
-                className={`${style.input} form-control`}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="form-group my-3 d-flex justify-content-center">
-              <input
-                type="password"
-                placeholder="Mật khẩu"
-                required
-                className={`${style.input} form-control`}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="form-group my-3 d-flex justify-content-center">
-              <input
-                type="password"
-                placeholder="Nhập lại mật khẩu"
-                required
-                className={`${style.input} form-control`}
-                onChange={(e) => setPassConfirm(e.target.value)}
-              />
-            </div>
-            <div className="d-flex justify-content-center">
-              <button className="btn btn-dark" type="submit">
-                Đăng ký
-              </button>
-            </div>
-          </form>
+      <div id="wrapper">
+        <div className="container">
           <div className="row justify-content-center p-2">
-            <form className="col-md-4 border my-3 p-3">
+            <form className="col-md-4 border my-3 p-3" onSubmit={handleSubmit}>
+              <h1 className={`${style.h1} text-center text-upercase py-3`}>
+                Hoagram
+              </h1>
+              <div className="form-group my-3 d-flex justify-content-center">
+                <h2 className={`${style.h2} text-center`}>
+                  Sign up to see photos and videos from your friends.
+                </h2>
+              </div>
+              <hr className="mx-5 py-2" />
+              <div className="form-group my-3 d-flex justify-content-center">
+                <input
+                  type="text"
+                  placeholder="Email"
+                  required
+                  className={`${style.input} form-control`}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-group my-3 d-flex justify-content-center">
+                <input
+                  type="text"
+                  placeholder="User name"
+                  required
+                  className={`${style.input} form-control`}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="form-group my-3 d-flex justify-content-center">
+                <input
+                  type="password"
+                  placeholder="Password"
+                  required
+                  className={`${style.input} form-control`}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="form-group my-3 d-flex justify-content-center">
+                <input
+                  type="password"
+                  placeholder="Re-Enter the password"
+                  required
+                  className={`${style.input} form-control`}
+                  onChange={(e) => setPassConfirm(e.target.value)}
+                />
+              </div>
               <div className="d-flex justify-content-center">
-                <h3 text-center className={`${style.h3}`}>
-                  Bạn đã có tài khoản? <Link to={"../login"}>Đăng nhập</Link>
-                </h3>
+                <button className="btn btn-dark" type="submit">
+                  Sign up
+                </button>
               </div>
             </form>
+            <div className="row justify-content-center p-2">
+              <form className="col-md-4 border my-3 p-3">
+                <div className="d-flex justify-content-center">
+                  <h3 text-center className={`${style.h3}`}>
+                    Have an account? <Link to={"../login"}>Log in</Link>
+                  </h3>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </>
-  )
+    </>
+  );
 }
 
-export default Register
+export default Register;

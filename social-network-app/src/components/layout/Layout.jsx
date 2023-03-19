@@ -5,9 +5,9 @@ import Header from '../header/Header'
 function Layout() {
   return (
     <>
-        <div className="wrapper-container">
+        <div className="container border-bottom">
             <Header />
-
+            
             <section className="content">
                 <Outlet />
             </section>
