@@ -1,5 +1,6 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
+import NewPost from '../../pages/newPost/NewPost'
 import Header from '../header/Header'
 
 function Layout() {
@@ -12,6 +13,7 @@ function Layout() {
                 <Outlet />
             </section>
         </div>
+        <NewPost/>
     </>
   )
 }

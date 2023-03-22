@@ -18,7 +18,7 @@ function NotifyHeader() {
                     <span class="unread-notification"></span>
                   </a>
                   <div
-                    class="dropdown-menu notification-ui_dd show box-shadow"
+                    class="dropdown-menu notification-ui_dd box-shadow"
                     aria-labelledby="navbarDropdown"
                   >
                     <div class="notification-ui_dd-header">
@@ -175,7 +175,7 @@ function NotifyHeader() {
                       </a>
                     </div>
                     <div class="notification-ui_dd-footer d-grid gap-2">
-                      <Link to={"/notifications"} class="btn btn-dark btn-block view-all-notify">
+                      <Link to={"/notifications"} class="btn btn-success btn-block view-all-notify">
                         View All
                       </Link>
                     </div>

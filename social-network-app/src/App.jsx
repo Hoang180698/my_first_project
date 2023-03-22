@@ -6,7 +6,9 @@ import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import HomePage from './pages/home/HomePage'
 import Messenge from './pages/messenge/Messenge'
+import NewPost from './pages/newPost/NewPost'
 import Notify from './pages/notify/Notify'
+import Profile from './pages/profile/Profile'
 import Search from './pages/search/Search'
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
                 <Route path="/search" element={<Search />}></Route>
                 <Route path="/messenge" element={<Messenge />}></Route>
                 <Route path="/notifications" element={<Notify />}></Route>
+                <Route path="/my-profile" element={<Profile />}></Route>
               </Route>
         </Route>
         <Route path="/login" element={<Login />} />

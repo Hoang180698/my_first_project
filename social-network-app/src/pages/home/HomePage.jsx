@@ -68,14 +68,17 @@ function HomePage() {
                     Ratione laboriosam non atque, porro cupiditate commodi?
                     Provident culpa vel sit enim!
                   </p>
+                  <div className="post-image">
                   <img
-                    src="https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F44%2F2022%2F11%2F17%2Farticle_291139_the-top-10-healthiest-foods-for-kids_-02.jpg&q=60"
+                    src="https://luhanhvietnam.com.vn/du-lich/vnt_upload/news/06_2020/ve-dep-khach-san-sonasea-phu-quoc.jpg"
                     alt="Content img"
                   />
+                  </div>
+                
                 </div>
                 <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-2">
-                    <div className="d-flex ">
+                  <div className="d-flex justify-content-between mb-2 mt-3">
+                    <div className="d-flex">
                       <a href="#!" className="text-danger mr-2 interact">
                         <span>
                           <i className="fa fa-heart"></i>

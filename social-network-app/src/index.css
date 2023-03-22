@@ -34,10 +34,6 @@ body {
     font-size: 20px;
 }
 
-/* .nav-item a.active {
-    background-color: #aaa;
-    text-decoration: underline;
-} */
 
 .nav-item a.active {
     border-bottom: rgb(0, 0, 0);
@@ -129,7 +125,6 @@ body {
 	content: "";
 	position: absolute;
 	top: -30px;
-	left: calc(50% - 7px);
 	border-top: 15px solid transparent;
 	border-right: 15px solid transparent;
 	border-bottom: 15px solid #fff;
@@ -189,9 +184,187 @@ body {
 }
 
 .view-all-notify:hover {
-	background-color: #3f3f3f;
+	background-color: #3cb460;
 }
 
-/* .header-notifications-list:hover  {
-	background-color: #555;
-} */
+.header-notifications-list *:hover {
+  background-color: #EFF1F3;
+}
+.header-notifications-list:hover {
+  background-color: #EFF1F3;
+}
+/* New post */
+
+.np-content{
+    width:100%;
+    height: 100%;
+    margin:5px auto;
+
+}
+
+.center{
+     margin:50px 30%;
+}
+
+
+.form-body{
+    border-radius: 50px;
+}
+
+.form-submit{
+    width:100%;
+    display:block;
+    color:gray;
+    padding:11px 35px;
+    background: #EBF3FA;
+    border-radius:50px;
+}
+
+
+ .form-body img{
+ float:left;
+  width:45px;
+  position:relative;
+   left:-55px;
+}
+
+.np-comment{
+	margin: auto;
+  position:absolute;
+  top:0;
+  background:rgba(242, 243, 245, 0.40);
+  width:100%;
+  height:100%;
+  min-height:150%;
+  display:none;
+}
+
+.np-block{
+  display:block;
+}
+
+.np-comment-box{
+  
+/*   position:absolute; */
+  top:50%;
+  left:5%;
+  width:500px;
+  background:#fff;
+  border:1px solid whitesmoke;
+  display:block;
+  border-radius:8px;
+  margin-top:100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding:10px;
+}
+
+.np-comment-header{
+  padding:10px;
+  border-bottom:1px solid gray;
+  border-radius:5px 5px 0px 0px;
+  min-height:26px;
+  
+}
+
+.np-comment-header h3{
+  width:80%;
+  float:left;
+  text-align:center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+
+.np-comment-body textarea{
+  min-width:93%;
+  max-width:94%;
+  margin:10px 1%;
+  border:none;
+  border-radius:5px;
+  padding:5px;
+  font-size:20px;
+  min-height:200px;
+  max-height:250px;
+}
+
+.np-comment-body textarea:focus{
+  border:none;
+  outline: none;
+}
+
+
+.button-send:hover{
+  background:rgba(218,218,218,0.50);
+}
+
+.np-comment-bottom{
+  margin:10px;
+  padding:2px;
+}
+
+
+.np-comment-bottom i:hover{
+  background:#EF78;
+  color:#f0f0f0;
+}
+
+
+.np-comment-header .message{
+/*   display:none; */
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  padding:15px 0;
+  background:aqua;
+  color:#fff;
+  text-align:center;
+}
+
+.np-icon input[type="file"]{
+  display:none;
+}
+
+@media screen and (max-width:562px){
+  .np-comment-box{
+    width:80%;
+  } 
+}
+
+/* card profile */
+.np-icon i {
+	font-size: 25px;
+	color: #3cb460;
+	text-align:center;
+}
+
+.banner {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 125px;
+	background-image: url("../img/banner.jpg");
+	background-position: center;
+	background-size: cover;
+}
+
+.img-circle {
+	height: 150px;
+	width: 150px;
+	border-radius: 150px;
+	border: 3px solid #fff;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+}
+
+.social-links a {
+	transition: all 0.2s;
+}
+.social-links a img {
+	height: 30px;
+}
+.social-links a:hover {
+	transform: translateY(-3px);
+}

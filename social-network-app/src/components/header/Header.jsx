@@ -3,11 +3,14 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import { logout } from "../../app/slices/auth.slice";
+import NewPost from "../../pages/newPost/NewPost";
+import useCreatePost from "../../pages/newPost/useCreatePost";
 import styles from "./Header.module.css";
 import NotifyHeader from "./notify/NotifyHeader";
 
 
 function Header() {
+  const { onCreatePost } = useCreatePost();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -60,13 +63,13 @@ function Header() {
                     <NotifyHeader />
 
                 <li className="nav-item mx-3">
-                  <NavLink
-                    to={"add-post"}
-                    className="nav-link collapse navbar-collapse"
+                  <button
+                    className="nav-link collapse navbar-collapse btn"
                     id="navbarSupportedContent"
+                    onClick={onCreatePost}
                   >
                     <i className="fa-regular fa-square-plus"></i>
-                  </NavLink>
+                  </button>
                 </li>
               </ul>
 
@@ -88,9 +91,9 @@ function Header() {
                   aria-labelledby="dropdownMenu2"
                 >
                   <li>
-                    <a className="dropdown-item" href="#">
-                      Action
-                    </a>
+                    <Link to={"/my-profile"} className="dropdown-item" href="#">
+                      Profile
+                    </Link>
                   </li>
                   <li>
                     <a className="dropdown-item" href="#">

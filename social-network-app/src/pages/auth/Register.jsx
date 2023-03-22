@@ -28,7 +28,8 @@ function Register() {
         }, 1500);
       })
       .catch((err) => {
-        alert(err);
+        console.log(err);
+        alert(err.data.message);
       });
   };
 

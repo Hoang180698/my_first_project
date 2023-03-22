@@ -1,0 +1,33 @@
+.profile-image img{
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+.profile-image {
+    width: 292px;
+    height: 150px;
+    text-align: center;
+}
+
+.btn-edit-profile {
+    background-color: #F2F3F5;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: center;
+    justify-content: center;
+}
+
+.btn-edit-profile:hover{
+    background-color: #CCD0D5;
+}
+
+.profile-stats ul {
+    list-style: none;
+}
+.profile-container {
+  margin: 0 auto;
+}
+.hr-profile {
+    max-width: 70%;
+}
