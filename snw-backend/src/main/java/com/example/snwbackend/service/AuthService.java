@@ -81,6 +81,7 @@ public class AuthService {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException("This email is already used");
         }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())

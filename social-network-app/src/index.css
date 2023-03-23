@@ -48,7 +48,7 @@ body {
 /* home page */
 
 .main-content {
-	padding-top: 100px;
+	padding-top: 40px;
 	padding-bottom: 100px;
 }
 
@@ -216,10 +216,13 @@ body {
     display:block;
     color:gray;
     padding:11px 35px;
-    background: #EBF3FA;
+    background: #F0F2F5;
     border-radius:50px;
 }
 
+.form-submit:hover {
+	background-color: #DADDE1;
+}
 
  .form-body img{
  float:left;

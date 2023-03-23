@@ -1,33 +1,14 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import useCreatePost from "../newPost/useCreatePost";
-import "./sass/style.scss";
+import React from 'react'
 
-function HomePage() {
-  const { onCreatePost } = useCreatePost();
+function SavedPost() {
   return (
     <>
-      <section className="main-content">
+              <section className="main-content">
         <div className="container">
-          <div className="col-sm-6 offset-sm-3">
-            <div className="post-block">
-              <div className="form-body ms-5">
-                <Link to={"/my-profile/"}>  <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Microsoft_Account.svg/1200px-Microsoft_Account.svg.png"
-                  alt=""
-                /></Link>
-              
-                <div className="form-submit" onClick={onCreatePost} role="button">
-                What's on your mind, Hoang?
-                </div>
-              </div>
-              <hr/>
-              <div className="icon-homepage">
-                <span>🙈 🖤 💛 💙 💜 💚 💖 🧡 🙉</span>
-              </div>
-            </div>
-          </div>
-          {/* Post  */}
+          <h1 className="text-center text-uppercase">Social Media Post</h1>
+          <br />
+          <br />
+
           <div className="row">
             <div className="col-sm-6 offset-sm-3">
               <div className="post-block">
@@ -87,11 +68,12 @@ function HomePage() {
                     Provident culpa vel sit enim!
                   </p>
                   <div className="post-image">
-                    <img
-                      src="https://luhanhvietnam.com.vn/du-lich/vnt_upload/news/06_2020/ve-dep-khach-san-sonasea-phu-quoc.jpg"
-                      alt="Content img"
-                    />
+                  <img
+                    src="https://luhanhvietnam.com.vn/du-lich/vnt_upload/news/06_2020/ve-dep-khach-san-sonasea-phu-quoc.jpg"
+                    alt="Content img"
+                  />
                   </div>
+                
                 </div>
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-2 mt-3">
@@ -102,20 +84,14 @@ function HomePage() {
                         </span>
                       </a>
                       <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-comment"></i>
-                        </span>
+                          <span><i class="fa-regular fa-comment"></i></span>
                       </a>
                       <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-paper-plane"></i>
-                        </span>
+                          <span><i class="fa-regular fa-paper-plane"></i></span>
                       </a>
                     </div>
                     <a href="#!" className="text-dark interact">
-                      <span>
-                        <i class="fa-regular fa-bookmark"></i>
-                      </span>
+                      <span><i class="fa-regular fa-bookmark"></i></span>
                     </a>
                   </div>
                   <div className="mb-0 d-flex count-interact">
@@ -147,12 +123,12 @@ function HomePage() {
                     <div className="d-flex mb-2">
                       <div>
                         <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">
-                            <img
-                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                              alt="User img"
-                              className="author-img author-img--small me-2"
-                            />
+                          <a href="#!" className="text-dark ">  
+                          <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
+                        alt="User img"
+                        className="author-img author-img--small me-2"
+                      />
                             John doe
                           </a>{" "}
                           <small className="text-muted">1m</small>
@@ -162,18 +138,12 @@ function HomePage() {
                           elit.
                         </p>
                         <div className="d-flex ms-5">
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
+                          <a href="#!" className="text-dark me-2 interact-comment">
                             <span>
-                              <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart"></i>
                             </span>
                           </a>
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
+                          <a href="#!" className="text-dark me-2 interact-comment">
                             <span>Reply</span>
                           </a>
                         </div>
@@ -191,7 +161,7 @@ function HomePage() {
             </div>
 
             {/*  */}
-
+            
             <div className="col-sm-6 offset-sm-3">
               <div className="post-block">
                 <div className="d-flex justify-content-between">
@@ -249,6 +219,7 @@ function HomePage() {
                     Ratione laboriosam non atque, porro cupiditate commodi?
                     Provident culpa vel sit enim!
                   </p>
+             
                 </div>
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-2">
@@ -259,20 +230,14 @@ function HomePage() {
                         </span>
                       </a>
                       <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-comment"></i>
-                        </span>
+                          <span><i class="fa-regular fa-comment"></i></span>
                       </a>
                       <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-paper-plane"></i>
-                        </span>
+                          <span><i class="fa-regular fa-paper-plane"></i></span>
                       </a>
                     </div>
                     <a href="#!" className="text-dark interact">
-                      <span>
-                        <i class="fa-regular fa-bookmark"></i>
-                      </span>
+                      <span><i class="fa-regular fa-bookmark"></i></span>
                     </a>
                   </div>
                   <div className="mb-0 d-flex count-interact">
@@ -304,12 +269,12 @@ function HomePage() {
                     <div className="d-flex mb-2">
                       <div>
                         <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">
-                            <img
-                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                              alt="User img"
-                              className="author-img author-img--small me-2"
-                            />
+                          <a href="#!" className="text-dark ">  
+                          <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
+                        alt="User img"
+                        className="author-img author-img--small me-2"
+                      />
                             John doe
                           </a>{" "}
                           <small className="text-muted">1m</small>
@@ -319,18 +284,12 @@ function HomePage() {
                           elit.
                         </p>
                         <div className="d-flex ms-5">
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
+                          <a href="#!" className="text-dark me-2 interact-comment">
                             <span>
-                              <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart"></i>
                             </span>
                           </a>
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
+                          <a href="#!" className="text-dark me-2 interact-comment">
                             <span>Reply</span>
                           </a>
                         </div>
@@ -346,11 +305,13 @@ function HomePage() {
                 </div>
               </div>
             </div>
+            
+
           </div>
         </div>
       </section>
     </>
-  );
+  )
 }
 
-export default HomePage;
+export default SavedPost

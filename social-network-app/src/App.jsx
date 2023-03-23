@@ -9,6 +9,8 @@ import Messenge from './pages/messenge/Messenge'
 import NewPost from './pages/newPost/NewPost'
 import Notify from './pages/notify/Notify'
 import Profile from './pages/profile/Profile'
+import ProfilePost from './pages/profile/ProfilePost'
+import SavedPost from './pages/profile/SavedPost'
 import Search from './pages/search/Search'
 
 function App() {
@@ -21,7 +23,10 @@ function App() {
                 <Route path="/search" element={<Search />}></Route>
                 <Route path="/messenge" element={<Messenge />}></Route>
                 <Route path="/notifications" element={<Notify />}></Route>
-                <Route path="/my-profile" element={<Profile />}></Route>
+                <Route path="/my-profile" element={<Profile />}>
+                  <Route path="" element={<ProfilePost/>} />
+                  <Route path="saved" element={<SavedPost/>} />
+                </Route>
               </Route>
         </Route>
         <Route path="/login" element={<Login />} />

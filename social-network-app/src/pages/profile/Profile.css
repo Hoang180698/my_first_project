@@ -31,3 +31,21 @@
 .hr-profile {
     max-width: 70%;
 }
+.profile-link *{
+    color: rgb(168, 165, 165);
+    font-size: 15px;
+}
+
+
+.profile-link a.active {
+    border-bottom: solid;
+    color: black;
+}
+
+.profile-link a.active i {
+    color: black;
+}
+
+.profile-link:hover *{
+    color: #CCD0D5;
+}

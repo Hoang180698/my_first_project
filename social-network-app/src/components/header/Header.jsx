@@ -91,7 +91,7 @@ function Header() {
                   aria-labelledby="dropdownMenu2"
                 >
                   <li>
-                    <Link to={"/my-profile"} className="dropdown-item" href="#">
+                    <Link to={"/my-profile/"} className="dropdown-item" href="#">
                       Profile
                     </Link>
                   </li>
