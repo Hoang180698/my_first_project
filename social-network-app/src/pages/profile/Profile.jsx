@@ -50,54 +50,54 @@ function Profile() {
           </div>
         </div>
       </div>
-      <div class="container d-flex mt-4">
-        <p class="me-auto ms-auto">
-          <i class="fa-solid fa-venus-mars"></i> Female
+      <div className="container d-flex mt-4">
+        <p className="me-auto ms-auto">
+          <i className="fa-solid fa-venus-mars"></i> Female
         </p>
-        <p class="me-auto">
-          <i class="fa fa-envelope me-2"></i> kiranacharya287@gmail.com
+        <p className="me-auto">
+          <i className="fa fa-envelope me-2"></i> kiranacharya287@gmail.com
         </p>
-        <p class="me-auto">
-          <i class="fa fa-phone me-2"></i> +91 9876543215
+        <p className="me-auto">
+          <i className="fa fa-phone me-2"></i> +91 9876543215
         </p>
-        <p class="me-auto">
-          <i class="fa fa-map-marker-alt me-2"></i> Bangalore
+        <p className="me-auto">
+          <i className="fa fa-map-marker-alt me-2"></i> Bangalore
         </p>
       </div>
       {/* post */}
       <div className="border-top ">
         <div className="d-flex mt-2 profile-link">
-          <NavLink to={"/my-profile/"} className="ms-auto me-5"> <i class="fa-solid fa-table-cells me-1"></i>Post</NavLink>
-          <NavLink to={"/my-profile/saved"} className="me-auto"><i class="fa-regular fa-bookmark me-1"></i>Saved</NavLink>
+          <NavLink to={"/my-profile/"} className="ms-auto me-5"> <i className="fa-solid fa-table-cells me-1"></i>Post</NavLink>
+          <NavLink to={"/my-profile/saved"} className="me-auto"><i className="fa-regular fa-bookmark me-1"></i>Saved</NavLink>
         </div>
         <Outlet />
       </div>
 
-      <section class="main-content">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-              <div class="profile-card card rounded-lg shadow p-4 p-xl-5 mb-4 text-center position-relative overflow-hidden">
-                <div class="banner"></div>
+      <section className="main-content">
+        <div className="container">
+          <div className="row">
+            <div className="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+              <div className="profile-card card rounded-lg shadow p-4 p-xl-5 mb-4 text-center position-relative overflow-hidden">
+                <div className="banner"></div>
                 <img
                   src="https://images.unsplash.com/photo-1513721032312-6a18a42c8763?w=152&h=152&fit=crop&crop=faces"
                   alt=""
-                  class="img-circle mx-auto mb-3"
+                  className="img-circle mx-auto mb-3"
                 />
-                <h3 class="mb-4">Kiran Acharya</h3>
-                <div class="text-start mb-4">
-                  <p class="mb-2 ">
-                    <i class="fa fa-envelope me-2"></i>{" "}
+                <h3 className="mb-4">Kiran Acharya</h3>
+                <div className="text-start mb-4">
+                  <p className="mb-2 ">
+                    <i className="fa fa-envelope me-2"></i>{" "}
                     kiranacharya287@gmail.com
                   </p>
-                  <p class="mb-2">
-                    <i class="fa fa-phone me-2"></i> +91 9876543215
+                  <p className="mb-2">
+                    <i className="fa fa-phone me-2"></i> +91 9876543215
                   </p>
-                  <p class="mb-2">
-                    <i class="fa fa-globe me-2"></i> kiranworkspace.com
+                  <p className="mb-2">
+                    <i className="fa fa-globe me-2"></i> kiranworkspace.com
                   </p>
-                  <p class="mb-2">
-                    <i class="fa fa-map-marker-alt me-2"></i> Bangalore
+                  <p className="mb-2">
+                    <i className="fa fa-map-marker-alt me-2"></i> Bangalore
                   </p>
                 </div>
               </div>

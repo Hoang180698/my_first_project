@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +21,10 @@ public class Post {
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+
+    @ElementCollection
+    @Column(name = "images")
+    private List<String> images;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

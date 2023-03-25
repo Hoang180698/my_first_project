@@ -193,7 +193,18 @@ body {
 .header-notifications-list:hover {
   background-color: #EFF1F3;
 }
+
 /* New post */
+
+.np-result img{
+	width: 150px;
+	height: 100px;
+	object-fit: cover;
+	padding: 0.2rem;
+}
+.np-result {
+	background-color: rgb(193, 226, 221);
+}
 
 .np-content{
     width:100%;

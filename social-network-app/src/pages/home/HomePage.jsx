@@ -88,7 +88,7 @@ function HomePage() {
                   </p>
                   <div className="post-image">
                     <img
-                      src="https://luhanhvietnam.com.vn/du-lich/vnt_upload/news/06_2020/ve-dep-khach-san-sonasea-phu-quoc.jpg"
+                      src="https://dienanphat.com/wp-content/uploads/2019/05/z2463633322426_ec809bb6976f923d090da3f46ebe93b0.jpg'"
                       alt="Content img"
                     />
                   </div>
