@@ -21,11 +21,13 @@ public class Like {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "post_id", nullable = false)
-    private Integer postId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer user_id;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @PrePersist
     public void prePersist() {

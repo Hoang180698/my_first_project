@@ -17,14 +17,12 @@ function Login() {
     login({ email, password })
       .unwrap()
       .then(() => {
-        alert("Login thành công");
-
         setTimeout(() => {
           navigate("/");
         }, 1500);
       })
-      .catch((err) => {
-        alert(err);
+      .catch(() => {
+        alert("Please check your password and account name and try again.");
       });
   };
   if (isAuthenticated) {

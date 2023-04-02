@@ -4,9 +4,9 @@ import Layout from './components/layout/Layout'
 import Private from './components/private/Private'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import Edit from './pages/edit-profile/Edit'
 import HomePage from './pages/home/HomePage'
 import Messenge from './pages/messenge/Messenge'
-import NewPost from './pages/newPost/NewPost'
 import Notify from './pages/notify/Notify'
 import Profile from './pages/profile/Profile'
 import ProfilePost from './pages/profile/ProfilePost'
@@ -27,6 +27,7 @@ function App() {
                   <Route path="" element={<ProfilePost/>} />
                   <Route path="saved" element={<SavedPost/>} />
                 </Route>
+                <Route path="/edit-profile" element={<Edit />}></Route>
               </Route>
         </Route>
         <Route path="/login" element={<Login />} />

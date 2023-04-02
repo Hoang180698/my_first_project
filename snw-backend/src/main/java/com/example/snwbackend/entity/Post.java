@@ -23,8 +23,8 @@ public class Post {
     private String content;
 
     @ElementCollection
-    @Column(name = "images")
-    private List<String> images;
+    @JoinTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
+    private List<String> imagesUrl;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -32,8 +32,9 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     public void prePersist() {
@@ -43,5 +44,10 @@ public class Post {
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    @PreRemove
+    public void preRemove() {
+        this.imagesUrl.clear();
     }
 }

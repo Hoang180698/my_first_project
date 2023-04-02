@@ -2,6 +2,8 @@ package com.example.snwbackend.request;
 
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -9,4 +11,5 @@ import lombok.*;
 @Builder
 public class UpsertPostRequest {
     private String content;
+    private List<String> imagesUrl;
 }

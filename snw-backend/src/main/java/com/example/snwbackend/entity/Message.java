@@ -24,11 +24,13 @@ public class Message {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "sender_id")
-    private Integer senderId;
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
-    @Column(name = "receiver_id")
-    private Integer receiverId;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @PrePersist
     public void prePersist() {

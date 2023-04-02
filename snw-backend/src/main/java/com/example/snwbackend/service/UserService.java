@@ -6,12 +6,12 @@ import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
 import com.example.snwbackend.repository.UserRepository;
-import com.example.snwbackend.request.UpsertUserRequest;
+import com.example.snwbackend.request.UpdateInfoUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,34 +30,17 @@ public class UserService {
         return userMapper.toUserDto(user);
     }
 
-    // Tạo User
-    public UserDto createUser(UpsertUserRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new BadRequestException("This email is already used");
-        }
-        User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .address(request.getAddress())
-                .password(request.getPassword())
-                .avatar(request.getAvatar())
-                .phone(request.getPhone())
-                .build();
-        userRepository.save(user);
-        return userMapper.toUserDto(user);
-    }
-
-    // Update User
-    public UserDto updateUser(Integer id, UpsertUserRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with id = " + id);
+    // Update thong tin ca nhan
+    public UserDto updateUser(UpdateInfoUserRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
         });
+        user.setBiography(request.getBiography());
+        user.setGender(request.getGender());
         user.setAddress(request.getAddress());
         user.setName(request.getName());
-        user.setAvatar(request.getAvatar());
         user.setPhone(request.getPhone());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
 
         userRepository.save(user);
         return userMapper.toUserDto(user);
@@ -76,5 +59,12 @@ public class UserService {
     // Lấy danh sách user đang follow
     public List<UserDto> getUsersFollower(Integer id) {
         return userRepository.getUsersFollower(id);
+    }
+
+    public void deleteUserById(Integer id) {
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with id = " + id);
+        });
+        userRepository.delete(user);
     }
 }

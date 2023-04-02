@@ -1,6 +1,8 @@
 package com.example.snwbackend;
 
+import com.example.snwbackend.entity.Post;
 import com.example.snwbackend.entity.User;
+import com.example.snwbackend.repository.PostRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -9,14 +11,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @SpringBootTest
 public class InitDataTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private Faker faker;
@@ -44,6 +48,36 @@ public class InitDataTest {
     void find_user() {
         Optional<User> user = userRepository.findByEmail("hoang180698");
         System.out.println(user.toString());
+    }
+
+    @Test
+    @Rollback(value = false)
+    void save_post() {
+        Random rd = new Random();
+
+        List<User> users = userRepository.findAll();
+
+        for (int i = 0; i < 20; i++) {
+            // Random 1 user
+            User rdUser = users.get(rd.nextInt(users.size()));
+
+            List<String> rdImages = new LinkedList<>();
+            for (int j = 0; j < 3; j++) {
+                String rdCategory = faker.internet().image().toString();
+                rdImages.add(rdCategory);
+            }
+
+
+
+            String title = faker.lorem().sentence(10);
+            Post post = Post.builder()
+                    .content(title)
+                    .user(rdUser)
+                    .imagesUrl(rdImages)
+                    .build();
+
+            postRepository.save(post);
+        }
     }
 
 }

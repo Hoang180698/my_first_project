@@ -7,12 +7,10 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class UpsertUserRequest {
+public class UpdateInfoUserRequest {
     private String name;
-    private String email;
     private String phone;
-    private String password;
-    private String avatar;
     private String address;
+    private String biography;
     private String gender;
 }

@@ -19,7 +19,7 @@ function imageSlider({ data }) {
     if (data.length === 1) {
         return (
             <div className="post-image d-flex position-relative">
-                <img src={data[0]}/>
+                <img src={`http://localhost:8080${data[0]}`}/>
             </div>
         )
     }
@@ -28,7 +28,7 @@ function imageSlider({ data }) {
         {data.map((item, idx) => {
           return (
             <img
-              src={item}
+              src={`http://localhost:8080${item}`}
               key={idx}
               className={slide === idx ? "" : "d-none"}
             />

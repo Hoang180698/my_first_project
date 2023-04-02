@@ -15,13 +15,13 @@ function Register() {
     e.preventDefault();
 
     if (password !== passConfirm) {
-      alert("Mật khẩu nhập lại chưa chính xác");
+      alert("Password confirm is not correct");
       return;
     }
     register({ email, name, password })
       .unwrap()
       .then(() => {
-        alert("Đăng ký thành công");
+        alert("successfully registered!");
 
         setTimeout(() => {
           navigate("/login");

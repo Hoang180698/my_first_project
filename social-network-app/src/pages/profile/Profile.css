@@ -5,10 +5,16 @@
     border-radius: 50%;
 }
 .profile-image {
+    margin-left: 180px;
     width: 292px;
     height: 150px;
     text-align: center;
 }
+
+.profile-container {
+    width: 100%;
+}
+
 
 .btn-edit-profile {
     background-color: #F2F3F5;
@@ -16,6 +22,9 @@
     font-size: 14px;
     text-align: center;
     justify-content: center;
+}
+.profile {
+    width: 100%;
 }
 
 .btn-edit-profile:hover{
@@ -25,9 +34,7 @@
 .profile-stats ul {
     list-style: none;
 }
-.profile-container {
-  margin: 0 auto;
-}
+
 .hr-profile {
     max-width: 70%;
 }
@@ -48,4 +55,11 @@
 
 .profile-link:hover *{
     color: #CCD0D5;
+}
+
+.profile-bio {
+    max-width: 85%;
+    word-wrap: break-word;
+    font-size: 14px;
+    color: #262626;
 }

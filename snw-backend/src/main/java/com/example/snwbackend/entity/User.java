@@ -1,5 +1,6 @@
 package com.example.snwbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,6 +47,7 @@ public class User implements UserDetails, Serializable {
     @Column(name = "avatar")
     private String avatar;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 

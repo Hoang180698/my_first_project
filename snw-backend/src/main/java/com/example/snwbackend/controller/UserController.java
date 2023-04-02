@@ -1,7 +1,6 @@
 package com.example.snwbackend.controller;
 
-import com.example.snwbackend.dto.UserDto;
-import com.example.snwbackend.request.UpsertUserRequest;
+import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,16 +20,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // Tạo User
-    @PostMapping("")
-    public ResponseEntity<?> createUser(@RequestBody UpsertUserRequest request) {
-        return new ResponseEntity<>(userService.createUser(request), HttpStatus.CREATED);
-    }
-
     // Cập nhật thông tin User
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody UpsertUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    @PutMapping("")
+    public ResponseEntity<?> updateUser(@RequestBody UpdateInfoUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(request));
     }
 
     // Tìm kiếm user
@@ -49,6 +42,13 @@ public class UserController {
     @GetMapping("{id}/follower")
     public ResponseEntity<?> getUsersFollower(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.getUsersFollower(id));
+    }
+
+    // Xóa User
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable Integer id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

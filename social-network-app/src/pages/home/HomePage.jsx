@@ -1,10 +1,27 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useGetPostsQuery } from "../../app/services/posts.service";
 import useCreatePost from "../newPost/useCreatePost";
 import "./sass/style.scss";
+import ImageSlider from '../../components/imageSlider/ImageSlider'
+import { formatDate } from "../../utils/functionUtils";
+
 
 function HomePage() {
+  const { auth } = useSelector((state) => state.auth);
   const { onCreatePost } = useCreatePost();
+
+  const { data, isLoading } = useGetPostsQuery();
+
+  if (isLoading) {
+    return <div className="text-center">
+    <div className="spinner-border" role="status">
+      <span className="sr-only">Loading...</span>
+    </div>
+  </div>
+}
+
   return (
     <>
       <section className="main-content">
@@ -12,13 +29,13 @@ function HomePage() {
           <div className="col-sm-6 offset-sm-3">
             <div className="post-block">
               <div className="form-body ms-5">
-                <Link to={"/my-profile/"}>  <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Microsoft_Account.svg/1200px-Microsoft_Account.svg.png"
+                <Link className="homepage-avatar" to={"/my-profile/"}>  <img
+                  src={auth.avatar === null ? "../../../public/user.jpg" : `http://localhost:8080${auth.avatar}`}
                   alt=""
                 /></Link>
               
                 <div className="form-submit" onClick={onCreatePost} role="button">
-                What's on your mind, Hoang?
+                What's on your mind, {auth.name}?
                 </div>
               </div>
               <hr/>
@@ -28,15 +45,19 @@ function HomePage() {
             </div>
           </div>
           {/* Post  */}
+        
           <div className="row">
-            <div className="col-sm-6 offset-sm-3">
-              <div className="post-block">
+          {data.length > 0 &&
+            data.map((p) => (
+              <div className="col-sm-6 offset-sm-3" key={p.id}>
+        
+              <div className="post-block border">
                 <div className="d-flex justify-content-between">
                   <div className="d-flex mb-3">
                     <div className="me-2">
                       <a href="#" className="text-dark">
                         <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
+                          src={p.user.avatar === null ? "../../../public/user.jpg" : `http://localhost:8080${p.user.avatar}`}
                           alt="User"
                           className="author-img"
                         />
@@ -45,10 +66,10 @@ function HomePage() {
                     <div>
                       <h5 className="mb-0">
                         <a href="#!" className="text-dark">
-                          Kiran Acharya
+                          {p.user.name}
                         </a>
                       </h5>
-                      <p className="mb-0 text-muted">5m</p>
+                      <p className="mb-0 text-muted time-post">{formatDate(p.createdAt)}</p>
                     </div>
                   </div>
 
@@ -82,18 +103,11 @@ function HomePage() {
                 {/* content */}
                 <div className="post-block__content mb-2">
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ratione laboriosam non atque, porro cupiditate commodi?
-                    Provident culpa vel sit enim!
+                      {p.content}
                   </p>
-                  <div className="post-image">
-                    <img
-                      src="https://dienanphat.com/wp-content/uploads/2019/05/z2463633322426_ec809bb6976f923d090da3f46ebe93b0.jpg'"
-                      alt="Content img"
-                    />
-                  </div>
+                  <ImageSlider data={p.imagesUrl} / >
                 </div>
-                <div className="mb-3">
+                <div className="mb-3 border-top">
                   <div className="d-flex justify-content-between mb-2 mt-3">
                     <div className="d-flex">
                       <a href="#!" className="text-danger mr-2 interact">
@@ -120,10 +134,10 @@ function HomePage() {
                   </div>
                   <div className="mb-0 d-flex count-interact">
                     <span className="text-dark">25k likes</span>
-                    <span className="text-dark ms-auto">2k comments</span>
+                    {/* <span className="text-dark ms-auto">2k comments</span> */}
                   </div>
                 </div>
-                <hr />
+                {/* <hr /> */}
                 <div className="post-block__comments">
                   {/* <!-- Comment Input --> */}
                   <div className="input-group mb-3">
@@ -143,7 +157,7 @@ function HomePage() {
                     </div>
                   </div>
                   {/* <!-- Comment content --> */}
-                  <div className="comment-view-box mb-3">
+                  {/* <div className="comment-view-box mb-3">
                     <div className="d-flex mb-2">
                       <div>
                         <h6 className="mb-1">
@@ -179,9 +193,9 @@ function HomePage() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   {/* <!-- More Comments --> */}
-                  <hr />
+                  {/* <hr /> */}
                   <a href="#!" className="text-dark view-more-coment">
                     View More comments{" "}
                     <span className="font-weight-bold">(12)</span>
@@ -190,162 +204,19 @@ function HomePage() {
               </div>
             </div>
 
-            {/*  */}
+            ))}
 
+            {/* ***************** */}
             <div className="col-sm-6 offset-sm-3">
-              <div className="post-block">
+             
+              <div className="post-block text-center">
+              <h2>You're all caught up</h2>
+              <Link to={"./search"} className="btn btn-primary">find more friends</Link>
                 <div className="d-flex justify-content-between">
-                  <div className="d-flex mb-3">
-                    <div className="me-2">
-                      <a href="#" className="text-dark">
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                          alt="User"
-                          className="author-img"
-                        />
-                      </a>
-                    </div>
-                    <div>
-                      <h5 className="mb-0">
-                        <a href="#!" className="text-dark">
-                          Kiran Acharya
-                        </a>
-                      </h5>
-                      <p className="mb-0 text-muted">5m</p>
-                    </div>
-                  </div>
-
-                  {/* edit xoa */}
-
-                  <div className="post-block__user-options dropdown">
-                    <a
-                      className="nav-link"
-                      href="#"
-                      id="navbarDropdown"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
-                    </a>
-                    <ul
-                      className="dropdown-menu dropdown-menu-lg-end"
-                      aria-labelledby="dropdownMenu2"
-                    >
-                      <a className="dropdown-item text-dark" href="#">
-                        <i className="fa fa-pencil me-1"></i>Edit
-                      </a>
-                      <a className="dropdown-item text-danger" href="#">
-                        <i className="fa fa-trash me-1"></i>Delete
-                      </a>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* content */}
-                <div className="post-block__content mb-2">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ratione laboriosam non atque, porro cupiditate commodi?
-                    Provident culpa vel sit enim!
-                  </p>
-                </div>
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-2">
-                    <div className="d-flex ">
-                      <a href="#!" className="text-danger mr-2 interact">
-                        <span>
-                          <i className="fa fa-heart"></i>
-                        </span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-comment"></i>
-                        </span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                        <span>
-                          <i class="fa-regular fa-paper-plane"></i>
-                        </span>
-                      </a>
-                    </div>
-                    <a href="#!" className="text-dark interact">
-                      <span>
-                        <i class="fa-regular fa-bookmark"></i>
-                      </span>
-                    </a>
-                  </div>
-                  <div className="mb-0 d-flex count-interact">
-                    <span className="text-dark">25k likes</span>
-                    <span className="text-dark ms-auto">2k comments</span>
-                  </div>
-                </div>
-                <hr />
-                <div className="post-block__comments">
-                  {/* <!-- Comment Input --> */}
-                  <div className="input-group mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Add your comment"
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        id="button-addon2"
-                      >
-                        <i className="fa fa-paper-plane"></i>
-                      </button>
-                    </div>
-                  </div>
-                  {/* <!-- Comment content --> */}
-                  <div className="comment-view-box mb-3">
-                    <div className="d-flex mb-2">
-                      <div>
-                        <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">
-                            <img
-                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                              alt="User img"
-                              className="author-img author-img--small me-2"
-                            />
-                            John doe
-                          </a>{" "}
-                          <small className="text-muted">1m</small>
-                        </h6>
-                        <p className="mb-0 ms-5">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit.
-                        </p>
-                        <div className="d-flex ms-5">
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
-                            <span>
-                              <i class="fa-regular fa-heart"></i>
-                            </span>
-                          </a>
-                          <a
-                            href="#!"
-                            className="text-dark me-2 interact-comment"
-                          >
-                            <span>Reply</span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <!-- More Comments --> */}
-                  <hr />
-                  <a href="#!" className="text-dark view-more-coment">
-                    View More comments{" "}
-                    <span className="font-weight-bold">(12)</span>
-                  </a>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>

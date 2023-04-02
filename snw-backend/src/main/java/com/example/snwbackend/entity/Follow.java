@@ -14,11 +14,14 @@ public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "follower_id")
-    private Integer followerId;
+    @ManyToOne
+    @JoinColumn(name = "follower_id")
+    private User follower;
 
-    @Column(name = "following_id")
-    private Integer followingId;
+    @ManyToOne
+    @JoinColumn(name = "following_id")
+    private User following;
+
 }

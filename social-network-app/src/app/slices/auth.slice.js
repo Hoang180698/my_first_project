@@ -4,6 +4,7 @@ import {
   setDataToLocalStorage,
 } from "../../utils/localStorageUtils";
 import { authApi } from "../services/auth.service";
+import { userApi } from "../services/user.service";
 
 const defaultState = {
   auth: null,
@@ -35,6 +36,14 @@ const authSlice = createSlice({
         setDataToLocalStorage("authSnw", state);
       }
     );
+    builder.addMatcher(
+      userApi.endpoints.updateUser.matchFulfilled,
+      (state, action) => {
+        console.log(action.payload)
+        state.auth = action.payload;
+        setDataToLocalStorage("authSnw", state);
+      }
+    )
   },
 });
 

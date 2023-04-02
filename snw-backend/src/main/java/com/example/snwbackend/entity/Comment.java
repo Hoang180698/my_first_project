@@ -27,11 +27,13 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "post_id", nullable = false)
-    private Integer postId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     public void prePersist() {

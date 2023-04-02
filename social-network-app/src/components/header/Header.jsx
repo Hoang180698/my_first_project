@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import { logout } from "../../app/slices/auth.slice";
 import NewPost from "../../pages/newPost/NewPost";
@@ -10,12 +10,16 @@ import NotifyHeader from "./notify/NotifyHeader";
 
 
 function Header() {
+
+  const { auth } = useSelector((state) => state.auth);
   const { onCreatePost } = useCreatePost();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
+
   return (
     <>
       <header className="border-bottom">
@@ -84,7 +88,7 @@ function Header() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <img className={styles.avatar} src="../../public/user.jpg" />
+                  <img className={styles.avatar} src={auth.avatar === null ? "../../public/user.jpg" : `http://localhost:8080${auth.avatar}`} />
                 </a>
                 <ul
                   className="dropdown-menu dropdown-menu-lg-end"
@@ -96,9 +100,9 @@ function Header() {
                     </Link>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#">
-                      Another action
-                    </a>
+                    <Link to={"/edit-profile"} className="dropdown-item" href="#">
+                      Edit
+                    </Link>
                   </li>
                   <li>
                     <hr className="dropdown-divider" />

@@ -1,24 +1,26 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { NavLink, Outlet } from "react-router-dom";
 import "./Profile.css";
 
 function Profile() {
+  const { auth } = useSelector((state) => state.auth);
   return (
     <>
       <div className="container d-flex">
-        <div className="profile-container text-center">
+        <div className="profile-container">
           <div className="profile d-flex mt-5">
-            <div className="profile-image">
+            <div className="profile-image d-flex justify-content-center">
               <img
-                src="https://images.unsplash.com/photo-1513721032312-6a18a42c8763?w=152&h=152&fit=crop&crop=faces"
+                src={auth.avatar === null ? "../../../public/user.jpg" : `http://localhost:8080${auth.avatar}`}
                 alt=""
               />
             </div>
-            <div classNameName="profile-right d-grid">
-              <div className="profile-user-settings d-flex px-5">
-                <h1 className="profile-user-name h4">janedoe_</h1>
+            <div classNameName="profile-right d-flex flex-column ms-5">
+              <div className="profile-user-settings d-flex ms-5">
+                <h1 className="profile-user-name h4">{auth.name}</h1>
 
-                <a className="btn mx-5 btn-edit-profile" href="#" role="button">
+                <a className="btn mx-5 btn-edit-profile" href="/edit-profile" role="button">
                   Edit profile
                 </a>
               </div>
@@ -40,11 +42,8 @@ function Profile() {
                   </li>
                 </ul>
               </div>
-              <div className="profile-bio mx-5 mt-4">
-                <p>
-                  <span className="profile-real-name">Jane Doe</span> Lorem
-                  ipsum dolor sit, amet consectetur adipisicing elit 📷✈️🏕️
-                </p>
+              <div className="profile-bio ps-5 mt-4">
+                <p> {auth.biography}</p>
               </div>
             </div>
           </div>
@@ -52,16 +51,16 @@ function Profile() {
       </div>
       <div className="container d-flex mt-4">
         <p className="me-auto ms-auto">
-          <i className="fa-solid fa-venus-mars"></i> Female
+          <i className="fa-solid fa-venus-mars"></i> {auth.gender}
         </p>
         <p className="me-auto">
-          <i className="fa fa-envelope me-2"></i> kiranacharya287@gmail.com
+          <i className="fa fa-envelope me-2"></i> {auth.email}
         </p>
         <p className="me-auto">
-          <i className="fa fa-phone me-2"></i> +91 9876543215
+          <i className="fa fa-phone me-2"></i> {auth.phone}
         </p>
         <p className="me-auto">
-          <i className="fa fa-map-marker-alt me-2"></i> Bangalore
+          <i className="fa fa-map-marker-alt me-2"></i> {auth.address}
         </p>
       </div>
       {/* post */}
@@ -72,39 +71,6 @@ function Profile() {
         </div>
         <Outlet />
       </div>
-
-      <section className="main-content">
-        <div className="container">
-          <div className="row">
-            <div className="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-              <div className="profile-card card rounded-lg shadow p-4 p-xl-5 mb-4 text-center position-relative overflow-hidden">
-                <div className="banner"></div>
-                <img
-                  src="https://images.unsplash.com/photo-1513721032312-6a18a42c8763?w=152&h=152&fit=crop&crop=faces"
-                  alt=""
-                  className="img-circle mx-auto mb-3"
-                />
-                <h3 className="mb-4">Kiran Acharya</h3>
-                <div className="text-start mb-4">
-                  <p className="mb-2 ">
-                    <i className="fa fa-envelope me-2"></i>{" "}
-                    kiranacharya287@gmail.com
-                  </p>
-                  <p className="mb-2">
-                    <i className="fa fa-phone me-2"></i> +91 9876543215
-                  </p>
-                  <p className="mb-2">
-                    <i className="fa fa-globe me-2"></i> kiranworkspace.com
-                  </p>
-                  <p className="mb-2">
-                    <i className="fa fa-map-marker-alt me-2"></i> Bangalore
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

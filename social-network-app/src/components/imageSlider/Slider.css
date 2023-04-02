@@ -25,11 +25,12 @@
     position: absolute;
     top : 50%;
     right : 5px;
-    color: white;
+    color:#f3f3f3;
   }
   .prev-slide{
     position: absolute;
     top : 50%;
     left : 5px;
-    color: white;
+    color:#f3f3f3;
+    
   }

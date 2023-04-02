@@ -17,7 +17,7 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "content")
     private String content;
@@ -30,6 +30,10 @@ public class Notification {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     public void prePersist() {

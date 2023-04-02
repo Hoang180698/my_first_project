@@ -6,6 +6,7 @@ body {
     background-color: white;
 	height: 100%;
 }
+
 .navbar .navbar-brand a{
     padding: 1rem 0;
     display: block;
@@ -50,6 +51,8 @@ body {
 .main-content {
 	padding-top: 40px;
 	padding-bottom: 100px;
+	overflow-y: auto;
+	max-height: 100vh;
 }
 
 .post-block {
@@ -74,7 +77,6 @@ body {
 .post-block__content video,
 .post-block__content audio {
 	max-width: 100%;
-	border-radius: 5px;
 }
 .post-block .comment-view-box__comment {
 	border-radius: 5px;
@@ -382,3 +384,4 @@ body {
 .social-links a:hover {
 	transform: translateY(-3px);
 }
+
