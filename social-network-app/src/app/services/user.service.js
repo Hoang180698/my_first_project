@@ -22,12 +22,24 @@ export const userApi = createApi({
                 body: data,
             }),
         }),
-        changeAvatar: builder.mutation({
+        uploadAvatar: builder.mutation({
             query: (data) => ({
-                url: "users",
-                method: "PUT",
+                url: "users/avatar",
+                method: "POST",
                 body: data,
             })
+        }),
+        searchUser: builder.query({
+            query: (term) => `users/search?term=${term}`
+        }),
+        getUserById: builder.query({
+            query: (userId) => `users/${userId}`
+        }),
+        deleteAvatar: builder.mutation({
+            query: (id) => ({
+                url: `users/avatar`,
+                method: "DELETE",
+            }),
         })
     }),
 });
@@ -36,5 +48,8 @@ export const userApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
     useUpdateUserMutation,
-    useChangeAvatarMutation
+    useUploadAvatarMutation,
+    useLazySearchUserQuery,
+    useGetUserByIdQuery,
+    useDeleteAvatarMutation,
 } = userApi;

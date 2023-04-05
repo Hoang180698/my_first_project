@@ -1,332 +1,99 @@
-import React from 'react';
-import { Slide, Fade } from 'react-slideshow-image';
-import 'react-slideshow-image/dist/styles.css'
-
-const fadeImages = [
-  {
-    url: 'https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80',
-    caption: 'First Slide'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80',
-    caption: 'Second Slide'
-  },
-
-];
+import React, { useState } from "react";
+import "./Search.css";
+import { useLazySearchUserQuery } from "../../app/services/user.service";
+import { useSelector } from "react-redux";
 
 function Search() {
+
+  const { auth } = useSelector((state) => state.auth);
+
+  const [term, setTerm] = useState("");
+  const [users, setUsers] = useState([]);
+  const [searchUser] = useLazySearchUserQuery();
+
+  const handleSearch = async () => {
+    if (term === "") {
+      return;
+    } else {
+      try {
+        let { data } = await searchUser(term);
+        setUsers(data);
+    } catch (error) {
+        alert(error);
+    }
+    }
+  }
+  const handleSearchOther = async (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  }
+
   return (
     <>
-    <section className="main-content">
-        <div className="container">
-          <h1 className="text-center text-uppercase">Social Media Post</h1>
-          <br />
-          <br />
-
-          <div className="row">
-            <div className="col-sm-6 offset-sm-3">
-              <div className="post-block">
-                <div className="d-flex justify-content-between">
-                  <div className="d-flex mb-3">
-                    <div className="me-2">
-                      <a href="#" className="text-dark">
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                          alt="User"
-                          className="author-img"
-                        />
-                      </a>
-                    </div>
-                    <div>
-                      <h5 className="mb-0">
-                        <a href="#!" className="text-dark">
-                          Kiran Acharya
-                        </a>
-                      </h5>
-                      <p className="mb-0 text-muted">5m</p>
-                    </div>
-                  </div>
-
-                  {/* edit xoa */}
-
-                  <div className="post-block__user-options dropdown">
-                    <a
-                      className="nav-link"
-                      href="#"
-                      id="navbarDropdown"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
-                    </a>
-                    <ul
-                      className="dropdown-menu dropdown-menu-lg-end"
-                      aria-labelledby="dropdownMenu2"
-                    >
-                      <a className="dropdown-item text-dark" href="#">
-                        <i className="fa fa-pencil me-1"></i>Edit
-                      </a>
-                      <a className="dropdown-item text-danger" href="#">
-                        <i className="fa fa-trash me-1"></i>Delete
-                      </a>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* content */}
-                <div className="post-block__content mb-2">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ratione laboriosam non atque, porro cupiditate commodi?
-                    Provident culpa vel sit enim!
-                  </p>
-                  <div className="post-image">
-                  <Slide>
-        {fadeImages.map((fadeImage) => (
-            <img src={fadeImage.url} />
-        ))}
-      </Slide>
-                  </div>
-                
-                </div>
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-2 mt-3">
-                    <div className="d-flex">
-                      <a href="#!" className="text-danger mr-2 interact">
-                        <span>
-                          <i className="fa fa-heart"></i>
-                        </span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-comment"></i></span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-paper-plane"></i></span>
-                      </a>
-                    </div>
-                    <a href="#!" className="text-dark interact">
-                      <span><i class="fa-regular fa-bookmark"></i></span>
-                    </a>
-                  </div>
-                  <div className="mb-0 d-flex count-interact">
-                    <span className="text-dark">25k likes</span>
-                    <span className="text-dark ms-auto">2k comments</span>
-                  </div>
-                </div>
-                <hr />
-                <div className="post-block__comments">
-                  {/* <!-- Comment Input --> */}
-                  <div className="input-group mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Add your comment"
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        id="button-addon2"
-                      >
-                        <i className="fa fa-paper-plane"></i>
-                      </button>
-                    </div>
-                  </div>
-                  {/* <!-- Comment content --> */}
-                  <div className="comment-view-box mb-3">
-                    <div className="d-flex mb-2">
-                      <div>
-                        <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">  
-                          <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                        alt="User img"
-                        className="author-img author-img--small me-2"
-                      />
-                            John doe
-                          </a>{" "}
-                          <small className="text-muted">1m</small>
-                        </h6>
-                        <p className="mb-0 ms-5">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit.
-                        </p>
-                        <div className="d-flex ms-5">
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>
-                            <i class="fa-regular fa-heart"></i>
-                            </span>
-                          </a>
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>Reply</span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <!-- More Comments --> */}
-                  <hr />
-                  <a href="#!" className="text-dark view-more-coment">
-                    View More comments{" "}
-                    <span className="font-weight-bold">(12)</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/*  */}
-            
-            <div className="col-sm-6 offset-sm-3">
-              <div className="post-block">
-                <div className="d-flex justify-content-between">
-                  <div className="d-flex mb-3">
-                    <div className="me-2">
-                      <a href="#" className="text-dark">
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                          alt="User"
-                          className="author-img"
-                        />
-                      </a>
-                    </div>
-                    <div>
-                      <h5 className="mb-0">
-                        <a href="#!" className="text-dark">
-                          Kiran Acharya
-                        </a>
-                      </h5>
-                      <p className="mb-0 text-muted">5m</p>
-                    </div>
-                  </div>
-
-                  {/* edit xoa */}
-
-                  <div className="post-block__user-options dropdown">
-                    <a
-                      className="nav-link"
-                      href="#"
-                      id="navbarDropdown"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
-                    </a>
-                    <ul
-                      className="dropdown-menu dropdown-menu-lg-end"
-                      aria-labelledby="dropdownMenu2"
-                    >
-                      <a className="dropdown-item text-dark" href="#">
-                        <i className="fa fa-pencil me-1"></i>Edit
-                      </a>
-                      <a className="dropdown-item text-danger" href="#">
-                        <i className="fa fa-trash me-1"></i>Delete
-                      </a>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* content */}
-                <div className="post-block__content mb-2">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ratione laboriosam non atque, porro cupiditate commodi?
-                    Provident culpa vel sit enim!
-                  </p>
-             
-                </div>
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-2">
-                    <div className="d-flex ">
-                      <a href="#!" className="text-danger mr-2 interact">
-                        <span>
-                          <i className="fa fa-heart"></i>
-                        </span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-comment"></i></span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-paper-plane"></i></span>
-                      </a>
-                    </div>
-                    <a href="#!" className="text-dark interact">
-                      <span><i class="fa-regular fa-bookmark"></i></span>
-                    </a>
-                  </div>
-                  <div className="mb-0 d-flex count-interact">
-                    <span className="text-dark">25k likes</span>
-                    <span className="text-dark ms-auto">2k comments</span>
-                  </div>
-                </div>
-                <hr />
-                <div className="post-block__comments">
-                  {/* <!-- Comment Input --> */}
-                  <div className="input-group mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Add your comment"
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        id="button-addon2"
-                      >
-                        <i className="fa fa-paper-plane"></i>
-                      </button>
-                    </div>
-                  </div>
-                  {/* <!-- Comment content --> */}
-                  <div className="comment-view-box mb-3">
-                    <div className="d-flex mb-2">
-                      <div>
-                        <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">  
-                          <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                        alt="User img"
-                        className="author-img author-img--small me-2"
-                      />
-                            John doe
-                          </a>{" "}
-                          <small className="text-muted">1m</small>
-                        </h6>
-                        <p className="mb-0 ms-5">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit.
-                        </p>
-                        <div className="d-flex ms-5">
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>
-                            <i class="fa-regular fa-heart"></i>
-                            </span>
-                          </a>
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>Reply</span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <!-- More Comments --> */}
-                  <hr />
-                  <a href="#!" className="text-dark view-more-coment">
-                    View More comments{" "}
-                    <span className="font-weight-bold">(12)</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-
+      <div classNameName="container h-100">
+        <div className="d-flex justify-content-center h-100">
+          <div className="searchbar my-5">
+            <input
+              className="search_input"
+              type="text"
+              name=""
+              placeholder="Search..."
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              onKeyDown={(e) => handleSearchOther(e)}
+            />
+            <a role="button" className="search_icon" onClick={handleSearch}>
+              <i className="fas fa-search"></i>
+            </a>
           </div>
         </div>
-      </section>
+      </div>
+      <div className="container">
+      <div className="row">
+        {users.length > 0 && users.map((u) => (
+            <div className="col-sm-6 offset-sm-3 search-user" key={u.id}>
+            <div className="post-block border">
+              <div className="d-flex">
+                <div className="me-2">
+                  <a href={u.id !== auth.id ? `u/${u.id}` : "my-profile"} className="text-dark">
+                    <img
+                      src={u.avatar ? `http://localhost:8080${u.avatar}` : "../../../public/user.jpg"}
+                      alt="User"
+                      className="author-img-search"
+                    />
+                  </a>
+                </div>
+                <div className="d-flex flex-column search-info">
+                  <div className="text-start ps-1">     
+                      <a href={`u/${u.id}`} className="text-dark">
+                        <h6>{u.name}</h6>
+                      </a>        
+                  </div >
+                  <div className="text-start ps-1 search-p">
+                    {u.id === auth.id && (
+                      <p className="mb-0">you</p>
+                    )}
+                    {u.id !== auth.id && (
+                      <p className="mb-0">{u.address}</p>
+                    )}                  
+                  </div>
+                </div>
+                <div className="ms-auto py-3 pe-1">
+                  <a role="button" className="btn-search btn me-1">
+                    following
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      
+      </div>
+      </div>
+     
     </>
-  )
+  );
 }
 
-export default Search
+export default Search;

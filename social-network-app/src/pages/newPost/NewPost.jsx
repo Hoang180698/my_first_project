@@ -1,7 +1,7 @@
 import { Button } from "bootstrap/dist/js/bootstrap.bundle";
 import React, { useState } from "react";
 import { useUploadMultiImagesMutation } from "../../app/services/images.service";
-import { useCreatePostMutation } from "../../app/services/posts.service";
+import { useCreatePostMutation, useCreatePostWithImagesMutation } from "../../app/services/posts.service";
 import useCreatePost from "./useCreatePost";
 import { useNavigate } from "react-router-dom";
 function NewPost() {
@@ -12,9 +12,10 @@ function NewPost() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const [uploadMultiImage] = useUploadMultiImagesMutation();
+  // const [uploadMultiImage] = useUploadMultiImagesMutation();
 
   const [createPost] = useCreatePostMutation();
+  const [createPostWithImages] = useCreatePostWithImagesMutation();
   const navigate = useNavigate();
 
   const imageHandleChange = (e) => {
@@ -38,7 +39,7 @@ function NewPost() {
     setSelectedImages([]);
   };
 
-  const handleCreatePosst = (data) => {
+  const handleCreatePost = (data) => {
     createPost(data)
       .unwrap()
       .then(() => {
@@ -58,21 +59,23 @@ function NewPost() {
   }
 
   const handlePost = () => {
-    const urls = [];
     if (selectedFiles.length !== 0) {
       const formData = new FormData();
       selectedFiles.forEach((file) => {
       formData.append("files", file);
     });
-        uploadMultiImage(formData)
+        createPostWithImages({ content: content, data: formData })
         .unwrap()
-        .then((res) => {
-          res.map((r) => urls.push(r.url));
-          const newP = {
-            content: content,
-            imagesUrl: urls,
-          };
-         handleCreatePosst(newP);
+        .then(() => {
+          setContent("");
+          setSelectedFiles([]);
+          setSelectedImages([]);
+          offCreatePost();
+          alert("Create post successfully");
+       
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
         })
         .catch((err) => {
           alert(err);
@@ -81,7 +84,7 @@ function NewPost() {
       const newPost = {
         content
       }
-        handleCreatePosst(newPost);
+        handleCreatePost(newPost);
     }
   
   };
@@ -109,6 +112,7 @@ function NewPost() {
             <textarea
               name=""
               placeholder="What's on your mind?"
+              rows="1"
               value={content}
               onChange={(e) => setContent(e.target.value)}
             ></textarea>

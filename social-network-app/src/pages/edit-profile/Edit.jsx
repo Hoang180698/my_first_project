@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useChangeAvatarMutation, useUpdateUserMutation } from "../../app/services/user.service";
+import { useDeleteAvatarMutation, useUpdateUserMutation, useUploadAvatarMutation } from "../../app/services/user.service";
 import "./Edit.css";
 function Edit() {
   const [tabIdx, setTabIdx] = useState(0);
 
   const { auth } = useSelector((state) => state.auth);
   const [updateUser] = useUpdateUserMutation();
-  const [changeAvatar] = useChangeAvatarMutation();
+  const [uploadAvatar] = useUploadAvatarMutation();
+  const [deleteAvatar] = useDeleteAvatarMutation();
 
   const [name, setName] = useState(auth.name);
   const [phone, setPhone] = useState(auth.phone);
@@ -25,14 +26,40 @@ function Edit() {
           alert(err);
         });
   }
-  const handleCancelAccount = () => {
-    setName(auth.name === null ? "" : auth.name);
-    setPhone(auth.phone === null ? "" : auth.phone);
-    setAddress(auth.address === null ? "" : auth.address);
-    setGender(auth.gender);
-    setBiography(auth.biography === null ? "" : auth.biography);
+  // const handleCancelAccount = () => {
+  //   setName(auth.name === null ? "" : auth.name);
+  //   setPhone(auth.phone === null ? "" : auth.phone);
+  //   setAddress(auth.address === null ? "" : auth.address);
+  //   setGender(auth.gender);
+  //   setBiography(auth.biography === null ? "" : auth.biography);
+  // }
+
+  const handleUploadAvatar = (e) => {
+    const file = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    uploadAvatar(formData) // Trả về URL /api/images/1
+        .unwrap()
+        .then((res) => {
+            alert("Upload avatar successfully");
+        })
+        .catch((err) => {
+            console.log(err);
+        });
   }
 
+  const handleDeleteAvatar = () => {
+      deleteAvatar()
+        .unwrap()
+        .then(() => {
+          alert("Avatar removed")
+        })
+        .catch((err) => {
+          console.log(err);
+      });
+  }
   return (
     <>
       <section className="py-1">
@@ -42,10 +69,31 @@ function Edit() {
               <div className="p-4">
                 <div className="avatar-circle text-center mb-3">
                   <img
-                    src="../../../public/user.jpg"
+                    src={auth.avatar ? `http://localhost:8080${auth.avatar}` : "../../../public/user.jpg" }
                     alt="Image"
                     className="shadow"
+                    data-bs-toggle="modal" data-bs-target="#staticBackdrop"
                   />
+                  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-center">
+        <h5 class="modal-title text-center" id="staticBackdropLabel">Change profile photo</h5>
+      </div>
+      <div class="border">
+      <label htmlFor="avatar-profile" type="button" class="d-block btn avatar-modal" style={{color:"#0095f6"}}>Upload photo</label>
+      </div>
+      {auth.avatar && (
+         <div class="border">
+         <a onClick={handleDeleteAvatar} type="button" class="d-block btn avatar-modal" style={{color:"red"}} data-bs-dismiss="modal">Remove current photo</a>
+         </div>
+      )}
+      <div className="border">
+        <a type="button" class="d-block btn avatar-modal" data-bs-dismiss="modal">Cancel</a>
+      </div>
+    </div>
+  </div>
+</div>
                 </div>
 
                 <div className="text-center">
@@ -53,7 +101,7 @@ function Edit() {
                     htmlFor="avatar-profile"
                     className="btn btn-info btn-sm "
                   >
-                    Upload new image
+                    Upload new photo
                   </label>
                 </div>
                 <input
@@ -62,7 +110,9 @@ function Edit() {
                   multiple
                   id="avatar-profile"
                   accept="image/png, image/jpeg, image/jpg"
+                  onChange={(e) => handleUploadAvatar(e)}
                 />
+                
               </div>
               <div
                 className="nav flex-column nav-pills mt-3 edit-tab"
@@ -152,7 +202,7 @@ function Edit() {
                         <option value="female" selected={gender === "female"}>Female</option>
                         <option value="gay" selected={gender === "gay"}>Gay</option>
                         <option value="les" selected={gender === "les"}>Les</option>
-                        <option value={null} selected={gender === null}>Prefer not to say</option>
+                        <option value={""} selected={!gender}>Prefer not to say</option>
                       </select>
                     </div>
                   </div>
@@ -165,8 +215,12 @@ function Edit() {
                   </div>
                 </div>
                 <div>
-                  <button className="btn btn-primary" onClick={handleUpdateAccount}>Update</button>
-                  <button className="btn btn-light" onClick={handleCancelAccount}>Cancel</button>
+                  <button className="btn btn-primary"
+                    onClick={handleUpdateAccount}
+                    disabled={name === auth.name && phone === auth.phone && address === auth.address && gender === auth.gender && biography === auth.biography}  >
+                    Update
+                  </button>
+                  {/* <button className="btn btn-light" onClick={handleCancelAccount}>Cancel</button> */}
                 </div>
               </div>
               <div
@@ -202,7 +256,7 @@ function Edit() {
                 </div>
                 <div>
                   <button className="btn btn-primary">Update</button>
-                  <button className="btn btn-light">Cancel</button>
+                  {/* <button className="btn btn-light">Cancel</button> */}
                 </div>
               </div>
             </div>

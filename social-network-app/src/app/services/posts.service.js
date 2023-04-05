@@ -21,11 +21,22 @@ export const postApi = createApi({
       providesTags: ["Post"],
     }),
     getPostById: builder.query({
-      query: (id) => `blogs/${id}`,
+      query: (id) => `post/${id}`,
+    }),
+    getPostByUserId: builder.query({
+      query: (userId) => `post/user-post/${userId}`,
     }),
     createPost: builder.mutation({
       query: (data) => ({
         url: "post",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Post"],
+    }),
+    createPostWithImages: builder.mutation({
+      query: ({content, data}) => ({
+        url: `post/create?content=${content}`,
         method: "POST",
         body: data,
       }),
@@ -65,4 +76,6 @@ export const {
   useGetPostsQuery,
   useUpdatePostMutation,
   useGetAllMyPostsQuery,
+  useCreatePostWithImagesMutation,
+  useGetPostByUserIdQuery,
 } = postApi;

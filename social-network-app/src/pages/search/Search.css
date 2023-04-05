@@ -1,0 +1,68 @@
+.searchbar{
+    margin-bottom: auto;
+    margin-top: auto;
+    height: 60px;
+    background-color: #353b48;
+    border-radius: 30px;
+    padding: 10px;
+    }
+
+    .search_input{
+    color: white;
+    border: 0;
+    outline: 0;
+    background: none;
+    width: 450px;
+    caret-color:transparent;
+    line-height: 40px;
+    transition: width 0.4s linear;
+    }
+
+    .searchbar:hover > .search_input{
+    padding: 0 10px;
+    caret-color:red;
+    transition: width 0.4s linear;
+    }
+
+    a.search_icon:hover {
+    background: white;
+    color: #e74c3c;
+    }
+
+    .search_icon{
+    height: 40px;
+    width: 40px;
+    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color:white;
+    text-decoration:none;
+    }
+
+    .search-info h6 {
+        font-size: large;
+    }
+
+    .author-img-search {
+        width: 70px;
+        vertical-align: middle;
+        height: 70px;
+        border-radius: 50%;
+    }
+
+    .search-p p{
+        max-width: 360px;
+        word-wrap: break-word;
+        font-size: 13px;
+        color: #262626;
+    }
+
+    .btn-search {
+        background-color: #F2F3F5;
+        font-weight: 500;
+        font-size: 14px;
+        text-align: center;
+        justify-content: center;
+    }

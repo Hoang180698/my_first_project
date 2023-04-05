@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { NavLink, Outlet } from "react-router-dom";
 import "./Profile.css";
 
+
 function Profile() {
   const { auth } = useSelector((state) => state.auth);
   return (
@@ -12,7 +13,7 @@ function Profile() {
           <div className="profile d-flex mt-5">
             <div className="profile-image d-flex justify-content-center">
               <img
-                src={auth.avatar === null ? "../../../public/user.jpg" : `http://localhost:8080${auth.avatar}`}
+                src={auth.avatar ? `http://localhost:8080${auth.avatar}` : "../../../public/user.jpg"}
                 alt=""
               />
             </div>
@@ -20,7 +21,7 @@ function Profile() {
               <div className="profile-user-settings d-flex ms-5">
                 <h1 className="profile-user-name h4">{auth.name}</h1>
 
-                <a className="btn mx-5 btn-edit-profile" href="/edit-profile" role="button">
+                <a className="btn mx-5 btn-edit-profile" href="/edit-profile">
                   Edit profile
                 </a>
               </div>
@@ -43,7 +44,7 @@ function Profile() {
                 </ul>
               </div>
               <div className="profile-bio ps-5 mt-4">
-                <p> {auth.biography}</p>
+                <p>{auth.biography}</p>
               </div>
             </div>
           </div>

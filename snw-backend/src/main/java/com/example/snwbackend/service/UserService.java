@@ -1,15 +1,19 @@
 package com.example.snwbackend.service;
 
 import com.example.snwbackend.dto.UserDto;
+import com.example.snwbackend.entity.Image;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
+import com.example.snwbackend.repository.ImageRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
+import com.example.snwbackend.response.ImageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,6 +22,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -66,5 +73,53 @@ public class UserService {
             throw new NotFoundException("Not found user with id = " + id);
         });
         userRepository.delete(user);
+    }
+
+    public ImageResponse uploadAvatar(MultipartFile file) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        String oldAvatarPath = user.getAvatar();
+
+        // Xoá bỏ  avatar cũ
+        if (oldAvatarPath != null && !oldAvatarPath.isEmpty()) {
+            Integer id = Integer.parseInt(oldAvatarPath.substring(oldAvatarPath.lastIndexOf("/") + 1));
+            imageRepository.deleteById(id);
+        }
+        try {
+            Image image = Image.builder()
+                    .data(file.getBytes())
+                    .type(file.getContentType())
+                    .user(user)
+                    .build();
+
+            imageRepository.save(image);
+
+            String url = "/api/images/read/" + image.getId();
+            user.setAvatar(url);
+            userRepository.save(user);
+            return new ImageResponse(url);
+        } catch (Exception e) {
+            throw new RuntimeException("Upload image error");
+        }
+    }
+
+    public void deleteAvatar() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        String oldAvatarPath = user.getAvatar();
+
+        // Xoá bỏ  avatar cũ
+        if (oldAvatarPath != null && !oldAvatarPath.isEmpty()) {
+            Integer id = Integer.parseInt(oldAvatarPath.substring(oldAvatarPath.lastIndexOf("/") + 1));
+            imageRepository.deleteById(id);
+            user.setAvatar(null);
+            userRepository.save(user);
+        } else {
+            throw new NotFoundException("Not have avatar");
+        }
     }
 }

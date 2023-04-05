@@ -23,6 +23,13 @@ public class PostController {
         return new ResponseEntity<>(postService.createPost(request), HttpStatus.CREATED);
     }
 
+    // Tạo Post với images
+    @PostMapping("create")
+    public ResponseEntity<?> createPostWithImages(@RequestParam String content, @ModelAttribute MultipartFile[] files) {
+        return new ResponseEntity<>(postService.createPostWithImages(content, files), HttpStatus.CREATED);
+    }
+
+
     // xem chi tiet post
     @GetMapping("{id}")
     public ResponseEntity<?> getPostById(@PathVariable Integer id) {
@@ -61,4 +68,5 @@ public class PostController {
     public ResponseEntity<?> getAllMyPost() {
         return ResponseEntity.ok(postService.getAllMyPost());
     }
+
 }

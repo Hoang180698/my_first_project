@@ -25,11 +25,16 @@ function ProfilePost() {
   }
 
   if (isLoading) {
-    return <div className="text-center">
+    return (
+      <dic className="container">
+          <div className="text-center">
     <div className="spinner-border" role="status">
       <span className="sr-only">Loading...</span>
     </div>
-  </div>;
+  </div>
+      </dic>
+    
+    ) 
 }
   return (
     <>
@@ -50,7 +55,7 @@ function ProfilePost() {
                     <div className="me-2">
                       <a href="#" className="text-dark">
                         <img
-                          src={p.user.avatar === null ? "../../../public/user.jpg" : `http://localhost:8080${p.user.avatar}`}
+                          src={p.user.avatar ? `http://localhost:8080${p.user.avatar}` : "../../../public/user.jpg" }
                           alt="User"
                           className="author-img"
                         />

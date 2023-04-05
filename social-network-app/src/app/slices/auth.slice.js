@@ -39,11 +39,27 @@ const authSlice = createSlice({
     builder.addMatcher(
       userApi.endpoints.updateUser.matchFulfilled,
       (state, action) => {
-        console.log(action.payload)
+        // console.log(action.payload)
         state.auth = action.payload;
         setDataToLocalStorage("authSnw", state);
       }
-    )
+    );
+    builder.addMatcher(
+      userApi.endpoints.uploadAvatar.matchFulfilled,
+      (state, action) => {
+        // console.log(action.payload)
+        state.auth.avatar = action.payload.url;
+        setDataToLocalStorage("authSnw", state);
+      },
+    );
+    builder.addMatcher(
+      userApi.endpoints.deleteAvatar.matchFulfilled,
+      (state, action) => {
+        // console.log(action.payload)
+        state.auth.avatar = null;
+        setDataToLocalStorage("authSnw", state);
+      },
+    );
   },
 });
 
