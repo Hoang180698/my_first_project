@@ -69,4 +69,15 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllMyPost());
     }
 
+    // Like post
+    @PostMapping("{id}/like")
+    public ResponseEntity<?> likePost(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.likePost(id));
+    }
+
+    // Dis like Post
+    @DeleteMapping("{id}/dislike")
+    public ResponseEntity<?> dislikePost(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.dislikePost(id));
+    }
 }

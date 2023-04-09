@@ -20,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         // Tao doi tuong
-        ErrorMessage error = new ErrorMessage(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập");
+        ErrorMessage error = new ErrorMessage(HttpStatus.UNAUTHORIZED, "You have to login");
 
         // Set thuoc tinh cho response
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

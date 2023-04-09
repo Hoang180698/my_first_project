@@ -73,7 +73,7 @@ public class InitDataTest {
             Post post = Post.builder()
                     .content(title)
                     .user(rdUser)
-                    .imagesUrl(rdImages)
+                    .imageUrls(rdImages)
                     .build();
 
             postRepository.save(post);

@@ -64,5 +64,4 @@ public class UserController {
         userService.deleteAvatar();
         return ResponseEntity.noContent().build();
     }
-
 }

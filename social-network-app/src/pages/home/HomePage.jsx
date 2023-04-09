@@ -62,7 +62,7 @@ function HomePage() {
           {/* Post  */}
 
           <div className="row">
-            {data.length > 0 && data.map((p) => <Post p={p} key={p.id} />)};
+            {data.length > 0 && data.map((p) => <Post p={p} key={p.post.id} />)};
             {/* ***************** */}
             <div className="col-sm-6 offset-sm-3">
               <div className="post-block text-center">

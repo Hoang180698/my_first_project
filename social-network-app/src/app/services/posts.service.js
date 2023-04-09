@@ -63,6 +63,20 @@ export const postApi = createApi({
     getAllMyPosts: builder.query({
       query: () => "post/user-post",
       providesTags: ["Post"],
+    }),
+    likePost: builder.mutation({
+      query: (id) => ({
+        url: `post/${id}/like`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Post"],
+    }),
+    dislikePost: builder.mutation({
+      query: (id) => ({
+        url: `post/${id}/dislike`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Post"],
     })
   }),
 });
@@ -78,4 +92,6 @@ export const {
   useGetAllMyPostsQuery,
   useCreatePostWithImagesMutation,
   useGetPostByUserIdQuery,
+  useLikePostMutation,
+  useDislikePostMutation,
 } = postApi;

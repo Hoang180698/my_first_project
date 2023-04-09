@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Entity
-@Table(name = "likes")
+@Table(
+        name = "likes",
+        uniqueConstraints ={@UniqueConstraint(columnNames={"user_id", "post_id"})}
+)
 public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,11 +24,11 @@ public class Like {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

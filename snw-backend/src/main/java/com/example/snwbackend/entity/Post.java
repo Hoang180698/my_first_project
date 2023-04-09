@@ -1,5 +1,6 @@
 package com.example.snwbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class Post {
 
     @ElementCollection
     @JoinTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
-    private List<String> imagesUrl;
+    private List<String> imageUrls;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -32,6 +33,7 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -48,6 +50,6 @@ public class Post {
 
     @PreRemove
     public void preRemove() {
-        this.imagesUrl.clear();
+        this.imageUrls.clear();
     }
 }

@@ -19,7 +19,7 @@ public class CustomAccessDenied implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         // Tao doi tuong
-        ErrorMessage error = new ErrorMessage(HttpStatus.FORBIDDEN, "Bạn không có quyền");
+        ErrorMessage error = new ErrorMessage(HttpStatus.FORBIDDEN, "You are not authorized");
 
         // Set thuoc tinh cho response
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

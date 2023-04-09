@@ -89,7 +89,7 @@ function User() {
 
           <div className="row">
             {posts.map((p) => (
-                <Post p={p} key={p.id}/>
+                <Post p={p} key={p.post.id}/>
             ))}
 
           </div>
