@@ -14,6 +14,7 @@ export const userApi = createApi({
             return headers
         },
     }),
+    tagTypes: ["Post"],
     endpoints: (builder) => ({
         updateUser: builder.mutation({
             query: (data) => ({
@@ -27,20 +28,37 @@ export const userApi = createApi({
                 url: "users/avatar",
                 method: "POST",
                 body: data,
-            })
+            }),
+            invalidatesTags: ["Post"],
         }),
         searchUser: builder.query({
-            query: (term) => `users/search?term=${term}`
+            query: (term) => `users/search?term=${term}`,
+            providesTags: ["Post"],
         }),
         getUserById: builder.query({
-            query: (userId) => `users/${userId}`
+            query: (userId) => `users/${userId}`,
+            providesTags: ["Post"],
         }),
         deleteAvatar: builder.mutation({
             query: (id) => ({
                 url: `users/avatar`,
                 method: "DELETE",
             }),
-        })
+        }),
+        followhUser: builder.mutation({
+            query: (id) => ({
+                url: `users/follow/${id}`,
+                method: "POST",
+            }),
+            invalidatesTags: ["Post"],
+        }),
+        unfollowhUser: builder.mutation({
+            query: (id) => ({
+                url: `users/unfollow/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Post"],
+        }),
     }),
 });
 
@@ -52,4 +70,6 @@ export const {
     useLazySearchUserQuery,
     useGetUserByIdQuery,
     useDeleteAvatarMutation,
+    useFollowhUserMutation,
+    useUnfollowhUserMutation,
 } = userApi;

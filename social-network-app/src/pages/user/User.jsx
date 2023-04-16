@@ -1,13 +1,46 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import { useGetUserByIdQuery } from '../../app/services/user.service';
+import { useNavigate, useParams } from 'react-router-dom'
+import { useFollowhUserMutation, useGetUserByIdQuery, useUnfollowhUserMutation } from '../../app/services/user.service';
 import { useGetPostByUserIdQuery } from '../../app/services/posts.service';
 import Post from '../../components/post/Post';
+import { useSelector } from 'react-redux';
 
 function User() {
     const { userId } = useParams();
     const { data: user, isLoading: isLoadingUser } = useGetUserByIdQuery(userId);
     const { data: posts, isLoading: isLoadingPosts} = useGetPostByUserIdQuery(userId);
+    const { auth } = useSelector((state) => state.auth);
+    const [followUser] = useFollowhUserMutation();
+    const [unfollowUser] = useUnfollowhUserMutation();
+
+    const navigate = useNavigate();
+
+    if (auth.id === Number(userId)) {
+      navigate("/my-profile/");
+    }
+
+    const handleFollow = (id) => {
+      followUser(id)
+      .unwrap()
+      .then(() => {
+
+      })
+      .catch((err) => {
+        alert(err);
+      })
+    }
+
+    const handleUnfollow = (id) => {
+      unfollowUser(id)
+      .unwrap()
+      .then(() => {
+
+      })
+      .catch((err) => {
+        alert(err);
+      })
+
+    }
 
     if (isLoadingUser || isLoadingPosts) {
         return (
@@ -31,14 +64,21 @@ function User() {
               alt=""
             />
           </div>
-          <div classNameName="profile-right d-flex flex-column ms-5">
+          <div className="profile-right d-flex flex-column">
             <div className="profile-user-settings d-flex ms-5">
               <h1 className="profile-user-name h4">{user.name}</h1>
 
-              <a className="btn ms-5 btn-edit-profile" href="/edit-profile">
-                Follow
-              </a>
-              <a className="btn ms-4 btn-edit-profile" href="/edit-profile">
+              {!user.followed && (
+                 <a role='button' className="btn ms-5 btn-primary" onClick={() => handleFollow(user.id)}>
+                 Follow
+               </a>
+              )}
+               {user.followed && (
+                 <a role='button' className="btn ms-5 btn-edit-profile" onClick={() => handleUnfollow(user.id)}>
+                 Unfollow
+               </a>
+              )}
+              <a className="btn ms-4 btn-edit-profile" href="/messenge">
                 Message
               </a>
             </div>
@@ -46,7 +86,7 @@ function User() {
             <div className="profile-stats">
               <ul className="d-flex mt-4">
                 <li className="mx-3">
-                  <b>164</b> post
+                  <b>{posts.length}</b> post
                 </li>
                 <li className="mx-3">
                   <a role="button">
@@ -72,7 +112,7 @@ function User() {
         <i className="fa-solid fa-venus-mars"></i> {user.gender}
       </p>
       <p className="me-auto">
-        <i className="fa fa-envelope me-2"></i> {user.email}
+      <i class="fa-solid fa-cake-candles"></i> {user.birthday}
       </p>
       <p className="me-auto">
         <i className="fa fa-phone me-2"></i> {user.phone}

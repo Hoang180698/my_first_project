@@ -1,6 +1,5 @@
 import { Button } from "bootstrap/dist/js/bootstrap.bundle";
 import React, { useState } from "react";
-import { useUploadMultiImagesMutation } from "../../app/services/images.service";
 import { useCreatePostMutation, useCreatePostWithImagesMutation } from "../../app/services/posts.service";
 import useCreatePost from "./useCreatePost";
 import { useNavigate } from "react-router-dom";

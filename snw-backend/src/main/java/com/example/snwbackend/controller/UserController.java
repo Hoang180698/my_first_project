@@ -61,7 +61,18 @@ public class UserController {
     // Xóa avatar
     @DeleteMapping("avatar")
     public ResponseEntity<?> deleteAvatar() {
-        userService.deleteAvatar();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(userService.deleteAvatar());
+    }
+
+    // Follow user
+    @PostMapping("follow/{id}")
+    public ResponseEntity<?> followUser(@PathVariable Integer id) {
+        return new ResponseEntity<>(userService.followUser(id), HttpStatus.CREATED);
+    }
+
+    // Unfollow
+    @DeleteMapping("unfollow/{id}")
+    public ResponseEntity<?> unfollowUser(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.unfollowUser(id));
     }
 }

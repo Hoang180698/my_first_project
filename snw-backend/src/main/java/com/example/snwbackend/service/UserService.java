@@ -1,15 +1,20 @@
 package com.example.snwbackend.service;
 
+import com.example.snwbackend.dto.UserDetailDto;
 import com.example.snwbackend.dto.UserDto;
+import com.example.snwbackend.entity.Follow;
 import com.example.snwbackend.entity.Image;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
+import com.example.snwbackend.repository.FollowRepository;
 import com.example.snwbackend.repository.ImageRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.response.ImageResponse;
+import com.example.snwbackend.response.StatusResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,14 +32,20 @@ public class UserService {
     private ImageRepository imageRepository;
 
     @Autowired
+    private FollowRepository followRepository;
+
+    @Autowired
     private UserMapper userMapper;
 
     // Tìm user theo id
-    public UserDto getUserById(Integer id) {
-        User user = userRepository.findById(id).orElseThrow(() -> {
+    public UserDetailDto getUserById(Integer id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return userRepository.findUserDetailDtoById(id, user.getId()).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + id);
         });
-        return userMapper.toUserDto(user);
     }
 
     // Update thong tin ca nhan
@@ -48,14 +59,19 @@ public class UserService {
         user.setAddress(request.getAddress());
         user.setName(request.getName());
         user.setPhone(request.getPhone());
+        user.setBirthday(request.getBirthday());
 
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
 
     // Tìm kiếm user theo tên
-    public List<UserDto> searchUser(String term) {
-        return userRepository.findByKeyword(term);
+    public List<UserDetailDto> searchUser(String term) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return userRepository.findByKeyword(term, user.getId());
     }
 
     // Lấy danh sách user đang follow
@@ -63,7 +79,7 @@ public class UserService {
         return userRepository.getUsersFollowing(id);
     }
 
-    // Lấy danh sách user đang follow
+    // Lấy danh sách follower
     public List<UserDto> getUsersFollower(Integer id) {
         return userRepository.getUsersFollower(id);
     }
@@ -75,6 +91,8 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    // Thay avatar
+    @Transactional
     public ImageResponse uploadAvatar(MultipartFile file) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -105,7 +123,9 @@ public class UserService {
         }
     }
 
-    public void deleteAvatar() {
+    // Xóa avatar
+    @Transactional
+    public StatusResponse deleteAvatar() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -121,5 +141,48 @@ public class UserService {
         } else {
             throw new NotFoundException("Not have avatar");
         }
+        return new StatusResponse("ok");
+    }
+
+    // follow user
+    public StatusResponse followUser(Integer id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+
+        User userFl = userRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with id = " + id);
+        });
+        if(followRepository.findByFollowerAndFollowing(user, userFl).isPresent()) {
+            throw new BadRequestException("You have already followed this user");
+        }
+
+        Follow follow = Follow
+                .builder()
+                .follower(user)
+                .following(userFl)
+                .build();
+        followRepository.save(follow);
+        return new StatusResponse("Successfully follow");
+    }
+
+    // unfollow
+    public StatusResponse unfollowUser(Integer id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+
+        User userFl = userRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with id = " + id);
+        });
+
+        Follow follow = followRepository.findByFollowerAndFollowing(user, userFl).orElseThrow(() -> {
+            throw new BadRequestException("Have not followed this user");
+        });
+        followRepository.delete(follow);
+
+        return new StatusResponse("ok");
     }
 }

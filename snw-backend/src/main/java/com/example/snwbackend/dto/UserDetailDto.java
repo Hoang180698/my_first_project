@@ -1,6 +1,6 @@
 package com.example.snwbackend.dto;
 
-import jakarta.persistence.Column;
+import com.example.snwbackend.entity.User;
 import lombok.*;
 
 @NoArgsConstructor
@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
-public class UserDto {
+public class UserDetailDto {
     private Integer id;
     private String name;
     private String email;
@@ -19,4 +19,5 @@ public class UserDto {
     private String avatar;
     private String gender;
     private String birthday;
+    private boolean followed;
 }

@@ -38,6 +38,9 @@ public class User implements UserDetails, Serializable {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "birthday")
+    private String birthday;
+
     @Column(name = "address")
     private String address;
 

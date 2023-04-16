@@ -37,7 +37,7 @@ function Post({ p }) {
       <div className="d-flex justify-content-between">
         <div className="d-flex mb-3">
           <div className="me-2">
-            <a href="#" className="text-dark">
+            <a href={`/u/${p.userId}`} className="text-dark">
               <img
                 src={p.userAvatar ? `http://localhost:8080${p.userAvatar}` : "../../../public/user.jpg" }
                 alt="User"
@@ -47,7 +47,7 @@ function Post({ p }) {
           </div>
           <div>
             <h5 className="mb-0">
-              <a href="#!" className="text-dark">
+              <a href={`/u/${p.userId}`} className="text-dark">
                 {p.userName}
               </a>
             </h5>
@@ -66,14 +66,14 @@ function Post({ p }) {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
+           <i class="fa-solid fa-ellipsis"></i>
           </a>
           <ul
             className="dropdown-menu dropdown-menu-lg-end"
             aria-labelledby="dropdownMenu2"
           >
-            <a className="dropdown-item text-dark text-center" href="#">
-            <i className="fa fa-pencil me-1"></i>Edit
+            <a className="dropdown-item text-dark text-center" href={`/p/${p.post.id}`}>
+            Go to post
             </a>
             <a role="button" className="dropdown-item text-danger text-center">
               Repost

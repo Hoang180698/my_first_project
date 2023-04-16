@@ -13,4 +13,5 @@ public class UpdateInfoUserRequest {
     private String address;
     private String biography;
     private String gender;
+    private String birthday;
 }

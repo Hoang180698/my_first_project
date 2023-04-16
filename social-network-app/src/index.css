@@ -2,6 +2,15 @@ body {
     background: #f3f3f3;
 	font-family: "Roboto", sans-serif;
 }
+.pd-container {
+	height: 80vh;
+}
+.search-container{
+	min-height: 70vh;
+}
+.main-content {
+	height: 94vh;
+}
 .container{
     background-color: white;
 	height: 100%;
@@ -386,4 +395,41 @@ body {
 }
 .social-links a:hover {
 	transform: translateY(-3px);
+}
+
+.comment-box {
+	/* background-color: #DADDE1; */
+	border-radius: 10px;
+	/* padding: 10px 10px; */
+}
+
+.comment-box h6 {
+	font-size: 14px;
+}
+
+.comment-box p {
+	font-size: 13px;
+	margin-left: 40px;
+	max-width: 80%;
+    word-wrap: break-word;
+    color: #262626;
+}
+.btn-post-comment{
+	color: #007bff;
+	border: none;
+}
+.btn-post-comment :hover{
+	color: #080808;
+}
+textarea:focus{
+	height: auto;
+	font-size: 14px;
+}
+
+.comment-activiti{
+	display: none;
+}
+
+.comment-box:hover .comment-activiti {
+	display: block;
 }

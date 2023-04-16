@@ -18,7 +18,7 @@ public class Comment {
     @Column(name = "id", nullable = false, unique = true)
     private Integer id;
 
-    @Column(name = "content", columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "created_at")

@@ -22,9 +22,11 @@ export const postApi = createApi({
     }),
     getPostById: builder.query({
       query: (id) => `post/${id}`,
+      providesTags: ["Post"],
     }),
     getPostByUserId: builder.query({
       query: (userId) => `post/user-post/${userId}`,
+      providesTags: ["Post"],
     }),
     createPost: builder.mutation({
       query: (data) => ({

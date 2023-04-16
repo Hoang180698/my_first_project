@@ -9,6 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class LikeResponse {
+public class StatusResponse {
     private String status;
 }

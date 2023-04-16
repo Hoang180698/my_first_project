@@ -13,6 +13,8 @@ import ProfilePost from "./pages/profile/ProfilePost";
 import SavedPost from "./pages/profile/SavedPost";
 import Search from "./pages/search/Search";
 import User from "./pages/user/User";
+import PostDetail from "./pages/post-detail/PostDetail";
+import NewPost from "./pages/newPost/NewPost";
 
 function App() {
   return (
@@ -30,6 +32,7 @@ function App() {
             </Route>
             <Route path="/edit-profile" element={<Edit />}></Route>
             <Route path="/u/:userId" element={<User />}></Route>
+            <Route path="/p/:postId" element={<PostDetail />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />} />

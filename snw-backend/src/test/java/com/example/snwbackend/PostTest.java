@@ -15,9 +15,5 @@ public class PostTest {
     @Autowired
     private PostRepository postRepository;
 
-    @Test
-    void find_post() {
-        List<PostDto> postDtos = postRepository.getPostDtoByUser(102);
-        System.out.println(postDtos);
-    }
+
 }

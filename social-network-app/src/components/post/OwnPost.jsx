@@ -23,7 +23,6 @@ function OwnPost({ p }) {
         .catch((err) => {
           alert(err);
         });
-    } else {
     }
   };
 
@@ -55,7 +54,7 @@ function OwnPost({ p }) {
           <div className="d-flex justify-content-between">
             <div className="d-flex mb-3">
               <div className="me-2">
-                <a href="#" className="text-dark">
+                <a href="/my-profile/" className="text-dark">
                   <img
                     src={
                       p.userAvatar
@@ -69,7 +68,7 @@ function OwnPost({ p }) {
               </div>
               <div>
                 <h5 className="mb-0">
-                  <a href="#!" className="text-dark">
+                  <a href="/my-profile/" className="text-dark">
                     {p.userName}
                   </a>
                 </h5>
@@ -90,7 +89,7 @@ function OwnPost({ p }) {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
+                <i class="fa-solid fa-ellipsis"></i>
               </a>
               <ul
                 className="dropdown-menu dropdown-menu-lg-end"
@@ -105,6 +104,9 @@ function OwnPost({ p }) {
                   onClick={() => handleDeletePost(p.post.id)}
                 >
                   <i className="fa fa-trash me-1"></i>Delete
+                </a>
+                <a className="dropdown-item text-dark" href={`/p/${p.post.id}`}>
+                  Go to Post
                 </a>
               </ul>
             </div>

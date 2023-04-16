@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./Search.css";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
+// import { useUnfollowhUserMutation } from "../../app/services/user.service";
+// import { useFollowhUserMutation } from "../../app/services/user.service";
 
 function Search() {
 
@@ -10,6 +12,31 @@ function Search() {
   const [term, setTerm] = useState("");
   const [users, setUsers] = useState([]);
   const [searchUser] = useLazySearchUserQuery();
+  // const [followUser] = useFollowhUserMutation();
+  // const [unfollowUser] = useUnfollowhUserMutation();
+
+  // const handleFollow = (id) => {
+  //   followUser(id)
+  //   .unwrap()
+  //   .then(() => {
+  //     handleSearch();
+  //   })
+  //   .catch((err) => {
+  //     alert(err);
+  //   })
+  // }
+
+  // const handleUnfollow = (id) => {
+  //   unfollowUser(id)
+  //   .unwrap()
+  //   .then(() => {
+  //     `handleSearch();`
+  //   })
+  //   .catch((err) => {
+  //     alert(err);
+  //   })
+
+  // }
 
   const handleSearch = async () => {
     if (term === "") {
@@ -23,7 +50,7 @@ function Search() {
     }
     }
   }
-  const handleSearchOther = async (e) => {
+  const handleSearchOther = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
@@ -31,7 +58,7 @@ function Search() {
 
   return (
     <>
-      <div classNameName="container h-100">
+      <div classNameName="h-100 ">
         <div className="d-flex justify-content-center h-100">
           <div className="searchbar my-5">
             <input
@@ -49,14 +76,18 @@ function Search() {
           </div>
         </div>
       </div>
-      <div className="container">
+      <div className="container search-container">
       <div className="row">
+        {/* {(users.length === 0 && term) && (
+          <h5 text-center>No results found.</h5>
+        )} */}
         {users.length > 0 && users.map((u) => (
             <div className="col-sm-6 offset-sm-3 search-user" key={u.id}>
-            <div className="post-block border">
+              <a href={u.id !== auth.id ? `u/${u.id}` : "my-profile/"}>
+              <div className="search-box border">
               <div className="d-flex">
                 <div className="me-2">
-                  <a href={u.id !== auth.id ? `u/${u.id}` : "my-profile"} className="text-dark">
+                  <a className="text-dark">
                     <img
                       src={u.avatar ? `http://localhost:8080${u.avatar}` : "../../../public/user.jpg"}
                       alt="User"
@@ -66,7 +97,7 @@ function Search() {
                 </div>
                 <div className="d-flex flex-column search-info">
                   <div className="text-start ps-1">     
-                      <a href={`u/${u.id}`} className="text-dark">
+                      <a className="text-dark">
                         <h6>{u.name}</h6>
                       </a>        
                   </div >
@@ -75,17 +106,28 @@ function Search() {
                       <p className="mb-0">you</p>
                     )}
                     {u.id !== auth.id && (
-                      <p className="mb-0">{u.address}</p>
+                      <div><p className="mb-0 mx-1">{u.address? `Live in ${u.address}. ` : ""} {u.birthday? `Birth: ${u.birthday}. ` : ""}</p>
+                      </div>     
                     )}                  
                   </div>
                 </div>
-                <div className="ms-auto py-3 pe-1">
-                  <a role="button" className="btn-search btn me-1">
-                    following
-                  </a>
+                <div className="ms-auto py-3 pe-1 search-p">
+                <p>{u.followed? "following" : ""}</p>
+                {/* {!u.followed && u.id !== auth.id && (
+                 <a role='button' className="btn ms-5 btn-primary btn-search" onClick={() => handleFollow(u.id)}>
+                 Follow
+               </a>
+              )}
+               {u.followed && u.id !== auth.id && (
+                 <a role='button' className="btn ms-5 btn-edit-profile btn-search" onClick={() => handleUnfollow(u.id)}>
+                 Unfollow
+               </a>
+              )} */}
                 </div>
               </div>
             </div>
+              </a>
+        
           </div>
         ))}
       

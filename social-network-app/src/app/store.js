@@ -4,6 +4,7 @@ import { imageApi } from "./services/images.service";
 import { postApi } from "./services/posts.service";
 import { userApi } from "./services/user.service";
 import authReducer from "./slices/auth.slice";
+import { commentApi } from "./services/comment.service";
 
 const store = configureStore({
     reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
         [imageApi.reducerPath]: imageApi.reducer,
         [postApi.reducerPath]: postApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
+        [commentApi.reducerPath]: commentApi.reducer,
         auth: authReducer
     },
     middleware: (getDefaultMiddleware) =>
@@ -18,7 +20,8 @@ const store = configureStore({
             authApi.middleware,
             imageApi.middleware,
             postApi.middleware,
-            userApi.middleware
+            userApi.middleware,
+            commentApi.middleware,
         ),
 });
 

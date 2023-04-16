@@ -7,24 +7,6 @@ import OwnPost from '../../components/post/OwnPost';
 function ProfilePost() {
   const { data, isLoading } = useGetAllMyPostsQuery();
 
-  const [deletePost] = useDeletePostMutation();
-
-  const handleDeletePost = (id) => {
-    let isConfirm = window.confirm("Are you sure you want to delete this post?")
-    if (isConfirm) {
-      deletePost(id)
-      .unwrap()
-      .then(
-        alert("You delete the post!")  
-      )
-      .catch((err) => {
-        alert(err);
-      })   
-    } else {
-      
-    }
-  }
-
   if (isLoading) {
     return (
       <dic className="container">

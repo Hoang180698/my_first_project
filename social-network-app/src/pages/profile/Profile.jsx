@@ -6,6 +6,7 @@ import "./Profile.css";
 
 function Profile() {
   const { auth } = useSelector((state) => state.auth);
+  
   return (
     <>
       <div className="container d-flex">
@@ -55,7 +56,7 @@ function Profile() {
           <i className="fa-solid fa-venus-mars"></i> {auth.gender}
         </p>
         <p className="me-auto">
-          <i className="fa fa-envelope me-2"></i> {auth.email}
+        <i class="fa-solid fa-cake-candles"></i> {auth.birthday}
         </p>
         <p className="me-auto">
           <i className="fa fa-phone me-2"></i> {auth.phone}

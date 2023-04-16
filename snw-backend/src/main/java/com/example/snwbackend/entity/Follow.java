@@ -9,7 +9,8 @@ import lombok.*;
 @Setter
 @Builder
 @Entity
-@Table(name = "follows")
+@Table(name = "follows",
+        uniqueConstraints ={@UniqueConstraint(columnNames={"follower_id", "following_id"})})
 public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

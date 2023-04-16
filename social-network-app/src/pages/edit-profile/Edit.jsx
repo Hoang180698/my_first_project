@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useDeleteAvatarMutation, useUpdateUserMutation, useUploadAvatarMutation } from "../../app/services/user.service";
 import "./Edit.css";
+import { useNavigate } from "react-router-dom";
 function Edit() {
   const [tabIdx, setTabIdx] = useState(0);
+
+  const navigate = useNavigate();
 
   const { auth } = useSelector((state) => state.auth);
   const [updateUser] = useUpdateUserMutation();
@@ -15,9 +18,10 @@ function Edit() {
   const [address, setAddress] = useState(auth.address);
   const [gender, setGender] = useState(auth.gender);
   const [biography, setBiography] = useState(auth.biography);
+  const [birthday, setBirthday] = useState(auth.birthday);
 
   const handleUpdateAccount = () => {
-      updateUser({ name, phone, address, gender, biography })
+      updateUser({ name, phone, address, gender, biography, birthday })
         .unwrap()
         .then(() => {
           alert("successfully updated!");
@@ -72,24 +76,23 @@ function Edit() {
                     src={auth.avatar ? `http://localhost:8080${auth.avatar}` : "../../../public/user.jpg" }
                     alt="Image"
                     className="shadow"
-                    data-bs-toggle="modal" data-bs-target="#staticBackdrop"
                   />
-                  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-header d-flex justify-content-center">
-        <h5 class="modal-title text-center" id="staticBackdropLabel">Change profile photo</h5>
+                  <div className="modal fade" id="modalUploadImage" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div className="modal-dialog modal-dialog-centered modal-sm">
+    <div className="modal-content">
+      <div className="modal-header d-flex justify-content-center">
+        <h5 className="modal-title text-center" id="staticBackdropLabel">Change profile photo</h5>
       </div>
-      <div class="border">
-      <label htmlFor="avatar-profile" type="button" class="d-block btn avatar-modal" style={{color:"#0095f6"}}>Upload photo</label>
+      <div className="border">
+      <label htmlFor="avatar-profile" type="button" className="d-block btn avatar-modal" style={{color:"#0095f6"}}>Upload photo</label>
       </div>
       {auth.avatar && (
-         <div class="border">
-         <a onClick={handleDeleteAvatar} type="button" class="d-block btn avatar-modal" style={{color:"red"}} data-bs-dismiss="modal">Remove current photo</a>
+         <div className="border">
+         <a onClick={handleDeleteAvatar} type="button" className="d-block btn avatar-modal" style={{color:"red"}} data-bs-dismiss="modal">Remove current photo</a>
          </div>
       )}
       <div className="border">
-        <a type="button" class="d-block btn avatar-modal" data-bs-dismiss="modal">Cancel</a>
+        <a type="button" className="d-block btn avatar-modal" data-bs-dismiss="modal">Cancel</a>
       </div>
     </div>
   </div>
@@ -98,7 +101,7 @@ function Edit() {
 
                 <div className="text-center">
                   <label
-                    htmlFor="avatar-profile"
+                    data-bs-toggle="modal" data-bs-target="#modalUploadImage"
                     className="btn btn-info btn-sm "
                   >
                     Upload new photo
@@ -206,6 +209,18 @@ function Edit() {
                       </select>
                     </div>
                   </div>
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Birthday</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        lang="fr-CA"
+                        value={birthday}
+                        onChange={(e) => setBirthday(e.target.value)}
+                      />
+                    </div>
+                  </div>
                   <div className="col-md-12">
                     <div className="form-group">
                       <label>Bio</label>
@@ -217,7 +232,7 @@ function Edit() {
                 <div>
                   <button className="btn btn-primary"
                     onClick={handleUpdateAccount}
-                    disabled={name === auth.name && phone === auth.phone && address === auth.address && gender === auth.gender && biography === auth.biography}  >
+                    disabled={name === auth.name && phone === auth.phone && address === auth.address && gender === auth.gender && biography === auth.biography && birthday === auth.birthday}  >
                     Update
                   </button>
                   {/* <button className="btn btn-light" onClick={handleCancelAccount}>Cancel</button> */}

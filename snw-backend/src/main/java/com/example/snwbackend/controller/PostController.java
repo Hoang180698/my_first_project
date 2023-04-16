@@ -47,8 +47,7 @@ public class PostController {
     // Xóa post
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePost(@PathVariable Integer id) {
-        postService.deletePost(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(postService.deletePost(id));
     }
 
     // Xem danh sách post của 1 user

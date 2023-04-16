@@ -1,6 +1,5 @@
 package com.example.snwbackend.service;
 
-import com.example.snwbackend.dto.PDto;
 import com.example.snwbackend.dto.PostDto;
 import com.example.snwbackend.entity.Image;
 import com.example.snwbackend.entity.Like;
@@ -13,8 +12,7 @@ import com.example.snwbackend.repository.LikeRepository;
 import com.example.snwbackend.repository.PostRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.request.UpsertPostRequest;
-import com.example.snwbackend.response.ImageResponse;
-import com.example.snwbackend.response.LikeResponse;
+import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +59,12 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post getPostById(Integer id) {
-        return postRepository.findById(id).orElseThrow(() -> {
+    public PostDto getPostById(Integer id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return postRepository.getPostDtoById(id, user.getId()).orElseThrow(() -> {
             throw new NotFoundException("Not found post with id = " + id);
         });
     }
@@ -91,7 +93,7 @@ public class PostService {
 
     // Xóa post
     @Transactional
-    public void deletePost(Integer id) {
+    public StatusResponse deletePost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found post with id = " + id);
         });
@@ -106,19 +108,25 @@ public class PostService {
         }
         likeRepository.deleteByPost(post);
         postRepository.delete(post);
+
+        return new StatusResponse("ok");
     }
 
     // Lấy danh sách post của 1 user
-    public List<PDto> getPostByUserId(Integer userId) {
+    public List<PostDto> getPostByUserId(Integer userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " +userId);
         });
-        return postRepository.getPDtoByUser(user.getId());
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user1 = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return postRepository.getPDtoByUser(userId, user1.getId());
     }
 
 
     // Lấy danh sách post cho trang chủ
-    public List<PDto> getAllPost() {
+    public List<PostDto> getAllPost() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -127,12 +135,12 @@ public class PostService {
     }
 
     // lấy danh post của mình
-    public List<PDto> getAllMyPost() {
+    public List<PostDto> getAllMyPost() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        return postRepository.getPDtoByUser(user.getId());
+        return postRepository.getPDtoByUser(user.getId(), user.getId());
     }
 
     // Tạo post với images
@@ -171,7 +179,7 @@ public class PostService {
 
     // Like post
     @Transactional
-    public LikeResponse likePost(Integer id) {
+    public StatusResponse likePost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found post with id = " + id);
         });
@@ -188,10 +196,11 @@ public class PostService {
                 .build();
         likeRepository.save(like);
 
-        return new LikeResponse("ok") ;
+        return new StatusResponse("ok") ;
     }
 
-    public LikeResponse dislikePost(Integer id) {
+    // Dis like post
+    public StatusResponse dislikePost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found post with id = " + id);
         });
@@ -203,6 +212,6 @@ public class PostService {
             throw new BadRequestException("You have not liked this post");
         });
         likeRepository.delete(like);
-        return new LikeResponse("ok") ;
+        return new StatusResponse("ok") ;
     }
 }
