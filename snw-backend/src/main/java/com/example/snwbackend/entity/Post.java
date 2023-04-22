@@ -3,6 +3,7 @@ package com.example.snwbackend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,12 @@ public class Post {
     @JoinTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
     private List<String> imageUrls;
 
+    @Column(name = "like_count")
+    private Integer likeCount;
+
+    @Column(name = "comment_count")
+    private Integer commentCount;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -40,13 +47,11 @@ public class Post {
 
     @PrePersist
     public void prePersist() {
+        this.setLikeCount(0);
+        this.setCommentCount(0);
         createdAt = LocalDateTime.now();
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     @PreRemove
     public void preRemove() {

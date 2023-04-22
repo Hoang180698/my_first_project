@@ -1,16 +1,24 @@
 import React from "react";
-import { formatDate } from "../../utils/functionUtils";
+import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import ImageSlider from "../imageSlider/ImageSlider";
 import {
   useDeletePostMutation,
   useDislikePostMutation,
   useLikePostMutation,
 } from "../../app/services/posts.service";
+import { useState } from "react";
+import PostModal from "../PostModal/PostModal";
+import Modal from "react-bootstrap/Modal";
+import { Link } from "react-router-dom";
+import Liker from "../liker/Liker";
 
 function OwnPost({ p }) {
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
   const [dislikePost] = useDislikePostMutation();
+
+  const [showPostModal, shetShowPostModal] = useState(false);
+  const [showLikerModal, setShowLikerModal] = useState(false);
 
   const handleDeletePost = (id) => {
     let isConfirm = window.confirm(
@@ -49,12 +57,32 @@ function OwnPost({ p }) {
 
   return (
     <>
+     {showLikerModal && (
+        <Modal centered show={showLikerModal}>
+          <div className="modal-content px-2">
+            <div className="d-flex border-bottom py-2">
+              <h6 className="modal-title mx-auto">Likes</h6>
+              <button type="button" className="btn-close" onClick={() => setShowLikerModal(false)}></button>
+            </div>
+            <Liker postId={p.post.id} />
+          </div>
+        </Modal>
+      )}
+       {showPostModal && (
+      <Modal centered show={showPostModal} size={p.post.imageUrls.length > 0 ? "xl" : "lg"}>
+        <div className="d-flex post-modal-container">
+        <a role='button' className="btn-close btn-close-white btn-close-pmd" onClick={() => shetShowPostModal(false)}>
+        </a>
+          <PostModal postId={p.post.id}/>
+        </div>
+      </Modal>
+    )}
       <div className="col-sm-6 offset-sm-3">
         <div className="post-block border">
           <div className="d-flex justify-content-between">
             <div className="d-flex mb-3">
               <div className="me-2">
-                <a href="/my-profile/" className="text-dark">
+                <a href="/profile/" className="text-dark">
                   <img
                     src={
                       p.userAvatar
@@ -68,11 +96,11 @@ function OwnPost({ p }) {
               </div>
               <div>
                 <h5 className="mb-0">
-                  <a href="/my-profile/" className="text-dark">
+                  <Link href="/profile/" className="text-dark">
                     {p.userName}
-                  </a>
+                  </Link>
                 </h5>
-                <p className="mb-0 text-muted time-post">
+                <p role="button" className="mb-0 text-muted time-post" data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(p.post.createdAt)}>
                   {formatDate(p.post.createdAt)}
                 </p>
               </div>
@@ -105,16 +133,16 @@ function OwnPost({ p }) {
                 >
                   <i className="fa fa-trash me-1"></i>Delete
                 </a>
-                <a className="dropdown-item text-dark" href={`/p/${p.post.id}`}>
+                <Link to={`/p/${p.post.id}`} className="dropdown-item text-dark">
                   Go to Post
-                </a>
+                </Link>
               </ul>
             </div>
           </div>
 
           {/* content */}
           <div className="post-block__content mb-2">
-            <p>{p.post.content}</p>
+            <pre>{p.post.content}</pre>
             <ImageSlider data={p.post.imageUrls} />
           </div>
           <div className="mb-3 border-top">
@@ -129,7 +157,7 @@ function OwnPost({ p }) {
                   <i class={p.liked ? "fa fa-heart" : "fa-regular fa-heart"}></i>
                   </span>
                 </a>
-                <a href="#!" className="text-dark ms-3 interact">
+                <a onClick={() => shetShowPostModal(true)} className="text-dark ms-3 interact">
                   <span>
                     <i class="fa-regular fa-comment"></i>
                   </span>
@@ -147,14 +175,21 @@ function OwnPost({ p }) {
               </a>
             </div>
             <div className="mb-0 d-flex count-interact">
-              <span className="text-dark">{p.likeCount} likes</span>
-              {/* <span className="text-dark ms-auto">2k comments</span> */}
+            {p.post.likeCount > 0 && (
+                 <span role="button" className="text-dark" onClick={() => setShowLikerModal(true)}>{p.post.likeCount} likes</span>
+              )}
+             
+             {p.post.commentCount > 0 && (
+               <span className="text-dark ms-auto">
+               {p.post.commentCount} comments
+             </span>
+             )}             
             </div>
           </div>
           {/* <hr /> */}
           <div className="post-block__comments">
             {/* <!-- Comment Input --> */}
-            <div className="input-group mb-3">
+            {/* <div className="input-group mb-3">
               <input
                 type="text"
                 className="form-control"
@@ -169,7 +204,7 @@ function OwnPost({ p }) {
                   <i className="fa fa-paper-plane"></i>
                 </button>
               </div>
-            </div>
+            </div> */}
             {/* <!-- Comment content --> */}
             {/* <div className="comment-view-box mb-3">
               <div className="d-flex mb-2">
@@ -210,10 +245,10 @@ function OwnPost({ p }) {
             </div> */}
             {/* <!-- More Comments --> */}
             {/* <hr /> */}
-            <a href="#!" className="text-dark view-more-coment">
+            {/* <a href="#!" className="text-dark view-more-coment">
               View All comments{" "}
               <span className="font-weight-bold">({p.commentCount})</span>
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

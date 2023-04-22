@@ -1,7 +1,8 @@
 import React from "react";
-import { formatDate } from "../../utils/functionUtils";
+import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import { useSelector } from "react-redux";
 import { useDeleteCommentMutation } from "../../app/services/comment.service";
+import { Link } from "react-router-dom";
 
 function CommentBox({ comments }) {
   const { auth } = useSelector((state) => state.auth);
@@ -9,24 +10,20 @@ function CommentBox({ comments }) {
 
   const handleDeleteComment = (id) => {
     deleteComment(id)
-        .unwrap()
-        .then(() => {
-
-        })
-        .catch((err) => {
-
-        })
+      .unwrap()
+      .then(() => {})
+      .catch((err) => {});
   };
 
   return (
     <>
-      <div className="comment-view-box mb-3">
+      <div className="comment-view-box">
         {comments.length > 0 &&
           comments.map((c) => (
             <div className="d-flex mb-2 comment-box" key={c.id}>
-              <div>
+              <div className="comment-box-content">
                 <h6 className="mb-0">
-                  <a href={`/u/${c.userId}`} className="text-dark ">
+                  <Link to={`/u/${c.userId}`} className="text-dark ">
                     <img
                       src={
                         c.userAvatar
@@ -37,8 +34,8 @@ function CommentBox({ comments }) {
                       className="author-img author-img--small me-2"
                     />
                     {c.userName} <span>.</span>
-                  </a>{" "}
-                  <small className="text-muted">
+                  </Link>{" "}
+                  <small className="text-muted" role="button" data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(c.createdAt)}>
                     {formatDate(c.createdAt)}
                   </small>
                 </h6>
@@ -75,7 +72,11 @@ function CommentBox({ comments }) {
                       <a className="dropdown-item text-dark" href="#">
                         Edit
                       </a>
-                      <a role="button" className="dropdown-item text-danger" onClick={() => handleDeleteComment(c.id)}>
+                      <a
+                        role="button"
+                        className="dropdown-item text-danger"
+                        onClick={() => handleDeleteComment(c.id)}
+                      >
                         Delete
                       </a>
                     </>

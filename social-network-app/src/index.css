@@ -1,16 +1,16 @@
+
 body {
     background: #f3f3f3;
 	font-family: "Roboto", sans-serif;
 }
+
+.container-big {
+	min-height: 100vh;
+}
 .pd-container {
 	height: 80vh;
 }
-.search-container{
-	min-height: 70vh;
-}
-.main-content {
-	height: 94vh;
-}
+
 .container{
     background-color: white;
 	height: 100%;
@@ -22,16 +22,17 @@ body {
     text-decoration: none;
 }
 
-.navbar-toggler span {
-    display: block;
-    width: 22px;
-    border: 1px;
+.navbar-toggler {
+	border: none;
 }
 
 .nav-item :hover {
     background-color: #f7f7f7;
 }
-
+.createpost {
+	color: black;
+    font-size: 20px;
+}
 .nav-item {
     margin: auto;
     border: black
@@ -56,6 +57,11 @@ body {
 }
 
 /* home page */
+
+.post-image{
+	height: 100%;
+	width: 100%;
+}
 
 .main-content {
 	padding-top: 40px;
@@ -89,6 +95,18 @@ body {
 	max-height: 750px;
 	height: 700px;
 	object-fit: contain;
+}
+.post-block__content pre {
+	font-size: 15px;
+	font-weight: 400;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;       
+    white-space: -moz-pre-wrap;  
+    white-space: -pre-wrap;      
+    white-space: -o-pre-wrap;   
+    word-wrap: break-word;  
+	font-family: "Roboto", sans-serif;    
 }
 .post-block .comment-view-box__comment {
 	border-radius: 5px;
@@ -257,7 +275,7 @@ body {
 }
 
 .np-comment{
-	margin: auto;
+   margin: auto;
   position:absolute;
   top:0;
   background:rgba(242, 243, 245, 0.40);
@@ -295,6 +313,18 @@ body {
   
 }
 
+.np-comment-body{
+	position: relative;
+}
+
+.emoji-newpost{
+	color: #080808;
+	position: absolute;
+	bottom: -10px;
+	left: 15px;
+	font-size: 22px;
+}
+
 .np-comment-header h3{
   width:80%;
   float:left;
@@ -311,14 +341,21 @@ body {
   border:none;
   border-radius:5px;
   padding:5px;
-  font-size:20px;
+  font-size:18px;
   min-height:200px;
-  max-height:250px;
+  max-height:80%;
 }
 
 .np-comment-body textarea:focus{
   border:none;
   outline: none;
+  font-size: 16px;
+}
+
+.emoji-picker-np{
+	position: absolute;
+	left: 40px;
+	top: 180px;
 }
 
 
@@ -396,6 +433,7 @@ body {
 .social-links a:hover {
 	transform: translateY(-3px);
 }
+/* comment  */
 
 .comment-box {
 	/* background-color: #DADDE1; */
@@ -410,10 +448,12 @@ body {
 .comment-box p {
 	font-size: 13px;
 	margin-left: 40px;
-	max-width: 80%;
+	max-width: 90%;
     word-wrap: break-word;
     color: #262626;
+	word-break: break-word;
 }
+
 .btn-post-comment{
 	color: #007bff;
 	border: none;
@@ -432,4 +472,51 @@ textarea:focus{
 
 .comment-box:hover .comment-activiti {
 	display: block;
+}
+
+.form-comment {
+	position: relative;
+	padding-left: 30px;
+	border: none;
+}
+.emoji-icon {
+	cursor: pointer;
+	color: #080808;
+	font-size: 24px;
+	position: absolute;
+	top: 10px;
+	left: 2px;
+  }
+.emoji-picker {
+	position: absolute;
+	bottom: 50px;
+	left: 30px;
+}
+.count-text{
+	position: absolute;
+	top: 40px;
+}
+.comment-box-content{
+	width: 90%;
+}
+
+/* Modal user */
+
+.modal-body-user {
+	height: 400px;
+    overflow-y: auto;
+}
+
+.name-user-modal {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.author-img-modal {
+	width: 80px;
+	height: 80px;
+	border-radius: 100%;
+}
+.unfollow-question {
+	font-size: 13px;
 }

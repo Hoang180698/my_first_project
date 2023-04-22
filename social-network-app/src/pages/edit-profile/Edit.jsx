@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { createRef, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useDeleteAvatarMutation, useUpdateUserMutation, useUploadAvatarMutation } from "../../app/services/user.service";
 import "./Edit.css";
-import { useNavigate } from "react-router-dom";
+import Modal from 'react-bootstrap/Modal';
+
 function Edit() {
   const [tabIdx, setTabIdx] = useState(0);
-
-  const navigate = useNavigate();
+  const [showModal, setShoModal] = useState(false);
 
   const { auth } = useSelector((state) => state.auth);
   const [updateUser] = useUpdateUserMutation();
@@ -46,8 +46,9 @@ function Edit() {
 
     uploadAvatar(formData) // Trả về URL /api/images/1
         .unwrap()
-        .then((res) => {
+        .then(() => {
             alert("Upload avatar successfully");
+            setShoModal(false);
         })
         .catch((err) => {
             console.log(err);
@@ -58,7 +59,8 @@ function Edit() {
       deleteAvatar()
         .unwrap()
         .then(() => {
-          alert("Avatar removed")
+          alert("Avatar removed");
+          setShoModal(false);
         })
         .catch((err) => {
           console.log(err);
@@ -77,34 +79,32 @@ function Edit() {
                     alt="Image"
                     className="shadow"
                   />
-                  <div className="modal fade" id="modalUploadImage" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div className="modal-dialog modal-dialog-centered modal-sm">
+<Modal centered show={showModal} size="sm" >
     <div className="modal-content">
       <div className="modal-header d-flex justify-content-center">
         <h5 className="modal-title text-center" id="staticBackdropLabel">Change profile photo</h5>
       </div>
       <div className="border">
-      <label htmlFor="avatar-profile" type="button" className="d-block btn avatar-modal" style={{color:"#0095f6"}}>Upload photo</label>
+      <label htmlFor="avatar-profile" type="button" className="d-block btn avatar-modal" style={{color:"#0095f6"}}>Upload new photo</label>
       </div>
       {auth.avatar && (
          <div className="border">
-         <a onClick={handleDeleteAvatar} type="button" className="d-block btn avatar-modal" style={{color:"red"}} data-bs-dismiss="modal">Remove current photo</a>
+         <a onClick={handleDeleteAvatar} type="button" className="d-block btn avatar-modal" style={{color:"red"}}>Remove current photo</a>
          </div>
       )}
       <div className="border">
-        <a type="button" className="d-block btn avatar-modal" data-bs-dismiss="modal">Cancel</a>
+        <a type="button" className="d-block btn avatar-modal" onClick={() => setShoModal(false)}>Cancel</a>
       </div>
     </div>
-  </div>
-</div>
+</Modal>
                 </div>
 
                 <div className="text-center">
                   <label
-                    data-bs-toggle="modal" data-bs-target="#modalUploadImage"
+                    onClick={() => setShoModal(true)}
                     className="btn btn-info btn-sm "
                   >
-                    Upload new photo
+                    Upload photo
                   </label>
                 </div>
                 <input

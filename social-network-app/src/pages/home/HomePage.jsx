@@ -10,6 +10,7 @@ import Post from "../../components/post/Post";
 
 function HomePage() {
   const { auth } = useSelector((state) => state.auth);
+  const { count } = useSelector((state) => state.newpost);
   const { onCreatePost } = useCreatePost();
 
   const { data, isLoading } = useGetPostsQuery();
@@ -17,8 +18,8 @@ function HomePage() {
   if (isLoading) {
     return (
       <div className="container">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
+        <div className="text-center m-5">
+          <div className="spinner-border m-5" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
@@ -33,7 +34,7 @@ function HomePage() {
           <div className="col-sm-6 offset-sm-3">
             <div className="post-block">
               <div className="form-body ms-5">
-                <Link className="homepage-avatar" to={"/my-profile/"}>
+                <Link className="homepage-avatar" to={"/profile/"}>
                   {" "}
                   <img
                     src={

@@ -12,7 +12,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Query("select new com.example.snwbackend.dto.CommentDto" +
             "(c.id, c.content, c.createdAt, c.updatedAt, c.post.id,"+
             "c.user.id, c.user.name, c.user.avatar) from Comment c where c.post.id = ?1" +
-            " order by c.createdAt ASC ")
+            " order by c.createdAt ASC")
     List<CommentDto> getAllCmtDtoByPost(Integer postId, Integer userId);
+
+    void deleteAllByPost(Post post);
 
 }

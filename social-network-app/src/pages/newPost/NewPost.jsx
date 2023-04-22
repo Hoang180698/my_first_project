@@ -1,21 +1,44 @@
 import { Button } from "bootstrap/dist/js/bootstrap.bundle";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCreatePostMutation, useCreatePostWithImagesMutation } from "../../app/services/posts.service";
 import useCreatePost from "./useCreatePost";
 import { useNavigate } from "react-router-dom";
+import EmojiPicker from "emoji-picker-react";
+
 function NewPost() {
   const { offCreatePost } = useCreatePost();
 
   const [content, setContent] = useState("");
 
+  const [showPicker, setShowPicker] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   // const [uploadMultiImage] = useUploadMultiImagesMutation();
+  const emojiRef = useRef(null);
+  const emojiButtonRef = useRef(null);
 
   const [createPost] = useCreatePostMutation();
   const [createPostWithImages] = useCreatePostWithImagesMutation();
   const navigate = useNavigate();
+
+  const onEmojiClick = (e) => {
+    setContent((prevInput) => prevInput + e.emoji);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target) && !emojiButtonRef.current.contains(event.target)) {
+        setShowPicker(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [emojiRef]);
 
   const imageHandleChange = (e) => {
     // console.log(e.target.files);
@@ -24,7 +47,6 @@ function NewPost() {
       ...prevSelectedFiles,
       ...newFiles,
     ]);
-    setSelectedImages;
     const fileArray = Array.from(e.target.files).map((file) =>
       URL.createObjectURL(file)
     );
@@ -115,6 +137,19 @@ function NewPost() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
             ></textarea>
+              <a role="button" className="emoji-newpost" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
+                      <i class="fa-sharp fa-regular fa-face-smile"></i>
+                    </a>
+                    {showPicker && (
+                      <div className="emoji-picker-np" ref={emojiRef}>
+                         <EmojiPicker
+                        height={350}
+                        width={350}
+                        onEmojiClick={onEmojiClick}
+                        autoFocusSearch={false}
+                      />
+                      </div>
+                    )}
           </div>
           <div className="np-comment-bottom">
             {selectedImages.length > 0 && (
@@ -150,8 +185,9 @@ function NewPost() {
 
             <div className="d-grid gap-2 mt-4">
               <button
+                role="button"
                 onClick={handlePost}
-                className="btn btn-success btn-block"
+                className="btn btn-success"
                 disabled={content === "" && selectedImages.length === 0}
               >
                 Post

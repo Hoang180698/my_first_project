@@ -1,0 +1,81 @@
+.post-modal-container {
+    position: relative;
+    max-height: 90vh;
+    width: 100%;
+    height: 100%;
+}
+.btn-close-pmd {
+    position: absolute;
+    right: -60px;
+    top: -20px;
+    color: white;
+}
+.author-img-pmd{
+    border-radius: 100%;
+    height: 40px;
+    width: 40px;
+}
+.postmodal-img img{
+    width: 100%;
+	object-fit: contain;
+}
+
+.postmodal-img {
+    display: flex;
+    justify-content: center;
+	text-align: center;
+    height: 90vh;
+    width: 65%;
+    background-color: black;
+}
+.pmd-content{
+    width: 40%;
+}
+
+.comment-pmd img{
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+}
+
+.pmd-cmt-content {
+    font-size: 13px;
+	margin-left: 40px;
+	max-width: 83%;
+    word-wrap: break-word;
+    color: #262626;
+	word-break: break-word;
+}
+.header-pmd-content{
+    height: 100%;
+    overflow-y: auto;
+}
+.footer-pmd-content{
+    height: 135px;
+}
+.icon-pmd i{
+    font-size: 20px;
+}
+
+.icon-pmd:hover i {
+    color: #a3a3a3;
+}
+.icon-pmd:hover i.fa {
+     color: rgb(214, 37, 37);
+}
+.pmd-content-noimg{
+    height: 90vh;
+    width: 100%;
+}
+
+.content-post-modal pre{
+    font-size: 15px;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;       
+    white-space: -moz-pre-wrap;  
+    white-space: -pre-wrap;      
+    white-space: -o-pre-wrap;   
+    word-wrap: break-word;  
+    font-family: "Roboto", sans-serif;
+}

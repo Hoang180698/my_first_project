@@ -6,7 +6,7 @@ import Header from '../header/Header'
 function Layout() {
   return (
     <>
-        <div className="container border-bottom">
+        <div className="container border-bottom container-big">
             <Header />
             
             <section className="content">

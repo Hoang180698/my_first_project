@@ -59,6 +59,25 @@ export const userApi = createApi({
             }),
             invalidatesTags: ["Post"],
         }),
+        removeFollower: builder.mutation({
+            query: (id) => ({
+                url: `users/remove-follower/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Post"],
+        }),
+        getUserLikePost: builder.query({
+            query: (postId) => `users/likes/post/${postId}`,
+            providesTags: ["Post"],
+        }),
+        getFollower: builder.query({
+            query: (userId) => `users/${userId}/follower`,
+            providesTags: ["Post"],
+        }),
+        getFollowing: builder.query({
+            query: (userId) => `users/${userId}/following`,
+            providesTags: ["Post"],
+        }),
     }),
 });
 
@@ -72,4 +91,8 @@ export const {
     useDeleteAvatarMutation,
     useFollowhUserMutation,
     useUnfollowhUserMutation,
+    useGetUserLikePostQuery,
+    useGetFollowerQuery,
+    useGetFollowingQuery,
+    useRemoveFollowerMutation,
 } = userApi;

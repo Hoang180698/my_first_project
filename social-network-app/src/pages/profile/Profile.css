@@ -58,10 +58,22 @@
 }
 
 .profile-bio {
-    max-width: 85%;
+    max-width: 100%;
     word-wrap: break-word;
     font-size: 14px;
     color: #262626;
+}
+
+.profile-bio pre {
+	font-size: 14px;
+	font-weight: 500;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;       
+    white-space: -moz-pre-wrap;  
+    white-space: -pre-wrap;      
+    white-space: -o-pre-wrap;   
+    word-wrap: break-word;      
 }
 
 

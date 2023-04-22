@@ -14,7 +14,8 @@ import SavedPost from "./pages/profile/SavedPost";
 import Search from "./pages/search/Search";
 import User from "./pages/user/User";
 import PostDetail from "./pages/post-detail/PostDetail";
-import NewPost from "./pages/newPost/NewPost";
+import Liker from "./components/liker/Liker";
+
 
 function App() {
   return (
@@ -26,13 +27,14 @@ function App() {
             <Route path="/search" element={<Search />}></Route>
             <Route path="/messenge" element={<Messenge />}></Route>
             <Route path="/notifications" element={<Notify />}></Route>
-            <Route path="/my-profile" element={<Profile />}>
+            <Route path="/profile" element={<Profile />}>
               <Route path="" element={<ProfilePost />} />
               <Route path="saved" element={<SavedPost />} />
             </Route>
             <Route path="/edit-profile" element={<Edit />}></Route>
             <Route path="/u/:userId" element={<User />}></Route>
             <Route path="/p/:postId" element={<PostDetail />}></Route>
+            <Route path="/likes" element={<Liker />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />} />

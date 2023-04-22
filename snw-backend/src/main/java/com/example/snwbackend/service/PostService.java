@@ -7,10 +7,7 @@ import com.example.snwbackend.entity.Post;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
-import com.example.snwbackend.repository.ImageRepository;
-import com.example.snwbackend.repository.LikeRepository;
-import com.example.snwbackend.repository.PostRepository;
-import com.example.snwbackend.repository.UserRepository;
+import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.UpsertPostRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.utils.ImageUtils;
@@ -41,10 +38,16 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
 
     // Tạo post
     @Transactional
     public Post createPost(UpsertPostRequest request) {
+        if(request.getContent().isEmpty()) {
+            throw new BadRequestException("Content or images cannot be empty");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -59,6 +62,7 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    // Lấy post theo id
     public PostDto getPostById(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -107,6 +111,7 @@ public class PostService {
             throw new BadRequestException("You do not have permission to delete this post");
         }
         likeRepository.deleteByPost(post);
+        commentRepository.deleteAllByPost(post);
         postRepository.delete(post);
 
         return new StatusResponse("ok");
@@ -146,6 +151,9 @@ public class PostService {
     // Tạo post với images
     @Transactional
     public Post createPostWithImages(String content, MultipartFile[] files) {
+        if(content.isEmpty() && files.length == 0) {
+            throw new BadRequestException("Content or images cannot be empty");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -194,12 +202,15 @@ public class PostService {
                 .post(post)
                 .user(user)
                 .build();
+        post.setLikeCount(post.getLikeCount() + 1);
         likeRepository.save(like);
+        postRepository.save(post);
 
         return new StatusResponse("ok") ;
     }
 
-    // Dis like post
+    // unlike post
+    @Transactional
     public StatusResponse dislikePost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found post with id = " + id);
@@ -211,7 +222,10 @@ public class PostService {
         Like like = likeRepository.findByPostAndUser(post, user).orElseThrow(() -> {
             throw new BadRequestException("You have not liked this post");
         });
+        post.setLikeCount(post.getLikeCount() - 1);
         likeRepository.delete(like);
+        postRepository.save(post);
+
         return new StatusResponse("ok") ;
     }
 }

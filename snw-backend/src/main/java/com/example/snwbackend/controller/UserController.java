@@ -75,4 +75,16 @@ public class UserController {
     public ResponseEntity<?> unfollowUser(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.unfollowUser(id));
     }
+
+   // Remove your follower
+    @DeleteMapping("remove-follower/{id}")
+    public ResponseEntity<?> removeFollower(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.removeFollower(id));
+    }
+
+    // Lấy danh sách user like post
+    @GetMapping("likes/post/{postId}")
+    public ResponseEntity<?> getAllUserLikePost(@PathVariable Integer postId) {
+        return ResponseEntity.ok(userService. getAllUserLikePost(postId));
+    }
 }

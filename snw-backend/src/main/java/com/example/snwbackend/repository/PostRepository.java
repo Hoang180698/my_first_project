@@ -19,10 +19,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     List<Post> getPostFollowing(Integer userId);
 
     @Query("select new com.example.snwbackend.dto.PostDto" +
-            "(p, count(l1.id), count(c.id), (exists(select 1 FROM Like l2 WHERE l2.user.id = ?2 AND l2.post.id = p.id))," +
+            "(p, (exists(select 1 FROM Like l WHERE l.user.id = ?2 AND l.post.id = p.id))," +
             " p.user.id, p.user.name, p.user.avatar)"+
-            "from Post p left join Like l1 on l1.post.id = p.id left join Comment c on c.post.id = p.id " +
-            "where p.id = ?1")
+            "from Post p where p.id = ?1")
     Optional<PostDto> getPostDtoById(Integer id, Integer userSendRqId);
 
 //    @Query("select new com.example.snwbackend.dto.PostDto" +
@@ -33,20 +32,26 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 //            "p.user.id = ?1 group by p.id order by p.createdAt DESC")
 //    List<PostDto> getPostDtoByUser(Integer userId);
 
-    @Modifying
-    @Query( value = "select new com.example.snwbackend.dto.PostDto" +
-            "(p, count(l1.id), count(c.id), (exists(select 1 FROM Like l2 WHERE l2.user.id = ?2 AND l2.post.id = p.id))," +
+
+    @Query( "select new com.example.snwbackend.dto.PostDto" +
+            "(p, (exists(select 1 FROM Like l WHERE l.user.id = ?2 AND l.post.id = p.id))," +
             " p.user.id, p.user.name, p.user.avatar)"+
-            "from Post p left join Like l1 on l1.post.id = p.id left join Comment c on c.post.id = p.id where " +
+            "from Post p  where " +
             "p.user.id = ?1 group by p.id order by p.createdAt DESC")
     List<PostDto> getPDtoByUser(Integer userId, Integer userSendRqId);
 
     @Query("select new com.example.snwbackend.dto.PostDto" +
-            "(p, count(l1.id), count(c.id), (exists(select 1 FROM Like l2 WHERE l2.user.id = ?1 AND l2.post.id = p.id))," +
+            "(p, (exists(select 1 FROM Like l2 WHERE l2.user.id = ?1 AND l2.post.id = p.id))," +
             " p.user.id, p.user.name, p.user.avatar)"+
-            "from Post p left join Like l1 on l1.post.id = p.id left join Comment c on c.post.id = p.id  " +
-            "left join Follow f on f.follower.id =?1" +
+            "from Post p left join Follow f on f.follower.id =?1" +
             "where p.user.id = f.following.id group by p.id order by p.createdAt DESC")
     List<PostDto> getPDtoFollowing(Integer userId);
+
+    @Query("select new com.example.snwbackend.dto.PostDto" +
+            "(p, (exists(select 1 FROM Like l2 WHERE l2.user.id = ?1 AND l2.post.id = p.id))," +
+            " p.user.id, p.user.name, p.user.avatar)"+
+            "from Post p left join Like l1 on l1.post.id = p.id left join Comment c on c.post.id = p.id  " +
+            "where p.user.id = ?1 group by p.id order by p.createdAt DESC")
+    List<PostDto> getOwnPostDtoLimit(Integer userId, Integer limit);
 
 }

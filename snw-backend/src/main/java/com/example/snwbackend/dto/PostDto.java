@@ -10,8 +10,6 @@ import lombok.*;
 @Builder
 public class PostDto {
     private Post post;
-    private Long likeCount;
-    private Long commentCount;
     private boolean liked;
     private Integer userId;
     private String userName;

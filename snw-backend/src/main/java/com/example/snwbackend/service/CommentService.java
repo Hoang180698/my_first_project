@@ -11,6 +11,7 @@ import com.example.snwbackend.repository.CommentRepository;
 import com.example.snwbackend.repository.PostRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.response.StatusResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -50,11 +51,15 @@ public class CommentService {
                 .user(user)
                 .post(post)
                 .build();
+        post.setCommentCount(post.getCommentCount() + 1);
 
         commentRepository.save(comment);
+        postRepository.save(post);
+
         return commentMapper.toCommentDto(comment);
     }
 
+    // edit comment
     public CommentDto editComment(Integer id, String content) {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found comment with id = " + id);
@@ -69,11 +74,14 @@ public class CommentService {
             throw new BadRequestException("You do not have permission to edit this comment");
         }
         comment.setContent(content);
+
         commentRepository.save(comment);
 
         return commentMapper.toCommentDto(comment);
     }
 
+    // Xóa comment
+    @Transactional
     public StatusResponse deleteComment(Integer id) {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found comment with id = " + id);
@@ -87,11 +95,18 @@ public class CommentService {
         if (comment.getUser().getId() != user.getId()) {
             throw new BadRequestException("You do not have permission to edit this comment");
         }
+        Post post = postRepository.findById(comment.getPost().getId()).orElseThrow(() -> {
+            throw new NotFoundException("Not found post with id = " + id);
+        });
+        post.setCommentCount(post.getCommentCount() - 1);
 
         commentRepository.delete(comment);
+        postRepository.save(post);
+
         return new StatusResponse("ok");
     }
 
+    // Lấy comment của 1 post
     public List<CommentDto> getAllCommentByPostId(Integer postId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {

@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useFollowhUserMutation, useGetUserByIdQuery, useUnfollowhUserMutation } from '../../app/services/user.service';
 import { useGetPostByUserIdQuery } from '../../app/services/posts.service';
 import Post from '../../components/post/Post';
 import { useSelector } from 'react-redux';
+import { post } from 'jquery';
+import { Modal } from 'react-bootstrap';
+import Follower from '../../components/users/Follower';
+import Following from '../../components/users/Following';
 
 function User() {
     const { userId } = useParams();
@@ -13,10 +17,15 @@ function User() {
     const [followUser] = useFollowhUserMutation();
     const [unfollowUser] = useUnfollowhUserMutation();
 
+    const [showModal, setShoModal] = useState(false);
+
+    const [showFollower, setShowFollower] = useState(false);
+    const [showFollowing, setShowFollowing] = useState(false);
+
     const navigate = useNavigate();
 
     if (auth.id === Number(userId)) {
-      navigate("/my-profile/");
+      navigate("/profile/");
     }
 
     const handleFollow = (id) => {
@@ -34,7 +43,7 @@ function User() {
       unfollowUser(id)
       .unwrap()
       .then(() => {
-
+        setShoModal(false)
       })
       .catch((err) => {
         alert(err);
@@ -45,8 +54,8 @@ function User() {
     if (isLoadingUser || isLoadingPosts) {
         return (
             <div className="container">
-            <div className="text-center">
-              <div className="spinner-border" role="status">
+            <div className="text-center m-5">
+              <div className="spinner-border m-5" role="status">
                 <span className="sr-only">Loading...</span>
               </div>
             </div>
@@ -55,6 +64,70 @@ function User() {
     }
   return (
     <>
+    {showFollower && (
+      <Modal centered show={true}>
+         <div className="modal-content px-2">
+            <div className="d-flex border-bottom py-2">
+              <h6 className="modal-title mx-auto">Followers</h6>
+              <button type="button" className="btn-close" onClick={() => setShowFollower(false)}></button>
+            </div>
+            <Follower userId={user.id}/>
+          </div>
+      </Modal>
+    )}
+    {showFollowing && (
+        <Modal centered show={true}>
+        <div className="modal-content px-2">
+           <div className="d-flex border-bottom py-2">
+             <h6 className="modal-title mx-auto">Following</h6>
+             <button type="button" className="btn-close" onClick={() => setShowFollowing(false)}></button>
+           </div>
+           <Following userId={user.id}/>
+         </div>
+     </Modal>
+    )}
+     {user.followed && (
+                <Modal centered show={showModal} size="sm">
+                <div className="modal-content">
+                  <div className="modal-header d-flex justify-content-center flex-column">
+                    <div className="author-modal">
+                      <img
+                        src={
+                          user.avatar
+                            ? `http://localhost:8080${user.avatar}`
+                            : "../../../public/user.jpg"
+                        }
+                        alt="User"
+                        className="author-img-modal"
+                      />
+                    </div>
+                    <p
+                      className="modal-title text-center mt-3 unfollow-question"
+                    >
+                      Unfollow {user.name}?
+                    </p>
+                  </div>
+                  <div className="border-top">
+                    <a
+                      type="button"
+                      className="d-block btn avatar-modal text-danger"
+                      onClick={() => handleUnfollow(user.id)}
+                    >
+                      Unfollow
+                    </a>
+                  </div>
+                  <div className="border-top">
+                    <a
+                      type="button"
+                      className="d-block btn"
+                      onClick={() => setShoModal(false)}
+                    >
+                      Cancel
+                    </a>
+                  </div>
+                </div>
+              </Modal>
+            )}
     <div className="container d-flex">
       <div className="profile-container">
         <div className="profile d-flex mt-5">
@@ -74,11 +147,11 @@ function User() {
                </a>
               )}
                {user.followed && (
-                 <a role='button' className="btn ms-5 btn-edit-profile" onClick={() => handleUnfollow(user.id)}>
-                 Unfollow
+                 <a role='button' className="btn pt-2 ms-5 btn-edit-profile" onClick={() => setShoModal(true)}>
+                 Following
                </a>
               )}
-              <a className="btn ms-4 btn-edit-profile" href="/messenge">
+              <a className="btn pt-2 ms-4 btn-edit-profile" href="/messenge">
                 Message
               </a>
             </div>
@@ -89,12 +162,12 @@ function User() {
                   <b>{posts.length}</b> post
                 </li>
                 <li className="mx-3">
-                  <a role="button">
+                  <a role="button" onClick={() => setShowFollower(true)}>
                     <b>188</b> followers
                   </a>
                 </li>
                 <li className="mx-3">
-                  <a role="button">
+                  <a role="button" onClick={() => setShowFollowing(true)}>
                     <b>218</b> following
                   </a>
                 </li>
@@ -128,7 +201,10 @@ function User() {
           <br />
 
           <div className="row">
-            {posts.map((p) => (
+            {posts.length === 0 && (
+              <h1 className='text-center'>No have post</h1>
+            )}
+            {post.length > 0 && posts.map((p) => (
                 <Post p={p} key={p.post.id}/>
             ))}
 

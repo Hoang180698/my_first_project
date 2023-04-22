@@ -3,13 +3,15 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import { logout } from "../../app/slices/auth.slice";
-import NewPost from "../../pages/newPost/NewPost";
 import useCreatePost from "../../pages/newPost/useCreatePost";
 import styles from "./Header.module.css";
 import NotifyHeader from "./notify/NotifyHeader";
 
 
 function Header() {
+  function refreshPage() {
+    window.location.reload(false);
+  }
 
   const { auth } = useSelector((state) => state.auth);
   const { onCreatePost } = useCreatePost();
@@ -31,15 +33,13 @@ function Header() {
             <button
               className="navbar-toggler"
               type="button"
-              data-toggle="dropdown"
+              data-bs-toggle="collapse"
               data-bs-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent"
               aria-expanded="false"
               aria-label="Toggle navigation"
             >
-              <span></span>
-              <span></span>
-              <span></span>
+              <span className="navbar-toggler-icon"></span>
             </button>
 
             {/* Link */}
@@ -49,12 +49,12 @@ function Header() {
             >
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li className="nav-item mx-3">
-                  <NavLink to={"/"} className="nav-link">
+                  <NavLink to={"/"} className="nav-link" onDoubleClick={refreshPage}>
                     <i className="fa-solid fa-house"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
-                  <NavLink to={"/search"} className="nav-link">
+                  <NavLink to={"/search"} className="nav-link" onDoubleClick={refreshPage}>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </NavLink>
                 </li>
@@ -67,13 +67,13 @@ function Header() {
                     <NotifyHeader />
 
                 <li className="nav-item mx-3">
-                  <button
-                    className="nav-link collapse navbar-collapse btn"
-                    id="navbarSupportedContent"
+                  <a
+                    role="button"
+                    className="createpost btn"
                     onClick={onCreatePost}
                   >
                     <i className="fa-regular fa-square-plus"></i>
-                  </button>
+                  </a>
                 </li>
               </ul>
 
@@ -95,7 +95,7 @@ function Header() {
                   aria-labelledby="dropdownMenu2"
                 >
                   <li>
-                    <Link to={"/my-profile/"} className="dropdown-item" href="#">
+                    <Link to={"/profile/"} className="dropdown-item" href="#">
                       Profile
                     </Link>
                   </li>
