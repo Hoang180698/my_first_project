@@ -10,12 +10,18 @@ function LikerUser({ u }) {
     const [showModal, setShoModal] = useState(false);
     const [followUser] = useFollowhUserMutation();
     const [unfollowUser] = useUnfollowhUserMutation();
+
+    const [loadingButton, setLoadingButton] = useState(false);
+    
   
     const handleFollow = (id) => {
+      setLoadingButton(true);
+      setTimeout(() => {
+        setLoadingButton(false);
+      }, 1500);
       followUser(id)
       .unwrap()
       .then(() => {
-  
       })
       .catch((err) => {
         alert(err);
@@ -23,6 +29,10 @@ function LikerUser({ u }) {
     }
   
     const handleUnfollow = (id) => {
+      setLoadingButton(true);
+      setTimeout(() => {
+        setLoadingButton(false);
+      }, 1500);
       unfollowUser(id)
       .unwrap()
       .then(() => {
@@ -121,18 +131,21 @@ function LikerUser({ u }) {
                   </div>
                   <div className="me-1 ms-auto mt-2">
                     {!u.followed && (
-                      <a role="button" className="btn ms-5 btn-primary" onClick={() => handleFollow(u.id)}>
-                        Follow
-                      </a>
+                      <button role="button" className="btn ms-5 btn-primary" onClick={() => handleFollow(u.id)} disabled={loadingButton}>
+                          {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
+                  {!loadingButton && "follow"}
+                      </button>
                     )}
                     {u.followed && (
-                      <a
+                      <button
                         role="button"
                         className="btn ms-5 btn-edit-profile"
                         onClick={() => setShoModal(true)}
+                        disabled={loadingButton}
                       >
-                        Following
-                      </a>
+                          {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
+                  {!loadingButton && "following"}
+                      </button>
                     )}
                   </div>
                 </div>

@@ -31,8 +31,8 @@ function Login() {
   return (
     <>
       <div id="wrapper">
-        <div className="container">
-          <div className="row justify-content-center p-2">
+        <div className="container login-container">
+          <div className="row justify-content-center py-5">
             <form className="col-md-3 border my-3 p-3" onSubmit={handleSubmit}>
               <h1 className={`${style.h1} text-center text-upercase py-3`}>
                 Hoagram
@@ -71,14 +71,14 @@ function Login() {
               </div>
             </form>
             <div className="row justify-content-center p-2">
-              <form className="col-md-3 border my-3 p-3">
+              <div className="col-md-3 border my-3 p-3">
                 <div className="d-flex justify-content-center">
                   <h3 text-center className={`${style.h3}`}>
                     Don't have an account?{" "}
                     <Link to={"../register"}>Sign up</Link>
                   </h3>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>

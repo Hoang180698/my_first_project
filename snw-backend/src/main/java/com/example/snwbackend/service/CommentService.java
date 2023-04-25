@@ -2,12 +2,14 @@ package com.example.snwbackend.service;
 
 import com.example.snwbackend.dto.CommentDto;
 import com.example.snwbackend.entity.Comment;
+import com.example.snwbackend.entity.Notification;
 import com.example.snwbackend.entity.Post;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.CommentMapper;
 import com.example.snwbackend.repository.CommentRepository;
+import com.example.snwbackend.repository.NotificationRepository;
 import com.example.snwbackend.repository.PostRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.response.StatusResponse;
@@ -33,7 +35,11 @@ public class CommentService {
     @Autowired
     private CommentMapper commentMapper;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     // Tạo comment
+    @Transactional
     public CommentDto createComment(Integer postId, String content) {
         if(content.isEmpty()) {
             throw new BadRequestException("Content is required");
@@ -55,6 +61,16 @@ public class CommentService {
 
         commentRepository.save(comment);
         postRepository.save(post);
+
+        // tao thong bao
+        Notification notification = Notification.builder()
+                .type("comment")
+                .user(post.getUser())
+                .sender(user)
+                .post(post)
+                .comment(comment)
+                .build();
+        notificationRepository.save(notification);
 
         return commentMapper.toCommentDto(comment);
     }
@@ -101,12 +117,13 @@ public class CommentService {
         post.setCommentCount(post.getCommentCount() - 1);
 
         commentRepository.delete(comment);
+        notificationRepository.deleteAllByComment(comment);
         postRepository.save(post);
 
         return new StatusResponse("ok");
     }
 
-    // Lấy comment của 1 post
+    // Lấy comments của 1 post
     public List<CommentDto> getAllCommentByPostId(Integer postId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../app/services/auth.service";
 import style from "./Auth.module.css";
 
@@ -36,7 +36,7 @@ function Register() {
   return (
     <>
       <div id="wrapper">
-        <div className="container">
+        <div className="container login-container">
           <div className="row justify-content-center p-2">
             <form className="col-md-4 border my-3 p-3" onSubmit={handleSubmit}>
               <h1 className={`${style.h1} text-center text-upercase py-3`}>

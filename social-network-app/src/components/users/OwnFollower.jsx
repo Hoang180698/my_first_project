@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 function OwnFollower({ u }) {
-  const { auth } = useSelector((state) => state.auth);
 
   const [showModal, setShoModal] = useState(false);
   const [removeFollower] = useRemoveFollowerMutation();

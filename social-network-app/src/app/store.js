@@ -6,6 +6,7 @@ import { userApi } from "./services/user.service";
 import authReducer from "./slices/auth.slice";
 import newpostReducer from "./slices/newpost.slice";
 import { commentApi } from "./services/comment.service";
+import { notificationApi } from "./services/notification.service";
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         [postApi.reducerPath]: postApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
+        [notificationApi.reducerPath]: notificationApi.reducer,
         auth: authReducer,
         newpost: newpostReducer,
     },
@@ -24,6 +26,7 @@ const store = configureStore({
             postApi.middleware,
             userApi.middleware,
             commentApi.middleware,
+            notificationApi.middleware
         ),
 });
 

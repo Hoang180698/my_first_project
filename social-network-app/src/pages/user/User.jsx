@@ -22,6 +22,8 @@ function User() {
     const [showFollower, setShowFollower] = useState(false);
     const [showFollowing, setShowFollowing] = useState(false);
 
+    const [loadingButton, setLoadingButton] = useState(false);
+
     const navigate = useNavigate();
 
     if (auth.id === Number(userId)) {
@@ -29,10 +31,14 @@ function User() {
     }
 
     const handleFollow = (id) => {
+      setLoadingButton(true);
+      setTimeout(() => {
+        setLoadingButton(false);
+      }, 1500);
       followUser(id)
       .unwrap()
       .then(() => {
-
+     
       })
       .catch((err) => {
         alert(err);
@@ -40,10 +46,14 @@ function User() {
     }
 
     const handleUnfollow = (id) => {
+      setLoadingButton(true);
+      setTimeout(() => {
+        setLoadingButton(false);
+      }, 1500);
       unfollowUser(id)
       .unwrap()
       .then(() => {
-        setShoModal(false)
+        setShoModal(false);
       })
       .catch((err) => {
         alert(err);
@@ -62,10 +72,18 @@ function User() {
           </div>
         )
     }
+    if(!user && !isLoadingUser) {
+      return (
+        <div className='container'>
+        <h3 className='text-center mt-5'>Sorry, this page isn't available.</h3>
+        <p className='text-center mt-4'>The link you followed may be broken, or the page may have been removed. Go back to Hoagram.</p>
+    </div>
+      )
+    }
   return (
     <>
     {showFollower && (
-      <Modal centered show={true}>
+      <Modal centered show={showFollower}>
          <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Followers</h6>
@@ -76,7 +94,7 @@ function User() {
       </Modal>
     )}
     {showFollowing && (
-        <Modal centered show={true}>
+        <Modal centered show={showFollowing}>
         <div className="modal-content px-2">
            <div className="d-flex border-bottom py-2">
              <h6 className="modal-title mx-auto">Following</h6>
@@ -142,14 +160,16 @@ function User() {
               <h1 className="profile-user-name h4">{user.name}</h1>
 
               {!user.followed && (
-                 <a role='button' className="btn ms-5 btn-primary" onClick={() => handleFollow(user.id)}>
-                 Follow
-               </a>
+                 <button className="btn ms-5 btn-primary" onClick={() => handleFollow(user.id)} disabled={loadingButton}>
+                  {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
+                  {!loadingButton && "follow"}
+               </button>
               )}
                {user.followed && (
-                 <a role='button' className="btn pt-2 ms-5 btn-edit-profile" onClick={() => setShoModal(true)}>
-                 Following
-               </a>
+                 <button className="btn pt-2 ms-5 btn-edit-profile" onClick={() => setShoModal(true)} disabled={loadingButton}>
+                  {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
+                  {!loadingButton && "following"}
+               </button>
               )}
               <a className="btn pt-2 ms-4 btn-edit-profile" href="/messenge">
                 Message

@@ -1,5 +1,6 @@
 package com.example.snwbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +20,7 @@ public class Notification {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private String type;
 
     @Column(name = "seen")
@@ -32,11 +30,25 @@ public class Notification {
     private LocalDateTime createdAt;
 
     @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        seen = false;
     }
 }

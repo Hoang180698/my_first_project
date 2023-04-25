@@ -1,10 +1,7 @@
 package com.example.snwbackend.service;
 
 import com.example.snwbackend.dto.PostDto;
-import com.example.snwbackend.entity.Image;
-import com.example.snwbackend.entity.Like;
-import com.example.snwbackend.entity.Post;
-import com.example.snwbackend.entity.User;
+import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
@@ -40,6 +37,9 @@ public class PostService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
 
     // Tạo post
@@ -112,6 +112,7 @@ public class PostService {
         }
         likeRepository.deleteByPost(post);
         commentRepository.deleteAllByPost(post);
+        notificationRepository.deleteAllByPost(post);
         postRepository.delete(post);
 
         return new StatusResponse("ok");
@@ -203,8 +204,18 @@ public class PostService {
                 .user(user)
                 .build();
         post.setLikeCount(post.getLikeCount() + 1);
+
         likeRepository.save(like);
         postRepository.save(post);
+
+        // Tao thong bao
+        Notification notification = Notification.builder()
+                .user(post.getUser())
+                .sender(user)
+                .type("like")
+                .post(post)
+                .build();
+        notificationRepository.save(notification);
 
         return new StatusResponse("ok") ;
     }
@@ -223,8 +234,13 @@ public class PostService {
             throw new BadRequestException("You have not liked this post");
         });
         post.setLikeCount(post.getLikeCount() - 1);
+
         likeRepository.delete(like);
         postRepository.save(post);
+
+        // xoa thong bao
+        Notification notification = notificationRepository.findByUserAndSenderAndPostAndType(post.getUser(), user, post, "like").get();
+        notificationRepository.delete(notification);
 
         return new StatusResponse("ok") ;
     }

@@ -56,6 +56,10 @@ body {
     color: white;
 }
 
+.login-container {
+	height: 100vh;
+}
+
 /* home page */
 
 .post-image{
@@ -127,7 +131,7 @@ body {
 	height: 7px;
 	width: 7px;
 	border-radius: 7px;
-	background-color: #66bb6a;
+	background-color: rgb(190, 33, 33);
 	position: absolute;
 	top: 7px;
 	left: 12px;
@@ -320,7 +324,7 @@ body {
 .emoji-newpost{
 	color: #080808;
 	position: absolute;
-	bottom: -10px;
+	bottom: -14px;
 	left: 15px;
 	font-size: 22px;
 }

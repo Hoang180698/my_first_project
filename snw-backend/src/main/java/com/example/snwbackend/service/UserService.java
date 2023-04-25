@@ -2,17 +2,11 @@ package com.example.snwbackend.service;
 
 import com.example.snwbackend.dto.UserDetailDto;
 import com.example.snwbackend.dto.UserDto;
-import com.example.snwbackend.entity.Follow;
-import com.example.snwbackend.entity.Image;
-import com.example.snwbackend.entity.Post;
-import com.example.snwbackend.entity.User;
+import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
-import com.example.snwbackend.repository.FollowRepository;
-import com.example.snwbackend.repository.ImageRepository;
-import com.example.snwbackend.repository.PostRepository;
-import com.example.snwbackend.repository.UserRepository;
+import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.response.ImageResponse;
 import com.example.snwbackend.response.StatusResponse;
@@ -23,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -38,6 +33,9 @@ public class UserService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -168,6 +166,7 @@ public class UserService {
     }
 
     // follow user
+    @Transactional
     public StatusResponse followUser(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -190,10 +189,21 @@ public class UserService {
                 .following(userFl)
                 .build();
         followRepository.save(follow);
+
+//       Tạo thông báo
+        Notification notification = Notification.builder()
+                .user(userFl)
+                .sender(user)
+                .type("follow")
+                .build();
+
+        notificationRepository.save(notification);
+
         return new StatusResponse("Successfully follow");
     }
 
     // unfollow
+    @Transactional
     public StatusResponse unfollowUser(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -208,6 +218,10 @@ public class UserService {
             throw new BadRequestException("Have not followed this user");
         });
         followRepository.delete(follow);
+
+        // Xoa thong bao
+        Notification notification = notificationRepository.findByUserAndSenderAndType(userFl, user, "follow").get();
+        notificationRepository.delete(notification);
 
         return new StatusResponse("ok");
     }

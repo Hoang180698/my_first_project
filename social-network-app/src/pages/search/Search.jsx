@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Search.css";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
@@ -12,6 +12,8 @@ function Search() {
   const [term, setTerm] = useState("");
   const [users, setUsers] = useState([]);
   const [searchUser] = useLazySearchUserQuery();
+
+  const myRef = useRef(null);
   // const [followUser] = useFollowhUserMutation();
   // const [unfollowUser] = useUnfollowhUserMutation();
 
@@ -77,7 +79,7 @@ function Search() {
         </div>
       </div>
       <div className="container">
-        <div className="row">
+        <div className="row" ref={myRef}>
           {/* {(users.length === 0 && term) && (
           <h5 text-center>No results found.</h5>
         )} */}

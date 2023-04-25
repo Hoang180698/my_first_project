@@ -27,9 +27,9 @@ function Header() {
       <header className="border-bottom">
         <nav className="navbar navbar-expand-lg navbar-light px-3">
           <div className="container-fluid">
-            <Link to={"/"} className={`${styles.logo} navbar-brand`}>
+            <a href={"/"} className={`${styles.logo} navbar-brand`}>
               Hoagram
-            </Link>
+            </a>
             <button
               className="navbar-toggler"
               type="button"
@@ -64,8 +64,9 @@ function Header() {
                   </NavLink>
                 </li>
                 {/* Thong bao */}
-                    <NotifyHeader />
-
+                <li className="nav-item mx-3 dropdown notification-ui">
+                <NotifyHeader />
+                </li>
                 <li className="nav-item mx-3">
                   <a
                     role="button"

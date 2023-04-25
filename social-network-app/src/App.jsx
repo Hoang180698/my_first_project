@@ -15,6 +15,8 @@ import Search from "./pages/search/Search";
 import User from "./pages/user/User";
 import PostDetail from "./pages/post-detail/PostDetail";
 import Liker from "./components/liker/Liker";
+import NotFound from "./pages/notfound/NotFound";
+
 
 
 function App() {
@@ -35,6 +37,7 @@ function App() {
             <Route path="/u/:userId" element={<User />}></Route>
             <Route path="/p/:postId" element={<PostDetail />}></Route>
             <Route path="/likes" element={<Liker />}></Route>
+            <Route path="*" element={<NotFound />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />} />
