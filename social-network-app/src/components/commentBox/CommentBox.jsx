@@ -3,6 +3,7 @@ import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import { useSelector } from "react-redux";
 import { useDeleteCommentMutation } from "../../app/services/comment.service";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function CommentBox({ comments }) {
   const { auth } = useSelector((state) => state.auth);
@@ -11,8 +12,13 @@ function CommentBox({ comments }) {
   const handleDeleteComment = (id) => {
     deleteComment(id)
       .unwrap()
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => {
+        toast.success("Removed")
+      })
+      .catch((err) => {
+        toast.error("Something went wrong. Please try again.");
+        console.log(err)
+      });
   };
 
   return (

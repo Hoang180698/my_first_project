@@ -3,6 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import { useFollowhUserMutation, useUnfollowhUserMutation } from "../../app/services/user.service";
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function LikerUser({ u }) {
     const { auth } = useSelector((state) => state.auth);
@@ -16,30 +17,39 @@ function LikerUser({ u }) {
   
     const handleFollow = (id) => {
       setLoadingButton(true);
-      setTimeout(() => {
-        setLoadingButton(false);
-      }, 1500);
       followUser(id)
       .unwrap()
       .then(() => {
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
     }
   
     const handleUnfollow = (id) => {
       setLoadingButton(true);
-      setTimeout(() => {
-        setLoadingButton(false);
-      }, 1500);
       unfollowUser(id)
       .unwrap()
       .then(() => {
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
           setShoModal(false);
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+        setShoModal(false);
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
   
     }

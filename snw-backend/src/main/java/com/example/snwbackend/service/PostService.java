@@ -21,6 +21,9 @@ import java.util.List;
 public class PostService {
 
     @Autowired
+    private SaveRepository saveRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -56,7 +59,6 @@ public class PostService {
         // Tạo post
         Post post = Post.builder()
                 .content(request.getContent())
-                .imageUrls(request.getImagesUrl())
                 .user(user)
                 .build();
         return postRepository.save(post);
@@ -90,7 +92,6 @@ public class PostService {
         }
 
         post.setContent(request.getContent());
-        post.setImageUrls(request.getImagesUrl());
 
         return postRepository.save(post);
     }
@@ -151,10 +152,11 @@ public class PostService {
 
     // Tạo post với images
     @Transactional
-    public Post createPostWithImages(String content, MultipartFile[] files) {
-        if(content.isEmpty() && files.length == 0) {
-            throw new BadRequestException("Content or images cannot be empty");
+    public Post createPostWithImages(MultipartFile[] files) {
+        if(files.length == 0 || files.length > 15) {
+            throw new BadRequestException("images cannot be empty or having size more than 15");
         }
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -175,7 +177,6 @@ public class PostService {
                 urls.add(url);
             }
             Post post = Post.builder()
-                    .content(content)
                     .imageUrls(urls)
                     .user(user)
                     .build();
@@ -183,7 +184,6 @@ public class PostService {
         } catch (Exception e) {
             throw new RuntimeException("Upload post error");
         }
-
     }
 
     // Like post
@@ -209,13 +209,16 @@ public class PostService {
         postRepository.save(post);
 
         // Tao thong bao
-        Notification notification = Notification.builder()
-                .user(post.getUser())
-                .sender(user)
-                .type("like")
-                .post(post)
-                .build();
-        notificationRepository.save(notification);
+        if (user.getId() != post.getUser().getId()) {
+            Notification notification = Notification.builder()
+                    .user(post.getUser())
+                    .post(post)
+                    .sender(user)
+                    .type("like")
+                    .build();
+            notificationRepository.save(notification);
+        }
+
 
         return new StatusResponse("ok") ;
     }
@@ -239,9 +242,53 @@ public class PostService {
         postRepository.save(post);
 
         // xoa thong bao
-        Notification notification = notificationRepository.findByUserAndSenderAndPostAndType(post.getUser(), user, post, "like").get();
-        notificationRepository.delete(notification);
+       notificationRepository.deleteByPostAndSenderAndType(post, user, "like");
 
         return new StatusResponse("ok") ;
     }
+
+    // Save post
+    public StatusResponse savePost(Integer id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found post with id = " + id);
+        });
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        if(saveRepository.findByUserAndPost(user, post).isPresent()) {
+            throw new BadRequestException("You have already saved this post");
+        }
+
+        Save save = Save.builder().user(user).post(post).build();
+
+        saveRepository.save(save);
+
+        return new StatusResponse("ok") ;
+    }
+
+    // Un save post
+    public StatusResponse unSavePost(Integer id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found post with id = " + id);
+        });
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Save save = saveRepository.findByUserAndPost(user, post).orElseThrow(() -> {
+            throw new BadRequestException("You have not saved this post");
+        });
+        saveRepository.delete(save);
+        return new StatusResponse("ok") ;
+    }
+
+    // Get saved posts
+    public List<PostDto> getAllSavedPost() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return postRepository.getAllSavedPost(user.getId());
+    };
 }

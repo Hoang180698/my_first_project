@@ -60,7 +60,7 @@ function Header() {
                 </li>
                 <li className="nav-item mx-3">
                   <NavLink to={"/messenge"} className="nav-link">
-                    <i class="fa-regular fa-message"></i>
+                    <i className="fa-regular fa-message"></i>
                   </NavLink>
                 </li>
                 {/* Thong bao */}
@@ -103,6 +103,11 @@ function Header() {
                   <li>
                     <Link to={"/edit-profile"} className="dropdown-item" href="#">
                       Edit
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={"/notifications"} className="dropdown-item" href="#">
+                      Notifications
                     </Link>
                   </li>
                   <li>

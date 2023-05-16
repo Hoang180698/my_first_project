@@ -5,21 +5,28 @@ import ImageSlider from "../imageSlider/ImageSlider";
 import {
   useDislikePostMutation,
   useLikePostMutation,
+  useSavePostMutation,
+  useUnSavePostMutation,
 } from "../../app/services/posts.service";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import PostModal from "../PostModal/PostModal";
 import Liker from "../liker/Liker";
+import { toast } from "react-toastify";
 
 function Post({ p }) {
   
   const [likePost] = useLikePostMutation();
   const [dislikePost] = useDislikePostMutation();
+  const [savePost] = useSavePostMutation();
+  const [unSavePost] = useUnSavePostMutation();
 
   const likerRef = useRef(null);
 
+  const [showMore, setShowMore] = useState(false);
   const [showPostModal, shetShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
+
   const handleOfLikerModal = () => {
     likerRef.current.removeChild(likerRef.current.children[0]);
     setShowLikerModal(false);
@@ -31,7 +38,10 @@ function Post({ p }) {
         .then(() => {
           //   alert("dislike");
         })
-        .catch((err) => alert(err));
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
     } else {
       likePost(postId)
         .unwrap()
@@ -39,7 +49,28 @@ function Post({ p }) {
           //   alert("liked");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    }
+  };
+  const handeleSavePost = (saved, postId) => {
+    if(saved) {
+      unSavePost(postId).unwrap()
+        .then(() => {
+         
+        })
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      savePost(postId).unwrap()
+        .then(() => {
+          
+        })
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
     }
@@ -76,29 +107,29 @@ function Post({ p }) {
       )}
       <div className="col-sm-6 offset-sm-3">
         <div
-          class="modal fade"
+          className="modal fade"
           id="popupModal"
           tabindex="-1"
           role="dialog"
           aria-labelledby="popupModalLabel"
           aria-hidden="true"
         >
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="popupModalLabel">
+          <div className="modal-dialog modal-lg" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="popupModalLabel">
                   Pop-up Modal
                 </h5>
                 <button
                   type="button"
-                  class="close"
+                  className="close"
                   data-dismiss="modal"
                   aria-label="Đóng"
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body">
+              <div className="modal-body">
                 <iframe
                   id="popupIframe"
                   src=""
@@ -148,7 +179,7 @@ function Post({ p }) {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <i class="fa-solid fa-ellipsis"></i>
+                <i className="fa-solid fa-ellipsis"></i>
               </a>
               <ul
                 className="dropdown-menu dropdown-menu-lg-end"
@@ -172,7 +203,11 @@ function Post({ p }) {
 
           {/* content */}
           <div className="post-block__content mb-2">
-            <pre>{p.post.content}</pre>
+            {p.post.content.length > 250 && (
+              <pre> {showMore ? p.post.content : `${p.post.content.substring(0, 240)}...`}
+              <b role="button" onClick={() => setShowMore(!showMore)}>{showMore ? "\nShow less" : "Show more"}</b></pre>
+            )}
+            {p.post.content.length <= 250 && <pre>{p.post.content}</pre>}  
             <ImageSlider data={p.post.imageUrls} />
           </div>
           <div className="mb-3 border-top">
@@ -200,7 +235,7 @@ function Post({ p }) {
                   onClick={() => shetShowPostModal(true)}
                 >
                   <span>
-                    <i class="fa-regular fa-comment"></i>
+                    <i className="fa-regular fa-comment"></i>
                   </span>
                 </a>
                 <a href="#!" className="text-dark ms-3 interact">
@@ -209,9 +244,9 @@ function Post({ p }) {
                   </span>
                 </a>
               </div>
-              <a href="#!" className="text-dark interact">
+              <a role="button" onClick={() => handeleSavePost(p.saved ,p.post.id)} className="text-dark interact">
                 <span>
-                  <i className="fa-regular fa-bookmark"></i>
+                  <i className={p.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
                 </span>
               </a>
             </div>
@@ -271,7 +306,7 @@ function Post({ p }) {
                   className="text-dark me-2 interact-comment"
                 >
                   <span>
-                    <i class="fa-regular fa-heart"></i>
+                    <i className="fa-regular fa-heart"></i>
                   </span>
                 </a>
                 <a

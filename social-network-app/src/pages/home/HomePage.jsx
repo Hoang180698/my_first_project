@@ -7,6 +7,7 @@ import "./sass/style.scss";
 // import ImageSlider from "../../components/imageSlider/ImageSlider";
 // import { formatDate } from "../../utils/functionUtils";
 import Post from "../../components/post/Post";
+import { Helmet } from "react-helmet";
 
 function HomePage() {
   const { auth } = useSelector((state) => state.auth);
@@ -29,6 +30,9 @@ function HomePage() {
 
   return (
     <>
+    <Helmet>
+      <title>Hoagram</title>
+    </Helmet>
       <section className="main-content">
         <div className="container">
           <div className="col-sm-6 offset-sm-3">

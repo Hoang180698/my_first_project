@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { useDeleteAvatarMutation, useUpdateUserMutation, useUploadAvatarMutation } from "../../app/services/user.service";
 import "./Edit.css";
 import Modal from 'react-bootstrap/Modal';
+import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 
 function Edit() {
   const [tabIdx, setTabIdx] = useState(0);
@@ -20,14 +22,25 @@ function Edit() {
   const [biography, setBiography] = useState(auth.biography);
   const [birthday, setBirthday] = useState(auth.birthday);
 
-  const handleUpdateAccount = () => {
+  const handleSetPhone = (event) => {
+    const newPhone = event.target.value.replace(/[^\d]/g, '');
+    setPhone(newPhone);
+  }
+
+  const handleChangePassword = () => {
+    
+  }
+
+  const handleUpdateAccount = (e) => {
+    e.preventDefault();
       updateUser({ name, phone, address, gender, biography, birthday })
         .unwrap()
         .then(() => {
-          alert("successfully updated!");
+          toast.success("successfully updated!");
         })
         .catch((err) => {
-          alert(err);
+          toast.error(err.data.message)
+          console.log(err);
         });
   }
   // const handleCancelAccount = () => {
@@ -47,11 +60,13 @@ function Edit() {
     uploadAvatar(formData) // Trả về URL /api/images/1
         .unwrap()
         .then(() => {
-            alert("Upload avatar successfully");
+            toast.success("Upload avatar successfully");
             setShoModal(false);
         })
         .catch((err) => {
+           toast.error("Something went wrong. Please try again.");
             console.log(err);
+            setShoModal(false);
         });
   }
 
@@ -59,15 +74,20 @@ function Edit() {
       deleteAvatar()
         .unwrap()
         .then(() => {
-          alert("Avatar removed");
+          toast.success("Avatar removed");
           setShoModal(false);
         })
         .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
           console.log(err);
+          setShoModal(false);
       });
   }
   return (
     <>
+    <Helmet>
+      <title>Edit profile | Hoagram</title>
+    </Helmet>
       <section className="py-1">
         <div className="container">
           <div className="bg-white rounded-lg d-block d-sm-flex">
@@ -159,11 +179,13 @@ function Edit() {
                 aria-labelledby="account-tab"
               >
                 <h3 className="mb-4">Account Settings</h3>
-                <div className="row">
+        
+                <form className="row" onSubmit={handleUpdateAccount}>
                   <div className="col-md-6">
                     <div className="form-group">
                       <label>Name</label>
                       <input
+                        required
                         type="text"
                         className="form-control"
                         value={name}
@@ -178,7 +200,8 @@ function Edit() {
                         type="text"
                         className="form-control"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => handleSetPhone(e)}
+                        maxLength={12}
                       />
                     </div>
                   </div>
@@ -224,20 +247,24 @@ function Edit() {
                   <div className="col-md-12">
                     <div className="form-group">
                       <label>Bio</label>
-                      <textarea className="form-control" rows="4" value={biography} onChange={(e) => setBiography(e.target.value)}>
+                      <textarea className="form-control" rows="4" value={biography} onChange={(e) => setBiography(e.target.value)} maxLength={200}>
                       </textarea>
+                      <span style={{fontSize: "12px"}} className={(biography && biography.length > 199) ? "text-danger" : ""}>{biography && `${biography.length}/200`}</span>
                     </div>
                   </div>
-                </div>
-                <div>
+                  <div>
                   <button className="btn btn-primary"
-                    onClick={handleUpdateAccount}
+                    type="submit"
                     disabled={name === auth.name && phone === auth.phone && address === auth.address && gender === auth.gender && biography === auth.biography && birthday === auth.birthday}  >
                     Update
                   </button>
                   {/* <button className="btn btn-light" onClick={handleCancelAccount}>Cancel</button> */}
                 </div>
+                </form>               
               </div>
+
+                {/* password */}
+
               <div
                 className={
                   tabIdx === 1 ? "tab-pane fade show active" : "tab-pane fade"
@@ -247,11 +274,12 @@ function Edit() {
                 aria-labelledby="password-tab"
               >
                 <h3 className="mb-4">Password Settings</h3>
+                <form onSubmit={handleChangePassword}>
                 <div className="row">
                   <div className="col-md-6">
                     <div className="form-group">
                       <label>Old password</label>
-                      <input type="password" className="form-control" />
+                      <input required type="password" className="form-control" />
                     </div>
                   </div>
                 </div>
@@ -259,20 +287,21 @@ function Edit() {
                   <div className="col-md-6">
                     <div className="form-group">
                       <label>New password</label>
-                      <input type="password" className="form-control" />
+                      <input required type="password" className="form-control" />
                     </div>
                   </div>
                   <div className="col-md-6">
                     <div className="form-group">
                       <label>Confirm new password</label>
-                      <input type="password" className="form-control" />
+                      <input required type="password" className="form-control" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <button className="btn btn-primary">Update</button>
+                  <button type="submit" className="btn btn-primary">Update</button>
                   {/* <button className="btn btn-light">Cancel</button> */}
                 </div>
+                </form>    
               </div>
             </div>
           </div>

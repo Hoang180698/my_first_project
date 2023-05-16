@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import ImageSlider from "../../components/imageSlider/ImageSlider";
 import Modal from "react-bootstrap/Modal";
@@ -8,6 +8,8 @@ import {
   useDislikePostMutation,
   useGetPostByIdQuery,
   useLikePostMutation,
+  useSavePostMutation,
+  useUnSavePostMutation,
 } from "../../app/services/posts.service";
 import {
   useAddCommentMutation,
@@ -18,10 +20,14 @@ import { useSelector } from "react-redux";
 import CommentBox from "../../components/commentBox/CommentBox";
 import EmojiPicker from "emoji-picker-react";
 import Liker from "../../components/liker/Liker";
+import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 
 function PostDetail() {
   const { postId } = useParams();
   const { auth } = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
 
   const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
   const { data: comments, isLoading: isLoadingComments } =
@@ -38,6 +44,8 @@ function PostDetail() {
   const [likePost] = useLikePostMutation();
   const [dislikePost] = useDislikePostMutation();
   const [addComment] = useAddCommentMutation();
+  const [savePost] = useSavePostMutation();
+  const [unSavePost] = useUnSavePostMutation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -69,11 +77,15 @@ function PostDetail() {
       deletePost(id)
         .unwrap()
         .then(() => {
-          alert("You delete the post!");
-          
+          toast.success("You delete the post!");
+          setTimeout(() => {
+            navigate("/");
+            window.location.reload(false);
+          }, 1000);
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
         });
     }
   };
@@ -85,7 +97,10 @@ function PostDetail() {
         .then(() => {
           //   alert("dislike");
         })
-        .catch((err) => alert(err));
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
     } else {
       likePost(postId)
         .unwrap()
@@ -93,21 +108,41 @@ function PostDetail() {
           //   alert("liked");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
     }
   };
 
+  const handeleSavePost = (saved, postId) => {
+    if(saved) {
+      unSavePost(postId).unwrap()
+        .then()
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      savePost(postId).unwrap()
+        .then()
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    }
+  }
+
   const handleAddComment = () => {
     if (text.length > 0) {
-      addComment({ postId, content: text })
+      const newData = {content: text}
+      addComment({ postId, data: newData })
         .unwrap()
         .then(() => {
           setText("");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Couldn't post comment!");
+          console.log(err);
         });
     }
   };
@@ -142,6 +177,9 @@ function PostDetail() {
 
   return (
     <>
+    <Helmet>
+      <title>Post of {post.userName} | Hoagram</title>
+    </Helmet>
      {showLikerModal && (
         <Modal centered show={true}>
           <div className="modal-content px-2">
@@ -258,11 +296,11 @@ function PostDetail() {
                       </span>
                     </a>
                   </div>
-                  <a href="#!" className="text-dark interact">
-                    <span>
-                      <i class="fa-regular fa-bookmark"></i>
-                    </span>
-                  </a>
+                  <a role="button" onClick={() => handeleSavePost(post.saved ,post.post.id)} className="text-dark interact">
+                <span>
+                  <i className={post.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
+                </span>
+              </a>
                 </div>
                 <div className="mb-0 d-flex count-interact">
                 {post.post.likeCount > 0 && (
@@ -293,6 +331,7 @@ function PostDetail() {
                       onKeyDown={(e) => handleAddCommentOther(e)}
                       maxRows={4}
                       ref={textareaRef}
+                      maxLength={240}
                     />
                     {showPicker && (
                       <div className="emoji-picker" ref={emojiRef}>
@@ -304,7 +343,7 @@ function PostDetail() {
                       />
                       </div>
                     )}
-                    <div className="input-group-append">
+                    <div className="input-group-append d-grid">
                       <button
                         className="btn btn-post-comment btn-block"
                         onClick={handleAddComment}
@@ -314,6 +353,9 @@ function PostDetail() {
                         post
                         {/* <i className="fa fa-paper-plane"></i> */}
                       </button>
+                      {text.length > 100 && 
+                <span className={text.length > 239 ? "text-danger ms-2 mt-3" : "ms-2 mt-2"} style={{fontSize: "11px"}}>{`${text.length}/240`}</span>  
+               } 
                   </div>
                 </div>
 

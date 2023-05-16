@@ -8,14 +8,18 @@ import { post } from 'jquery';
 import { Modal } from 'react-bootstrap';
 import Follower from '../../components/users/Follower';
 import Following from '../../components/users/Following';
+import { toast } from 'react-toastify';
+import { useCreateContactMutation } from '../../app/services/chat.service';
 
 function User() {
     const { userId } = useParams();
     const { data: user, isLoading: isLoadingUser } = useGetUserByIdQuery(userId);
     const { data: posts, isLoading: isLoadingPosts} = useGetPostByUserIdQuery(userId);
+
     const { auth } = useSelector((state) => state.auth);
     const [followUser] = useFollowhUserMutation();
     const [unfollowUser] = useUnfollowhUserMutation();
+    const [createContact] = useCreateContactMutation();
 
     const [showModal, setShoModal] = useState(false);
 
@@ -30,33 +34,51 @@ function User() {
       navigate("/profile/");
     }
 
+    const handleCreateContact = (id) => {
+      createContact({ userId: id }) 
+      .unwrap()
+      .then((res) => {
+        navigate(`/messenge/inbox/${res.id}`);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
     const handleFollow = (id) => {
       setLoadingButton(true);
-      setTimeout(() => {
-        setLoadingButton(false);
-      }, 1500);
       followUser(id)
       .unwrap()
       .then(() => {
-     
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
     }
 
     const handleUnfollow = (id) => {
       setLoadingButton(true);
-      setTimeout(() => {
-        setLoadingButton(false);
-      }, 1500);
       unfollowUser(id)
       .unwrap()
       .then(() => {
         setShoModal(false);
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+        setShoModal(false);
+        setTimeout(() => {
+          setLoadingButton(false);
+        }, 1200);
       })
 
     }
@@ -152,33 +174,32 @@ function User() {
           <div className="profile-image d-flex justify-content-center">
             <img
               src={user.avatar ? `http://localhost:8080${user.avatar}` : "../../../public/user.jpg"}
-              alt=""
             />
           </div>
           <div className="profile-right d-flex flex-column">
-            <div className="profile-user-settings d-flex ms-5">
+            <div className="profile-user-settings d-flex ms-4 ps-1">
               <h1 className="profile-user-name h4">{user.name}</h1>
 
               {!user.followed && (
-                 <button className="btn ms-5 btn-primary" onClick={() => handleFollow(user.id)} disabled={loadingButton}>
+                 <button className="btn ms-4 btn-primary" onClick={() => handleFollow(user.id)} disabled={loadingButton}>
                   {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
                   {!loadingButton && "follow"}
                </button>
               )}
                {user.followed && (
-                 <button className="btn pt-2 ms-5 btn-edit-profile" onClick={() => setShoModal(true)} disabled={loadingButton}>
+                 <button className="btn pt-2 ms-4 btn-edit-profile" onClick={() => setShoModal(true)} disabled={loadingButton}>
                   {loadingButton && <i className='fa-solid fa-circle-notch fa-spin mx-3'></i>}
                   {!loadingButton && "following"}
                </button>
               )}
-              <a className="btn pt-2 ms-4 btn-edit-profile" href="/messenge">
+              <a className="btn pt-2 ms-4 btn-edit-profile" role='button' onClick={() => handleCreateContact(user.id)}>
                 Message
               </a>
             </div>
 
             <div className="profile-stats">
               <ul className="d-flex mt-4">
-                <li className="mx-3">
+                <li className="me-3">
                   <b>{posts.length}</b> post
                 </li>
                 <li className="mx-3">

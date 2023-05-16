@@ -5,18 +5,24 @@ import {
   useDeletePostMutation,
   useDislikePostMutation,
   useLikePostMutation,
+  useSavePostMutation,
+  useUnSavePostMutation,
 } from "../../app/services/posts.service";
 import { useState } from "react";
 import PostModal from "../PostModal/PostModal";
 import Modal from "react-bootstrap/Modal";
 import { Link } from "react-router-dom";
 import Liker from "../liker/Liker";
+import { toast } from "react-toastify";
 
 function OwnPost({ p }) {
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
   const [dislikePost] = useDislikePostMutation();
+  const [savePost] = useSavePostMutation();
+  const [unSavePost] = useUnSavePostMutation();
 
+  const [showMore, setShowMore] = useState(false);
   const [showPostModal, shetShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
 
@@ -27,9 +33,10 @@ function OwnPost({ p }) {
     if (isConfirm) {
       deletePost(id)
         .unwrap()
-        .then(() => alert("You delete the post!"))
+        .then(() => toast.success("You delete the post!"))
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
         });
     }
   };
@@ -41,7 +48,10 @@ function OwnPost({ p }) {
         .then(() => {
         //   alert("dislike");
         })
-        .catch((err) => alert(err));
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err)
+        });
     } else {
       likePost(postId)
         .unwrap()
@@ -49,8 +59,26 @@ function OwnPost({ p }) {
         //   alert("liked");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
           console.log(err)
+        });
+    }
+  };
+
+  const handeleSavePost = (saved, postId) => {
+    if(saved) {
+      unSavePost(postId).unwrap()
+        .then()
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      savePost(postId).unwrap()
+        .then()
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
         });
     }
   };
@@ -123,6 +151,9 @@ function OwnPost({ p }) {
                 className="dropdown-menu dropdown-menu-lg-end"
                 aria-labelledby="dropdownMenu2"
               >
+                  <Link to={`/p/${p.post.id}`} className="dropdown-item text-dark">
+                  Go to Post
+                </Link>
                 <a className="dropdown-item text-dark" href="#">
                   <i className="fa fa-pencil me-1"></i>Edit
                 </a>
@@ -133,16 +164,17 @@ function OwnPost({ p }) {
                 >
                   <i className="fa fa-trash me-1"></i>Delete
                 </a>
-                <Link to={`/p/${p.post.id}`} className="dropdown-item text-dark">
-                  Go to Post
-                </Link>
               </ul>
             </div>
           </div>
 
           {/* content */}
           <div className="post-block__content mb-2">
-            <pre>{p.post.content}</pre>
+          {p.post.content.length > 250 && (
+              <pre> {showMore ? p.post.content : `${p.post.content.substring(0, 240)}...`}
+              <b role="button" onClick={() => setShowMore(!showMore)}>{showMore ? "\nShow less" : " Show more"}</b></pre>
+            )}
+            {p.post.content.length <= 250 && <pre>{p.post.content}</pre>}  
             <ImageSlider data={p.post.imageUrls} />
           </div>
           <div className="mb-3 border-top">
@@ -168,9 +200,9 @@ function OwnPost({ p }) {
                   </span>
                 </a>
               </div>
-              <a href="#!" className="text-dark interact">
+              <a role="button" onClick={() => handeleSavePost(p.saved ,p.post.id)} className="text-dark interact">
                 <span>
-                  <i class="fa-regular fa-bookmark"></i>
+                  <i className={p.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
                 </span>
               </a>
             </div>

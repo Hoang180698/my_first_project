@@ -3,10 +3,7 @@ package com.example.snwbackend.controller;
 import com.example.snwbackend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -25,5 +22,15 @@ public class NotificationController {
     public ResponseEntity<?> seenNotification() {
         notificationService.seenNotification();
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteNotificationById(@PathVariable Integer id) {
+        return ResponseEntity.ok(notificationService.deleteNotificationById(id));
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteAllNotificationByUser() {
+        return ResponseEntity.ok(notificationService.deleteAllNotificationByUser());
     }
 }

@@ -1,182 +1,162 @@
-import React from 'react'
-import ImageSlider from '../../components/imageSlider/ImageSlider'
+import React from "react";
+import "./chat.css";
+import TextareaAutosize from "react-textarea-autosize";
+import InputChat from "../../components/chat/InputChat";
+import { over } from "stompjs";
+import SockJS from "sockjs-client";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useGetContactsQuery } from "../../app/services/chat.service";
+import { useEffect } from "react";
+import { NavLink, Outlet } from "react-router-dom";
 
-const slides = [
-      "https://jes.edu.vn/wp-content/uploads/2017/10/h%C3%ACnh-%E1%BA%A3nh.jpg",
-      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg",
-      "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg",
-      "https://st3.depositphotos.com/20645118/35718/i/1600/depositphotos_357186180-stock-photo-just-born-zeebra-her-mother.jpg"
-]
-const slides2 = [
-  "https://images.pexels.com/photos/539719/pexels-photo-539719.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-  "https://www.shutterstock.com/image-photo/surreal-image-african-elephant-wearing-260nw-1365289022.jpg"
-]
-
+var stompClient = null;
 function Messenge() {
- 
-  return (
-    <>
+  const { auth } = useSelector((state) => state.auth);
+  const [messages, setMessages] = useState([]);
+  const [currentContactId, setCurrentContactId] = useState(0);
+  const [content, setContent] = useState("");
 
-     <section className="main-content">
-        <div className="container">
-          <h1 className="text-center text-uppercase">Social Media Post</h1>
-          <br />
-          <br />
+  const { data, isLoading } = useGetContactsQuery();
 
-          <div className="row">
-            <div className="col-sm-6 offset-sm-3">
-              <div className="post-block">
-                <div className="d-flex justify-content-between">
-                  <div className="d-flex mb-3">
-                    <div className="me-2">
-                      <a href="#" className="text-dark">
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                          alt="User"
-                          className="author-img"
-                        />
-                      </a>
-                    </div>
-                    <div>
-                      <h5 className="mb-0">
-                        <a href="#!" className="text-dark">
-                          Kiran Acharya
-                        </a>
-                      </h5>
-                      <p className="mb-0 text-muted">5m</p>
-                    </div>
-                  </div>
+  useEffect(() => {
+    // connect();
+  }, [currentContactId]);
 
-                  {/* edit xoa */}
+  const handleSendMessage = () => {
+    const newMessage = { senderId: auth.id, content: content };
+    stompClient.send(
+      "/app/message/" + currentContactId,
+      {},
+      JSON.stringify(newMessage)
+    );
+    setContent("");
+  };
 
-                  <div className="post-block__user-options dropdown">
-                    <a
-                      className="nav-link"
-                      href="#"
-                      id="navbarDropdown"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <i className="fa fa-ellipsis-v" aria-hidden="true"></i>
-                    </a>
-                    <ul
-                      className="dropdown-menu dropdown-menu-lg-end"
-                      aria-labelledby="dropdownMenu2"
-                    >
-                      <a className="dropdown-item text-dark" href="#">
-                        <i className="fa fa-pencil me-1"></i>Edit
-                      </a>
-                      <a className="dropdown-item text-danger" href="#">
-                        <i className="fa fa-trash me-1"></i>Delete
-                      </a>
-                    </ul>
-                  </div>
-                </div>
+  const onConnected = () => {
+    stompClient.subscribe(
+      "/topic/messages/" + currentContactId,
+      onMessageReceived
+    );
+  };
 
-                {/* content */}
-                <div className="post-block__content mb-2">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ratione laboriosam non atque, porro cupiditate commodi?
-                    Provident culpa vel sit enim!
-                  </p>
-                 <ImageSlider data={slides} / >
-                
-                </div>
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-2 mt-3">
-                    <div className="d-flex">
-                      <a href="#!" className="text-danger mr-2 interact">
-                        <span>
-                          <i className="fa fa-heart"></i>
-                        </span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-comment"></i></span>
-                      </a>
-                      <a href="#!" className="text-dark ms-3 interact">
-                          <span><i class="fa-regular fa-paper-plane"></i></span>
-                      </a>
-                    </div>
-                    <a href="#!" className="text-dark interact">
-                      <span><i class="fa-regular fa-bookmark"></i></span>
-                    </a>
-                  </div>
-                  <div className="mb-0 d-flex count-interact">
-                    <span className="text-dark">25k likes</span>
-                    <span className="text-dark ms-auto">2k comments</span>
-                  </div>
-                </div>
-                <hr />
-                <div className="post-block__comments">
-                  {/* <!-- Comment Input --> */}
-                  <div className="input-group mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Add your comment"
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        id="button-addon2"
-                      >
-                        <i className="fa fa-paper-plane"></i>
-                      </button>
-                    </div>
-                  </div>
-                  {/* <!-- Comment content --> */}
-                  <div className="comment-view-box mb-3">
-                    <div className="d-flex mb-2">
-                      <div>
-                        <h6 className="mb-1">
-                          <a href="#!" className="text-dark ">  
-                          <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3QLKE2uwuNuRA7wm5VKxwygySQAhafNN1GQ&usqp=CAU"
-                        alt="User img"
-                        className="author-img author-img--small me-2"
-                      />
-                            John doe
-                          </a>{" "}
-                          <small className="text-muted">1m</small>
-                        </h6>
-                        <p className="mb-0 ms-5">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit.
-                        </p>
-                        <div className="d-flex ms-5">
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>
-                            <i class="fa-regular fa-heart"></i>
-                            </span>
-                          </a>
-                          <a href="#!" className="text-dark me-2 interact-comment">
-                            <span>Reply</span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <!-- More Comments --> */}
-                  <hr />
-                  <a href="#!" className="text-dark view-more-coment">
-                    View More comments{" "}
-                    <span className="font-weight-bold">(12)</span>
-                  </a>
-                </div>
-              </div>
-            </div>
+  const onMessageReceived = (payload) => {
+    const payloadData = JSON.parse(payload.body);
+    let newMess = [payloadData, ...messages];
+    setMessages((oldMess) => [payloadData, ...oldMess]);
+  };
 
-            {/*  */}
-            
+  const onError = (err) => {
+    console.log(err);
+  };
+  const connect = () => {
+    let Sock = new SockJS("http://localhost:8080/ws");
+    stompClient = over(Sock);
+    stompClient.connect({}, onConnected, onError);
+  };
 
+  if (isLoading) {
+    return (
+      <div className="container">
+        <div className="text-center m-5">
+          <div className="spinner-border m-5" role="status">
+            <span className="sr-only">Loading...</span>
           </div>
         </div>
-      </section>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="container">
+        <div className="col-sm-10 offset-sm-1  messenge-container mt-4 container-chat">
+          <div className="d-flex border body-chat">
+            <div className="sidebar-chat border-end pt-1">
+              <div className="border-bottom mb-2 p-3 d-flex">
+                <span className="inbox-user-name mx-auto">{auth.name}</span>
+                <i className="fa-regular fa-pen-to-square ms-auto" style={{fontSize: "26px"}}></i>
+              </div>
+              {data.map((c) => (
+                <NavLink
+                  className="px-3 py-2 d-flex user-chat-box text-dark"
+                  to={`/messenge/inbox/${c.id}`}
+                  key={c.id}
+                >
+                  <img
+                    src={
+                      c.user1.id === auth.id
+                        ? c.user2.avatar
+                          ? `http://localhost:8080${c.user2.avatar}`
+                          : "../../../public/user.jpg"
+                        : c.user1.avatar
+                        ? `http://localhost:8080${c.user1.avatar}`
+                        : "../../../public/user.jpg"
+                    }
+                    className="avatar-chat"
+                  />
+                  <div className="px-2 d-flex flex-column" style={{maxWidth:"75%"}}>
+                    <span className="mt-2 chat-user-name">
+                      {c.user1.id === auth.id ? c.user2.name : c.user1.name}
+                    </span>
+                    
+                    <span className="last-message mt-0">
+                      {c.lastMessage?.sender.id === auth.id ? "you: " : ""}
+                      {c.lastMessage?.content}
+                    </span>
+                  </div>
+                </NavLink>
+              ))}
+            </div>
+            <Outlet />
+            {/* <div className="d-flex flex-column conversation-container">
+              <div className="conversation-content d-flex flex-column-reverse p-3">
+                {messages.map((m) => (
+                  <div
+                    className={
+                      m.sender.id === auth.id
+                        ? "d-flex message-content-box own-message"
+                        : "d-flex message-content-box"
+                    }
+                    key={m.id}
+                  >
+                    <p
+                      className={
+                        m.sender.id === auth.id ? "ms-auto" : "me-auto border"
+                      }
+                    >
+                      {m.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="input-message mx-auto mt-auto mb-3 d-flex border">
+                <a role="button" className="ms-3 my-auto">
+                  <i className="fa-sharp fa-regular fa-face-smile"></i>
+                </a>
+                <TextareaAutosize
+                  rows="1"
+                  type="text"
+                  className="form-control ms-2"
+                  maxRows={4}
+                  placeholder="Message..."
+                  autoFocus={true}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+                <button
+                  className="btn btn-post-comment btn-block me-2"
+                  onClick={handleSendMessage}
+                >
+                  Send
+                </button>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </div>
     </>
-  )
+  );
 }
 
-export default Messenge
+export default Messenge;

@@ -5,6 +5,7 @@ import {
 } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function OwnFollower({ u }) {
 
@@ -16,17 +17,18 @@ function OwnFollower({ u }) {
       .unwrap()
       .then(() => {
         setShoModal(false);
-        alert("Removed");
+        toast.success("Removed");
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+        setShoModal(false);
       });
   };
  
   return (
     <>
-      <div className="d-flex mt-3">
-        {u.followed && (
+      <div className="d-flex mt-3">     
           <Modal centered show={showModal} size="sm">
             <div className="modal-content">
               <div className="modal-header d-flex justify-content-center flex-column">
@@ -66,8 +68,6 @@ function OwnFollower({ u }) {
               </div>
             </div>
           </Modal>
-        )}
-
         <div className="me-2">
           <Link to={`/u/${u.id}`} className="text-dark d-flex">
             <img

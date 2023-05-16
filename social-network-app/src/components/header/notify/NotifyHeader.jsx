@@ -10,17 +10,25 @@ function NotifyHeader() {
   const [seenNotifycation] = useSeenNotificationMutation();
 
   const handleClick = () => {
-    seenNotifycation().unwrap().then().catch();
+    if(data && !data[0].seen) {
+      seenNotifycation().unwrap().then().catch();
+    }
   }
 
   if (isLoading) {
     return (
       <>
-        <div className="text-center m-5">
-          <div className="spinner-border m-5" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
+         <a
+        className="nav-link dropdown-toggle notification-ui_icon"
+        href=""
+        id="navbarDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i className="fa fa-bell"></i>
+      </a>
       </>
     );
   }
@@ -57,18 +65,24 @@ function NotifyHeader() {
           )}
           {data.length > 0 &&
             data.map((n) => (
-              <div className="header-notifications-list header-notifications-list--unread text-dark">
-                <div className="header-notifications-list_img">
-                  <img src="images/users/user2.jpg" alt="user" />
-                </div>
+              <div className="header-notifications-list" key={n.id}>
+                <Link to={`/u/${n.sender.id}`} className="header-notifications-list_img">
+                  <img src={n.sender.avatar ? `http://localhost:8080${n.sender.avatar}` : "../../../../public/user.jpg"} />
+                </Link>
                 <div className="header-notifications-list_detail">
                   <p>
-                    <b>Richard Miles</b> <br />
-                    <span className="text-muted">reacted to your post</span>
+                    <b>{n.sender.name}</b> <br />
+                    {n.type === "follow" && <p className="text-muted mt-2">Started following you</p>}
+                    {n.type === "like" && <Link to={`/p/${n.post.id}`}><span className="text-muted">Liked your post</span></Link>}
+                    {n.type === "comment" && <Link to={`/p/${n.post.id}`}><span className="text-muted">Commented your post</span></Link>}
                   </p>
-                  <p className="nt-link text-truncate">
-                    How to travel long way home from here.
-                  </p>
+                  {n.type !== "follow" && (
+                     <p className="nt-link text-truncate">
+                      <Link to={`/p/${n.post.id}`} className="text-dark">
+                      {n.type === "like" ? `${n.post.content}` : `${n.comment.content}`}
+                      </Link>
+                   </p>
+                  )}     
                 </div>
                 <p>
                   <small role="button" data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(n.createdAt)}>{formatDate(n.createdAt)}</small>

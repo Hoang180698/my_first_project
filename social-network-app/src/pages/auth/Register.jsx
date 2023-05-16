@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../app/services/auth.service";
 import style from "./Auth.module.css";
+import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 
 function Register() {
   const [register] = useRegisterMutation();
@@ -21,20 +23,22 @@ function Register() {
     register({ email, name, password })
       .unwrap()
       .then(() => {
-        alert("successfully registered!");
-
+        toast.success("successfully registered!");
         setTimeout(() => {
           navigate("/login");
         }, 1500);
       })
       .catch((err) => {
+        toast.error(err.data.message);
         console.log(err);
-        alert(err.data.message);
       });
   };
 
   return (
     <>
+    <Helmet>
+      <title>Register | Hoagram</title>
+    </Helmet>
       <div id="wrapper">
         <div className="container login-container">
           <div className="row justify-content-center p-2">

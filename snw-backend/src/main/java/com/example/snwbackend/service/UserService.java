@@ -7,6 +7,7 @@ import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
 import com.example.snwbackend.repository.*;
+import com.example.snwbackend.request.PasswordRequest;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.response.ImageResponse;
 import com.example.snwbackend.response.StatusResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +55,10 @@ public class UserService {
 
     // Update thong tin ca nhan
     public UserDto updateUser(UpdateInfoUserRequest request) {
+        String gender = request.getGender();
+        if(gender.equals("male") && gender.equals("female") && gender.equals("gay") && gender.equals("les") && gender.equals("")) {
+            throw new BadRequestException("invalid request in field gender");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -220,8 +226,7 @@ public class UserService {
         followRepository.delete(follow);
 
         // Xoa thong bao
-        Notification notification = notificationRepository.findByUserAndSenderAndType(userFl, user, "follow").get();
-        notificationRepository.delete(notification);
+        notificationRepository.deleteByUserAndSenderAndType(userFl, user, "follow");
 
         return new StatusResponse("ok");
     }
@@ -259,4 +264,15 @@ public class UserService {
     }
 
 
+    // thay doi password
+    public StatusResponse changePassword(PasswordRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+
+
+
+        return new StatusResponse("ok");
+    }
 }

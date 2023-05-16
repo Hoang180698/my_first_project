@@ -21,9 +21,10 @@ export const commentApi = createApi({
             providesTags: ["Post"],
         }),
         addComment: builder.mutation({
-            query: ({ postId, content }) => ({
-                url: `comment/${postId}?content=${content}`,
+            query: ({ postId, data }) => ({
+                url: `comment/${postId}`,
                 method: "POST",
+                body: (data)
             }),
             invalidatesTags: ["Post"],
         }),

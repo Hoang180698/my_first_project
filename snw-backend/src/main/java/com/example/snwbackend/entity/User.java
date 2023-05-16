@@ -44,8 +44,8 @@ public class User implements UserDetails, Serializable {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "Biography")
-    private String Biography;
+    @Column(name = "biography")
+    private String biography;
 
     @Column(name = "avatar")
     private String avatar;

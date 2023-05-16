@@ -1,11 +1,15 @@
 package com.example.snwbackend.controller;
 
+import com.example.snwbackend.exception.BadRequestException;
+import com.example.snwbackend.request.CommentRequest;
 import com.example.snwbackend.service.CommentService;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,8 +22,11 @@ public class CommentController {
 
     // Comment một post
     @PostMapping("{postId}")
-    public ResponseEntity<?> createComment(@PathVariable Integer postId, @RequestParam String content) {
-        return new ResponseEntity<>(commentService.createComment(postId, content), HttpStatus.CREATED);
+    public ResponseEntity<?> createComment(@PathVariable Integer postId, @RequestBody @Valid CommentRequest request, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new BadRequestException("Invalid request");
+        }
+        return new ResponseEntity<>(commentService.createComment(postId, request), HttpStatus.CREATED);
     }
 
     // Lấy danh sách comment của 1 post
@@ -30,8 +37,8 @@ public class CommentController {
 
     // Sửa comment
     @PutMapping("{id}")
-    public ResponseEntity<?> editComment(@PathVariable Integer id, @RequestParam String content) {
-        return ResponseEntity.ok(commentService.editComment(id, content));
+    public ResponseEntity<?> editComment(@PathVariable Integer id, @RequestBody @Valid CommentRequest request) {
+        return ResponseEntity.ok(commentService.editComment(id, request));
     }
 
     // Xóa comment

@@ -7,6 +7,7 @@ import authReducer from "./slices/auth.slice";
 import newpostReducer from "./slices/newpost.slice";
 import { commentApi } from "./services/comment.service";
 import { notificationApi } from "./services/notification.service";
+import { chatApi } from "./services/chat.service";
 
 const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
         [userApi.reducerPath]: userApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
         [notificationApi.reducerPath]: notificationApi.reducer,
+        [chatApi.reducerPath]: chatApi.reducer,
         auth: authReducer,
         newpost: newpostReducer,
     },
@@ -26,7 +28,8 @@ const store = configureStore({
             postApi.middleware,
             userApi.middleware,
             commentApi.middleware,
-            notificationApi.middleware
+            notificationApi.middleware,
+            chatApi.middleware,
         ),
 });
 

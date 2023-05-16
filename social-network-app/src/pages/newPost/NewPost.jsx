@@ -1,9 +1,14 @@
 import { Button } from "bootstrap/dist/js/bootstrap.bundle";
 import React, { useEffect, useRef, useState } from "react";
-import { useCreatePostMutation, useCreatePostWithImagesMutation } from "../../app/services/posts.service";
+import {
+  useCreatePostMutation,
+  useCreatePostWithImagesMutation,
+  useUpdatePostMutation,
+} from "../../app/services/posts.service";
 import useCreatePost from "./useCreatePost";
 import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
+import { toast } from "react-toastify";
 
 function NewPost() {
   const { offCreatePost } = useCreatePost();
@@ -20,6 +25,7 @@ function NewPost() {
 
   const [createPost] = useCreatePostMutation();
   const [createPostWithImages] = useCreatePostWithImagesMutation();
+  const [updatePost] = useUpdatePostMutation();
   const navigate = useNavigate();
 
   const onEmojiClick = (e) => {
@@ -28,13 +34,17 @@ function NewPost() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (emojiRef.current && !emojiRef.current.contains(event.target) && !emojiButtonRef.current.contains(event.target)) {
+      if (
+        emojiRef.current &&
+        !emojiRef.current.contains(event.target) &&
+        !emojiButtonRef.current.contains(event.target)
+      ) {
         setShowPicker(false);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
-  
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -43,6 +53,10 @@ function NewPost() {
   const imageHandleChange = (e) => {
     // console.log(e.target.files);
     const newFiles = Array.from(e.target.files);
+    if (selectedFiles.length + newFiles.length > 15) {
+      toast.warning("Can't post more than 15 photos");
+      return;
+    }
     setSelectedFiles((prevSelectedFiles) => [
       ...prevSelectedFiles,
       ...newFiles,
@@ -68,46 +82,54 @@ function NewPost() {
         setSelectedFiles([]);
         setSelectedImages([]);
         offCreatePost();
-        alert("Create post successfully");
-       
+        toast.success("Create post successfully");
+
         setTimeout(() => {
           navigate("/");
         }, 1000);
       })
       .catch((err) => {
-        alert(err);
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
       });
-  }
+  };
 
   const handlePost = () => {
     if (selectedFiles.length !== 0) {
       const formData = new FormData();
       selectedFiles.forEach((file) => {
-      formData.append("files", file);
-    });
-        createPostWithImages({ content: content, data: formData })
+        formData.append("files", file);
+      });
+      createPostWithImages(formData)
         .unwrap()
-        .then(() => {
-          setContent("");
-          setSelectedFiles([]);
-          setSelectedImages([]);
-          offCreatePost();
-          alert("Create post successfully");
-       
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        .then((res) => {
+          const newData = {
+            id: res.id,
+            content: content,
+          };
+          updatePost(newData)
+            .unwrap()
+            .then(() => {
+              toast.success("Create post successfully");
+              setContent("");
+              setSelectedFiles([]);
+              setSelectedImages([]);
+              offCreatePost();
+            });
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
         });
     } else {
       const newPost = {
-        content
-      }
-        handleCreatePost(newPost);
+        content,
+      };
+      handleCreatePost(newPost);
     }
-  
   };
   const renderPhotos = (source) => {
     return source.map((photo) => {
@@ -137,19 +159,24 @@ function NewPost() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
             ></textarea>
-              <a role="button" className="emoji-newpost" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
-                      <i class="fa-sharp fa-regular fa-face-smile"></i>
-                    </a>
-                    {showPicker && (
-                      <div className="emoji-picker-np" ref={emojiRef}>
-                         <EmojiPicker
-                        height={350}
-                        width={350}
-                        onEmojiClick={onEmojiClick}
-                        autoFocusSearch={false}
-                      />
-                      </div>
-                    )}
+            <a
+              role="button"
+              className="emoji-newpost"
+              onClick={() => setShowPicker(true)}
+              ref={emojiButtonRef}
+            >
+              <i className="fa-sharp fa-regular fa-face-smile"></i>
+            </a>
+            {showPicker && (
+              <div className="emoji-picker-np" ref={emojiRef}>
+                <EmojiPicker
+                  height={350}
+                  width={350}
+                  onEmojiClick={onEmojiClick}
+                  autoFocusSearch={false}
+                />
+              </div>
+            )}
           </div>
           <div className="np-comment-bottom">
             {selectedImages.length > 0 && (

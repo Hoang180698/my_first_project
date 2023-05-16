@@ -131,7 +131,7 @@ body {
 	height: 7px;
 	width: 7px;
 	border-radius: 7px;
-	background-color: rgb(190, 33, 33);
+	background-color: red;
 	position: absolute;
 	top: 7px;
 	left: 12px;
@@ -183,6 +183,7 @@ body {
 	justify-content: space-between;
 	padding: 20px 25px;
 	border-bottom: 1px solid #ddd;
+	height: 100px;
 }
 .header-notifications-list--unread {
 	position: relative;
@@ -524,3 +525,8 @@ textarea:focus{
 .unfollow-question {
 	font-size: 13px;
 }
+
+textarea {
+	outline: none;
+	resize: none;
+  }

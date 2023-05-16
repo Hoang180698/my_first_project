@@ -1,0 +1,87 @@
+.container-chat {
+    height: 80vh;
+}
+.sidebar-chat {
+    width: 33%;
+    height: 100%;
+    display: block;
+}
+.body-chat {
+    height: 100%;
+}
+.conversation-content {
+    height: 100%;
+    overflow-y: auto;
+}
+.avatar-chat {
+    width: 54px;
+    vertical-align: middle;
+    height: 54px;
+    border-radius: 50%;
+}
+.user-chat-box .chat-user-name{
+    font-size: 13.5px;
+    font-weight: 400;
+}
+.user-chat-box:hover {
+    background-color: #e4e4e4;
+}
+.last-message {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+.message-content-box p{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-size: 13px;
+    border-radius: 50px;
+    font-weight: 400;
+    max-width: 70%;
+    word-wrap: break-word;
+	word-break: break-word;
+}
+.own-message p{
+    background-color: #e1e1e1;
+    border: none;
+}
+.message-content-box {
+    width: 100%;
+}
+.conversation-container{
+    width: 67%;
+}
+.input-message i{
+    color: #000;
+    font-size: 20px;
+}
+.input-message textarea {
+    border: none;
+}
+.input-message textarea:focus {
+    outline:none;
+}
+.input-message {
+    border-radius: 50px;
+    width: 90%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.sidebar-chat a.active {
+    background-color: #c7c7c7;
+}
+
+.avatar-inbox {
+    width: 30px;
+    vertical-align: middle;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.inbox-user-name {
+    font-weight: 500;
+}

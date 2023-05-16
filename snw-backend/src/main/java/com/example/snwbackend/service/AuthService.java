@@ -88,6 +88,9 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .gender("")
+                .phone("")
+                .address("")
+                .biography("")
                 .build();
         userRepository.save(user);
         return userMapper.toUserDto(user);

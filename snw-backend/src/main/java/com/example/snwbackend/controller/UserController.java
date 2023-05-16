@@ -1,7 +1,9 @@
 package com.example.snwbackend.controller;
 
+import com.example.snwbackend.request.PasswordRequest;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class UserController {
 
     // Cập nhật thông tin User
     @PutMapping("")
-    public ResponseEntity<?> updateUser(@RequestBody UpdateInfoUserRequest request) {
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateInfoUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(request));
     }
 
@@ -86,5 +88,11 @@ public class UserController {
     @GetMapping("likes/post/{postId}")
     public ResponseEntity<?> getAllUserLikePost(@PathVariable Integer postId) {
         return ResponseEntity.ok(userService. getAllUserLikePost(postId));
+    }
+
+    // Thay doi pass
+    @PutMapping("change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordRequest request) {
+        return ResponseEntity.ok(userService.changePassword(request));
     }
 }

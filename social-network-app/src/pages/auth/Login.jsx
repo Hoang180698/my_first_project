@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../app/services/auth.service";
 import style from "./Auth.module.css";
+import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 
 function Login() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -17,12 +19,22 @@ function Login() {
     login({ email, password })
       .unwrap()
       .then(() => {
+        toast.success("Login success");
         setTimeout(() => {
           navigate("/");
         }, 1500);
       })
       .catch(() => {
-        alert("Please check your password and account name and try again.");
+        toast.error('Please check your password and account name and try again.', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          });
       });
   };
   if (isAuthenticated) {
@@ -30,6 +42,9 @@ function Login() {
   }
   return (
     <>
+    <Helmet>
+      <title>Login | Hoagram</title>
+    </Helmet>
       <div id="wrapper">
         <div className="container login-container">
           <div className="row justify-content-center py-5">

@@ -3,6 +3,7 @@ import "./Search.css";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 // import { useUnfollowhUserMutation } from "../../app/services/user.service";
 // import { useFollowhUserMutation } from "../../app/services/user.service";
 
@@ -11,6 +12,7 @@ function Search() {
 
   const [term, setTerm] = useState("");
   const [users, setUsers] = useState([]);
+  const [noRes, setNoRes] = useState(false);
   const [searchUser] = useLazySearchUserQuery();
 
   const myRef = useRef(null);
@@ -46,9 +48,14 @@ function Search() {
     } else {
       try {
         let { data } = await searchUser(term);
+        if(data.length > 0) {
+          setNoRes(false);
+        } else {
+          setNoRes(true);
+        }
         setUsers(data);
       } catch (error) {
-        alert(error);
+        console.log(error);
       }
     }
   };
@@ -60,6 +67,9 @@ function Search() {
 
   return (
     <>
+    <Helmet>
+      <title>Search | Hoagram</title>
+    </Helmet>
       <div classNameName="h-100 ">
         <div className="d-flex justify-content-center h-100">
           <div className="searchbar my-5">
@@ -83,6 +93,10 @@ function Search() {
           {/* {(users.length === 0 && term) && (
           <h5 text-center>No results found.</h5>
         )} */}
+          {noRes &&
+            <div>
+              <h4 className="text-center">No result found.</h4>
+            </div>}
           {users.length > 0 &&
             users.map((u) => (
               <div className="col-sm-6 offset-sm-3 search-user" key={u.id}>

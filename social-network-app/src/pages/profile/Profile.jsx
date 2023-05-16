@@ -6,6 +6,7 @@ import { useFollowhUserMutation, useUnfollowhUserMutation } from "../../app/serv
 import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { Modal } from "react-bootstrap";
+import { Helmet } from "react-helmet";
 
 
 function Profile() {
@@ -19,6 +20,9 @@ function Profile() {
   
   return (
     <>
+    <Helmet>
+      <title>Profile | Hoagram</title>
+    </Helmet>
      {showFollower && (
       <Modal centered show={true}>
          <div className="modal-content px-2">

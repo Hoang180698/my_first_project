@@ -24,6 +24,10 @@ export const postApi = createApi({
       query: (id) => `post/${id}`,
       providesTags: ["Post"],
     }),
+    getAllSavedPost: builder.query({
+      query: () => `post/save`,
+      providesTags: ["Post"],
+    }),
     getPostByUserId: builder.query({
       query: (userId) => `post/user-post/${userId}`,
       providesTags: ["Post"],
@@ -37,8 +41,8 @@ export const postApi = createApi({
       invalidatesTags: ["Post"],
     }),
     createPostWithImages: builder.mutation({
-      query: ({content, data}) => ({
-        url: `post/create?content=${content}`,
+      query: (data) => ({
+        url: `post/create`,
         method: "POST",
         body: data,
       }),
@@ -79,7 +83,22 @@ export const postApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["Post"],
-    })
+    }),
+    savePost: builder.mutation({
+      query: (id) => ({
+        url: `post/${id}/save`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Post"],
+    }),
+    unSavePost: builder.mutation({
+      query: (id) => ({
+        url: `post/${id}/un-save`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Post"],
+    }),
+
   }),
 });
 
@@ -96,4 +115,7 @@ export const {
   useGetPostByUserIdQuery,
   useLikePostMutation,
   useDislikePostMutation,
+  useSavePostMutation,
+  useUnSavePostMutation,
+  useGetAllSavedPostQuery,
 } = postApi;

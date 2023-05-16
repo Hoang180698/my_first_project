@@ -12,6 +12,8 @@ import {
   useDislikePostMutation,
   useGetPostByIdQuery,
   useLikePostMutation,
+  useSavePostMutation,
+  useUnSavePostMutation,
 } from "../../app/services/posts.service";
 import { useState } from "react";
 import { useRef } from "react";
@@ -21,6 +23,7 @@ import EmojiPicker from "emoji-picker-react";
 import { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Liker from "../liker/Liker";
+import { toast } from "react-toastify";
 
 function PostModal({ postId }) {
   const { auth } = useSelector((state) => state.auth);
@@ -29,6 +32,7 @@ function PostModal({ postId }) {
   const { data: comments, isLoading: isLoadingComments } =
     useGetCommentByPostIdQuery(postId);
 
+  const [showMore, setShowMore] = useState(false);
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const emojiRef = useRef(null);
@@ -41,6 +45,8 @@ function PostModal({ postId }) {
   const [likePost] = useLikePostMutation();
   const [dislikePost] = useDislikePostMutation();
   const [addComment] = useAddCommentMutation();
+  const [savePost] = useSavePostMutation();
+  const [unSavePost] = useUnSavePostMutation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -75,9 +81,28 @@ function PostModal({ postId }) {
     if (isConfirm) {
       deletePost(id)
         .unwrap()
-        .then(() => alert("You delete the post!"))
+        .then(() => toast.success("You delete the post!"))
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    }
+  };
+
+  const handeleSavePost = (saved, postId) => {
+    if(saved) {
+      unSavePost(postId).unwrap()
+        .then()
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      savePost(postId).unwrap()
+        .then()
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
         });
     }
   };
@@ -89,7 +114,10 @@ function PostModal({ postId }) {
         .then(() => {
           //   alert("dislike");
         })
-        .catch((err) => alert(err));
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(first)(err);
+        })
     } else {
       likePost(postId)
         .unwrap()
@@ -97,7 +125,7 @@ function PostModal({ postId }) {
           //   alert("liked");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
     }
@@ -105,13 +133,15 @@ function PostModal({ postId }) {
 
   const handleAddComment = () => {
     if (text.length > 0) {
-      addComment({ postId, content: text })
+      const newData = { content: text }
+      addComment({ postId, data: newData})
         .unwrap()
         .then(() => {
           setText("");
         })
         .catch((err) => {
-          alert(err);
+          toast.error("Couldn't post comment.");
+          console.log(err);
         });
     }
   };
@@ -224,8 +254,12 @@ function PostModal({ postId }) {
                 </ul>
               </div>
             </div>
-            <div className="ms-1 content-post-modal">
-              <pre>{post.post.content}</pre>
+            <div className="ms-1 pe-2 content-post-modal">
+            {post.post.content.length > 250 && (
+              <pre> {showMore ? post.post.content : `${post.post.content.substring(0, 240)}...`}
+              <b role="button" onClick={() => setShowMore(!showMore)}>{showMore ? "\nShow less" : " Show more"}</b></pre>
+            )}
+            {post.post.content.length <= 250 && <pre>{post.post.content}</pre>}  
             </div>
           </div>
 
@@ -272,9 +306,9 @@ function PostModal({ postId }) {
                   </span>
                 </a>
               </div>
-              <a href="#!" className="text-dark icon-pmd">
+              <a role="button" onClick={() => handeleSavePost(post.saved ,post.post.id)} className="text-dark interact">
                 <span>
-                  <i class="fa-regular fa-bookmark"></i>
+                  <i className={post.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
                 </span>
               </a>
             </div>
@@ -312,6 +346,7 @@ function PostModal({ postId }) {
               onKeyDown={(e) => handleAddCommentOther(e)}
               autoFocus={true}
               ref={textareaRef}
+              maxLength={240}
             />
             {showPicker && (
               <div className="emoji-picker" ref={emojiRef}>
@@ -323,7 +358,7 @@ function PostModal({ postId }) {
                 />
               </div>
             )}
-            <div className="input-group-append">
+            <div className="input-group-append d-grid">
               <button
                 className="btn btn-post-comment btn-block"
                 onClick={handleAddComment}
@@ -332,7 +367,11 @@ function PostModal({ postId }) {
                 post
                 {/* <i className="fa fa-paper-plane"></i> */}
               </button>
-            </div>
+               {text.length > 100 && 
+                <span className={text.length > 239 ? "text-danger ms-2 mt-2" : "ms-2 mt-2"} style={{fontSize: "11px"}}>{`${text.length}/240`}</span>  
+               } 
+                  
+            </div>    
           </div>
         </div>
       </div>

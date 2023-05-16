@@ -26,6 +26,20 @@ export const notificationApi = createApi({
                 method: "PUT",
             }),
             invalidatesTags: ["Post"],
+        }),
+        deleteNotificationById: builder.mutation({
+          query: (id) => ({
+            url: `notification/${id}`,
+            method: "DELETE",
+          }),
+          invalidatesTags: ["Post"],
+        }),
+        deleteAllNotification: builder.mutation({
+          query: () => ({
+            url: `notification`,
+            method: "DELETE",
+          }),
+          invalidatesTags: ["Post"],
         })
     }),
 });
@@ -35,4 +49,6 @@ export const notificationApi = createApi({
 export const {
    useGetAllNotificationQuery,
    useSeenNotificationMutation,
+   useDeleteNotificationByIdMutation,
+   useDeleteAllNotificationMutation,
 } = notificationApi;

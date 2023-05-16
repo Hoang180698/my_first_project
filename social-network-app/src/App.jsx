@@ -16,7 +16,8 @@ import User from "./pages/user/User";
 import PostDetail from "./pages/post-detail/PostDetail";
 import Liker from "./components/liker/Liker";
 import NotFound from "./pages/notfound/NotFound";
-
+import MessageBox from "./pages/messenge/MessageBox";
+import Inbox from "./pages/messenge/Inbox";
 
 
 function App() {
@@ -27,7 +28,10 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route path="/" element={<HomePage />}></Route>
             <Route path="/search" element={<Search />}></Route>
-            <Route path="/messenge" element={<Messenge />}></Route>
+            <Route path="/messenge" element={<Messenge />}>
+              <Route path="" element={<MessageBox />}></Route>
+              <Route path="inbox/:contactId" element={<Inbox />}></Route>
+            </Route>
             <Route path="/notifications" element={<Notify />}></Route>
             <Route path="/profile" element={<Profile />}>
               <Route path="" element={<ProfilePost />} />

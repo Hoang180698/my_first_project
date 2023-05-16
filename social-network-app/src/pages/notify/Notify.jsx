@@ -1,88 +1,122 @@
-import React from 'react';
- import "./sass/style.scss";
+import React, { useEffect, useState } from "react";
+import "./sass/style.scss";
+import {
+	useDeleteAllNotificationMutation,
+  useGetAllNotificationQuery,
+  useSeenNotificationMutation,
+} from "../../app/services/notification.service";
+import { formatDate, formatDateTime } from "../../utils/functionUtils";
+import { Link } from "react-router-dom";
+import NotifyBox from "../../components/notifyBox/NotifyBox";
+import { Modal } from "react-bootstrap";
+import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 
 function Notify() {
+  const { data, isLoading } = useGetAllNotificationQuery();
+
+  const [seenNotifycation] = useSeenNotificationMutation();
+
+  const [showModal, setShowModal] = useState(false);
+
+  const [deleteAllNotification] = useDeleteAllNotificationMutation();
+
+  const handleDelteteAllNotification = () => {
+	deleteAllNotification().unwrap().then(() => {
+		toast.success("Removed all");
+	}).catch((err) => {
+		toast.error("Something went wrong. Please try again.");
+		console.log(err);
+	});
+  }
+
+  useEffect(() => {
+    seenNotifycation().unwrap().then().catch();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="text-center m-5">
+          <div className="spinner-border m-5" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-    <section class="section-50">
-		<div class="container">
-			<h3 class="m-b-50 heading-line">Notifications <i class="fa fa-bell text-muted"></i></h3>
+	<Helmet>
+		<title>
+			Notification | Hoagram
+		</title>
+	</Helmet>
+	{data.length > 0 && (
+		<Modal show={showModal} centered>
+		<div className="modal-content">
+					  <div className="modal-header d-flex justify-content-center flex-column">
+					   
+						<p style={{fontSize: "16px"}}
+						  className="modal-title text-center mt-2 unfollow-question"
+						>
+						  Are you sure you want to remove all notifications?
+						</p>
+					  </div>
+					  <div className="border-top">
+						<a
+						  type="button"
+						  className="d-block btn avatar-modal text-danger"
+						  onClick={handleDelteteAllNotification}
+						>
+						  Remove all
+						</a>
+					  </div>
+					  <div className="border-top">
+						<a
+						  type="button"
+						  className="d-block btn"
+						  onClick={() => setShowModal(false)}
+						>
+						  Cancel
+						</a>
+					  </div>
+					</div>
+		</Modal>
+	)}
+      <section className="section-50">
+        <div className="container">
+          <div className="d-flex mb-4">
+            <h3 className="mb-3 heading-line">
+              Notifications <i className="fa fa-bell text-muted"></i>
+            </h3>
+			{data.length > 0 && (
+				 <button className="ms-auto me-3 btn rm-all-notification" onClick={() => setShowModal(true)}>
+				 <i className="fa fa-trash me-1"></i>
+				  Remove all
+			   </button>
+			)}  
+          </div>
 
-			<div class="notification-ui_dd-content">
-				<a class="notification-list notification-list--unread text-dark">
-					<div class="notification-list_content">
-						<div class="notification-list_img">
-							<img src="images/users/user1.jpg" alt="user" />
-						</div>
-						<div class="notification-list_detail">
-							<p><b>John Doe</b> reacted to your post</p>
-							<p class="text-muted">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde, dolorem.</p>
-							<p class="text-muted"><small>10 mins ago</small></p>
-						</div>
-					</div>
-					<div class="notification-list_feature-img">
-						<img src="images/features/random1.jpg" alt="Feature image" />
-					</div>
-				</a>
-        {/*  */}
-				<a class="notification-list notification-list--unread text-dark">
-					<div class="notification-list_content">
-						<div class="notification-list_img">
-							<img src="images/users/user2.jpg" alt="user" />
-						</div>
-						<div class="notification-list_detail">
-							<p><b>Richard Miles</b> liked your post</p>
-							<p class="text-muted">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde, dolorem.</p>
-							<p class="text-muted"><small>10 mins ago</small></p>
-						</div>
-					</div>
-					<div class="notification-list_feature-img">
-						<img src="images/features/random2.jpg" alt="Feature image" />
-					</div>
-				</a>
-        {/*  */}
-				<a class="notification-list text-dark">
-					<div class="notification-list_content">
-						<div class="notification-list_img">
-							<img src="images/users/user3.jpg" alt="user" />
-						</div>
-						<div class="notification-list_detail">
-							<p><b>Brian Cumin</b> reacted to your post</p>
-							<p class="text-muted">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde, dolorem.</p>
-							<p class="text-muted"><small>10 mins ago</small></p>
-						</div>
-					</div>
-					<div class="notification-list_feature-img">
-						<img src="images/features/random3.jpg" alt="Feature image" />
-					</div>
-				</a>
-        {/*  */}
-				<a class="notification-list text-dark">
-					<div class="notification-list_content">
-						<div class="notification-list_img">
-							<img src="images/users/user4.jpg" alt="user" />
-						</div>
-						<div class="notification-list_detail">
-							<p><b>Lance Bogrol</b> reacted to your post</p>
-							<p class="text-muted">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde, dolorem.</p>
-							<p class="text-muted"><small>10 mins ago</small></p>
-						</div>
-					</div>
-					<div class="notification-list_feature-img">
-						<img src="images/features/random4.jpg" alt="Feature image" />
-					</div>
-				</a>
+          <div className="notification-ui_dd-content">
+			{data.length === 0 && (
+				<p className="text-center mt-3 mx-4" style={{fontSize: "24px"}}>
+				When someone likes or comments on one of your posts, you'll see it here.
+				</p>
+			)}
+            {data.length > 0 && data.map((n) => <NotifyBox n={n} key={n.id} />)}
+          </div>
 
-			</div>
-
-			<div class="text-center">
-				<a href="#!" class="dark-link load-more">Load more activity</a>
-			</div>
-
-		</div>
-	</section>
+          <div className="text-center">
+            <a href="#" className="dark-link load-more">
+              Load more activity
+            </a>
+          </div>
+        </div>
+      </section>
     </>
-  )
+  );
 }
 
-export default Notify
+export default Notify;

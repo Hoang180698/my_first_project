@@ -12,6 +12,7 @@ import com.example.snwbackend.repository.CommentRepository;
 import com.example.snwbackend.repository.NotificationRepository;
 import com.example.snwbackend.repository.PostRepository;
 import com.example.snwbackend.repository.UserRepository;
+import com.example.snwbackend.request.CommentRequest;
 import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ public class CommentService {
 
     // Tạo comment
     @Transactional
-    public CommentDto createComment(Integer postId, String content) {
-        if(content.isEmpty()) {
+    public CommentDto createComment(Integer postId, CommentRequest request) {
+        if(request.getContent().isEmpty()) {
             throw new BadRequestException("Content is required");
         }
         Post post = postRepository.findById(postId).orElseThrow(() -> {
@@ -53,7 +54,7 @@ public class CommentService {
         });
 
         Comment comment = Comment.builder()
-                .content(content)
+                .content(request.getContent())
                 .user(user)
                 .post(post)
                 .build();
@@ -63,20 +64,22 @@ public class CommentService {
         postRepository.save(post);
 
         // tao thong bao
-        Notification notification = Notification.builder()
-                .type("comment")
-                .user(post.getUser())
-                .sender(user)
-                .post(post)
-                .comment(comment)
-                .build();
-        notificationRepository.save(notification);
-
+        if (user.getId() != post.getUser().getId()) {
+            Notification notification = Notification.builder()
+                    .type("comment")
+                    .user(post.getUser())
+                    .sender(user)
+                    .post(post)
+                    .comment(comment)
+                    .build();
+            notificationRepository.save(notification);
+        }
+        
         return commentMapper.toCommentDto(comment);
     }
 
     // edit comment
-    public CommentDto editComment(Integer id, String content) {
+    public CommentDto editComment(Integer id, CommentRequest request) {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found comment with id = " + id);
         });
@@ -89,7 +92,7 @@ public class CommentService {
         if (comment.getUser().getId() != user.getId()) {
             throw new BadRequestException("You do not have permission to edit this comment");
         }
-        comment.setContent(content);
+        comment.setContent(request.getContent());
 
         commentRepository.save(comment);
 

@@ -25,8 +25,8 @@ public class PostController {
 
     // Tạo Post với images
     @PostMapping("create")
-    public ResponseEntity<?> createPostWithImages(@RequestParam String content, @ModelAttribute MultipartFile[] files) {
-        return new ResponseEntity<>(postService.createPostWithImages(content, files), HttpStatus.CREATED);
+    public ResponseEntity<?> createPostWithImages(@ModelAttribute MultipartFile[] files) {
+        return new ResponseEntity<>(postService.createPostWithImages(files), HttpStatus.CREATED);
     }
 
 
@@ -78,5 +78,23 @@ public class PostController {
     @DeleteMapping("{id}/dislike")
     public ResponseEntity<?> dislikePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.dislikePost(id));
+    }
+
+    // Save Post
+    @PostMapping("{id}/save")
+    public ResponseEntity<?> savePost(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.savePost(id));
+    }
+
+    // Un save Post
+    @DeleteMapping("{id}/un-save")
+    public ResponseEntity<?> unSavePost(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.unSavePost(id));
+    }
+
+    // Get all post saved
+    @GetMapping("save")
+    public ResponseEntity<?> getAllSavedPost() {
+        return ResponseEntity.ok(postService.getAllSavedPost());
     }
 }

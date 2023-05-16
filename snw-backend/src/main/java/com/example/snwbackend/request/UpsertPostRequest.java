@@ -11,5 +11,4 @@ import java.util.List;
 @Builder
 public class UpsertPostRequest {
     private String content;
-    private List<String> imagesUrl;
 }

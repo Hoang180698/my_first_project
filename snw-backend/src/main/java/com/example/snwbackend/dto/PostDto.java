@@ -14,4 +14,5 @@ public class PostDto {
     private Integer userId;
     private String userName;
     private String userAvatar;
+    private boolean saved;
 }

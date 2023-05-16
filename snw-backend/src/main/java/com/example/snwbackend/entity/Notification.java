@@ -3,6 +3,7 @@ package com.example.snwbackend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 import java.time.LocalDateTime;
 
@@ -42,7 +43,7 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "sender_id")
     private User sender;
 

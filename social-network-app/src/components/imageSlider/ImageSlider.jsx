@@ -34,8 +34,8 @@ function imageSlider({ data }) {
             />
           );
         })}
-         <button className="btn prev-slide" onClick={prevSlide}><i class="fa-solid fa-chevron-left"></i></button>
-         <button className="btn next-slide" onClick={nextSlide}><i class="fa-solid fa-chevron-right"></i></button>
+         <button className="btn prev-slide" onClick={prevSlide}><i className="fa-solid fa-chevron-left"></i></button>
+         <button className="btn next-slide" onClick={nextSlide}><i className="fa-solid fa-chevron-right"></i></button>
          <span className="indicators">
           {data.map((_, idx) => {
             return (

@@ -3,8 +3,6 @@ import {
   useDeletePostMutation,
   useGetAllMyPostsQuery,
 } from "../../app/services/posts.service";
-import { formatDate } from "../../utils/functionUtils";
-import ImageSlider from "../../components/imageSlider/ImageSlider";
 import OwnPost from "../../components/post/OwnPost";
 
 function ProfilePost() {
@@ -28,6 +26,7 @@ function ProfilePost() {
           <div className="row">
             <h1>
               <h1 className="text-center">No have post</h1>
+              <p className="text-center">When you share photos, they will appear on your profile.</p>
             </h1>
           </div>
         </div>

@@ -57,6 +57,7 @@ body{
 }
 
 .notification-list{
+	height: 120px;
 	display: flex;
 	justify-content: space-between;
 	padding:20px;
@@ -103,4 +104,38 @@ body{
 
 .notification-list--unread {
 	border-left: solid black;
+}
+.notification-list_detail p {
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis; 
+}
+
+.notification-list_detail {
+	width: 70%;
+}
+
+.notify-activiti {
+	position: absolute;
+	top: 0px;
+	right: 20px;
+	display: block;
+}
+.notification-list_feature-img {
+	position: relative;
+}
+
+.notify-activiti{
+	position: absolute;
+	top: 0;
+	right: 35px;
+	display: none;
+}
+
+.notification-list:hover .notify-activiti {
+	display: block;
+}
+
+.rm-all-notification:hover{
+	text-decoration: underline solid black;
 }
