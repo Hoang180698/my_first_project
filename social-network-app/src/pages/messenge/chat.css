@@ -5,6 +5,7 @@
     width: 33%;
     height: 100%;
     display: block;
+    overflow-y: auto;
 }
 .body-chat {
     height: 100%;
@@ -60,10 +61,11 @@
 }
 .input-message textarea {
     border: none;
+    width: 100%;
+    outline: none;
+    font-size: 14px;
 }
-.input-message textarea:focus {
-    outline:none;
-}
+
 .input-message {
     border-radius: 50px;
     width: 90%;
@@ -85,3 +87,9 @@
 .inbox-user-name {
     font-weight: 500;
 }
+
+.new-message-footer {
+    height: 50vh;
+    overflow-y: auto;
+}
+

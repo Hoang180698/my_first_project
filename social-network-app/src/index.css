@@ -57,7 +57,7 @@ body {
 }
 
 .login-container {
-	height: 100vh;
+	min-height: 100vh;
 }
 
 /* home page */
@@ -530,3 +530,17 @@ textarea {
 	outline: none;
 	resize: none;
   }
+
+.input-auth {
+	background-color:rgb(245, 245, 245);
+}
+.input-auth input {
+	background-color:rgb(245, 245, 245);
+	width: 100%;
+	font-size: 14px;
+}
+
+.input-box-auth {
+	height: 68px;
+}
+

@@ -65,4 +65,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "from Post p left join Save s on s.user.id =?1" +
             "where p.id = s.post.id group by p.id order by s.createdAt DESC")
     List<PostDto> getAllSavedPost(Integer userId);
+
+    Integer countByUser_Id(Integer userId);
 }

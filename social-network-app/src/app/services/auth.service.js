@@ -21,11 +21,14 @@ export const authApi = createApi({
                 body: data,
             }),
         }),
+        checkEmailExist: builder.query({
+            query: (email) => `check-email?email=${email}`
+        })
     }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-    useLoginMutation, useRegisterMutation
+    useLoginMutation, useRegisterMutation, useLazyCheckEmailExistQuery,
 } = authApi;

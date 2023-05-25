@@ -9,6 +9,8 @@ import { useState } from "react";
 import { useGetContactsQuery } from "../../app/services/chat.service";
 import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import NewMessage from "./NewMessage";
+import { Helmet } from "react-helmet";
 
 var stompClient = null;
 function Messenge() {
@@ -19,9 +21,9 @@ function Messenge() {
 
   const { data, isLoading } = useGetContactsQuery();
 
-  useEffect(() => {
-    // connect();
-  }, [currentContactId]);
+  // useEffect(() => {
+  //   // connect();
+  // }, [currentContactId]);
 
   const handleSendMessage = () => {
     const newMessage = { senderId: auth.id, content: content };
@@ -69,13 +71,16 @@ function Messenge() {
 
   return (
     <>
+    <Helmet>
+      <title>Direct | Hoagram</title>
+    </Helmet>
       <div className="container">
         <div className="col-sm-10 offset-sm-1  messenge-container mt-4 container-chat">
           <div className="d-flex border body-chat">
             <div className="sidebar-chat border-end pt-1">
               <div className="border-bottom mb-2 p-3 d-flex">
                 <span className="inbox-user-name mx-auto">{auth.name}</span>
-                <i className="fa-regular fa-pen-to-square ms-auto" style={{fontSize: "26px"}}></i>
+                <NewMessage />
               </div>
               {data.map((c) => (
                 <NavLink

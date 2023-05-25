@@ -1,42 +1,65 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
-import { useGetContactByIdQuery, useGetMessagesQuery } from "../../app/services/chat.service";
+import { useGetContactByIdQuery, useGetMessagesQuery, useLazyGetMessagesQuery } from "../../app/services/chat.service";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useState } from "react";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
+import EmojiPicker from "emoji-picker-react";
 
 var stompClient = null;
 function Inbox() {
   const { contactId } = useParams();
   const { auth } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
+  const [getMessage] = useLazyGetMessagesQuery();
   const [content, setContent] = useState("");
-  const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(contactId);
+  const [showPicker, setShowPicker] = useState(false); 
+  // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(contactId);
   const { data: contact, isLoading: isLoadingContact } = useGetContactByIdQuery(contactId);
+  const emojiRef = useRef(null);
+  const emojiButtonRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(!oldMessage) return;
-    setMessages(oldMessage);
-  },[oldMessage])
+   const fectchData = async () => {
+      let { data } = await getMessage(contactId);
+      setMessages(data);
+   }
+   fectchData();
+   setContent("");
+  },[contactId])
 
   useEffect(() => {
     connect();
-
-    // return stompClient.disconnect();
   }, [contactId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target) && !emojiButtonRef.current.contains(event.target)) {
+        setShowPicker(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [emojiRef]);
 
   const connect = () => {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError)
+    stompClient.connect({}, onConnected, onError);
   }
 
   const onDisconnect = () => {
-    stompClient.disconnect();
+    if (stompClient !== null) {
+      stompClient.disconnect();
+    }
   }
 
   const onError = (err) => {
@@ -44,13 +67,16 @@ function Inbox() {
   };
 
   const onConnected = () => {
-    stompClient.subscribe("/topic/messages/" + contactId,
+    stompClient.subscribe("/topic/contact/" + contactId,
     onMessageReceived);
   };
 
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
     setMessages((oldMess) => [payloadData, ...oldMess]);
+  };
+  const onEmojiClick = (e) => {
+    setContent((prevInput) => prevInput + e.emoji);
   };
 
   const handleSendMessage = () => {
@@ -73,7 +99,7 @@ function Inbox() {
     }
   }
 
-  if (isLoadingMes || isLoadingContact) {
+  if (isLoadingContact) {
     return (
       <div className="container">
         <div className="text-center m-5">
@@ -127,14 +153,14 @@ function Inbox() {
           </div>
         ))}
       </div>
-      <div className="input-message mx-auto mt-auto mb-3 d-flex border">
-        <a role="button" className="ms-3 my-auto">
+      <div className="input-message mx-auto mt-auto mb-3 d-flex border position-relative">
+        <a role="button" className="ms-3 my-auto" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
           <i className="fa-sharp fa-regular fa-face-smile"></i>
         </a>
         <TextareaAutosize
           rows="1"
           type="text"
-          className="form-control ms-2"
+          className="ms-2 my-auto"
           maxRows={4}
           placeholder="Message..."
           autoFocus={true}
@@ -142,6 +168,16 @@ function Inbox() {
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => handleSendMessageOther(e)}
         />
+            {showPicker && (
+                      <div className="emoji-picker" ref={emojiRef}>
+                         <EmojiPicker
+                        height={400}
+                        width={300}
+                        onEmojiClick={onEmojiClick}
+                        autoFocusSearch={false}
+                      />
+                      </div>
+                    )}
         <button className="btn btn-post-comment btn-block me-2" onClick={handleSendMessage}>Send</button>
       </div>
     </div>

@@ -236,9 +236,9 @@ function PostModal({ postId }) {
                 >
                   {post.userId === auth.id && (
                     <>
-                      <a className="dropdown-item text-dark" role="button">
+                      {/* <a className="dropdown-item text-dark" role="button">
                         <i className="fa fa-pencil me-1"></i>Edit
-                      </a>
+                      </a> */}
                       <a
                         className="dropdown-item text-danger"
                         role="button"

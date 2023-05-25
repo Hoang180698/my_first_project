@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-function UserModal({ u }) {
+function UserModal({ u, follow, unfollow }) {
   const { auth } = useSelector((state) => state.auth);
 
   const [showModal, setShoModal] = useState(false);
@@ -22,15 +22,16 @@ function UserModal({ u }) {
     followUser(id)
       .unwrap()
       .then(() => {
+        follow(id);
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1200);
+        }, 1000);
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1200);
+        }, 1000);
         console.log(err);
       });
   };
@@ -41,15 +42,16 @@ function UserModal({ u }) {
       .unwrap()
       .then(() => {
         setShoModal(false);
+        unfollow(id);
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1200);
+        }, 1000);
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1200);
+        }, 1000);
         console.log(err);
         setShoModal(false);
       });

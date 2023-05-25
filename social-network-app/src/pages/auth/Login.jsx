@@ -10,8 +10,10 @@ function Login() {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false)
   const [login] = useLoginMutation();
   const navigate = useNavigate();
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,8 +26,8 @@ function Login() {
           navigate("/");
         }, 1500);
       })
-      .catch(() => {
-        toast.error('Please check your password and account name and try again.', {
+      .catch((err) => {
+        toast.error("Please check your password and account name and try again.", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: true,
@@ -35,6 +37,7 @@ function Login() {
           progress: undefined,
           theme: "colored",
           });
+          console.log(err)
       });
   };
   if (isAuthenticated) {
@@ -52,24 +55,33 @@ function Login() {
               <h1 className={`${style.h1} text-center text-upercase py-3`}>
                 Hoagram
               </h1>
-              <div className="form-group my-3 d-flex justify-content-center"></div>
               <div className="form-group my-3 d-flex justify-content-center">
+                <div className="form-control input-auth d-flex align-items-center">
                 <input
                   type="text"
                   placeholder="Email"
                   required
-                  className={`${style.input} form-control`}
+                  className="me-2"
                   onChange={(e) => setEmail(e.target.value)}
                 />
+               </div>     
               </div>
               <div className="form-group my-3 d-flex justify-content-center">
+                <div className="form-control input-auth d-flex align-items-center">
                 <input
-                  type="password"
+                  type={showPassword? "text" : "password"}
                   placeholder="Password"
                   required
-                  className={`${style.input} form-control`}
+                  className="me-2"
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                 {!showPassword &&
+                   <i role="button" className="fa-regular fa-eye-slash" onClick={() => setShowPassword(true)}></i>
+                    ||
+                    <i role="button"  className="fa-regular fa-eye" onClick={() => setShowPassword(false)}></i>
+                  }
+                </div>
+               
               </div>
               <div className="d-flex justify-content-center">
                 <button className="btn btn-dark" type="submit">
@@ -90,7 +102,7 @@ function Login() {
                 <div className="d-flex justify-content-center">
                   <h3 text-center className={`${style.h3}`}>
                     Don't have an account?{" "}
-                    <Link to={"../register"}>Sign up</Link>
+                    <Link to={"/register"}>Sign up</Link>
                   </h3>
                 </div>
               </div>

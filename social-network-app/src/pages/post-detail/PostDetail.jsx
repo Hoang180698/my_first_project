@@ -39,6 +39,7 @@ function PostDetail() {
   const emojiButtonRef = useRef(null);
   const [showLikerModal, setShowLikerModal] = useState(false);
   const textareaRef = useRef(null);
+  
 
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
@@ -307,9 +308,9 @@ function PostDetail() {
                  <span role="button" className="text-dark" onClick={() => setShowLikerModal(true)}>{post.post.likeCount} likes</span>
               )}
              
-             {post.post.commentCount > 0 && (
+             {comments.length > 0 && (
                <span className="text-dark ms-auto">
-               {post.post.commentCount} comments
+               {comments.length} comments
              </span>
              )}             
                 </div>

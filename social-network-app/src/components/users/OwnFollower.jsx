@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-function OwnFollower({ u }) {
+function OwnFollower({ u, rmFollower }) {
 
   const [showModal, setShoModal] = useState(false);
   const [removeFollower] = useRemoveFollowerMutation();
@@ -16,6 +16,7 @@ function OwnFollower({ u }) {
     removeFollower(id)
       .unwrap()
       .then(() => {
+        rmFollower(id);
         setShoModal(false);
         toast.success("Removed");
       })

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { NavLink, Outlet } from "react-router-dom";
 import "./Profile.css";
-import { useFollowhUserMutation, useUnfollowhUserMutation } from "../../app/services/user.service";
+import { useFollowhUserMutation, useGetUserByIdQuery, useUnfollowhUserMutation } from "../../app/services/user.service";
 import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { Modal } from "react-bootstrap";
@@ -12,12 +12,25 @@ import { Helmet } from "react-helmet";
 function Profile() {
   const { auth } = useSelector((state) => state.auth);
 
+  const { data: user, isLoading: isLoadingUser } = useGetUserByIdQuery(auth.id);
+  
   const [followUser] = useFollowhUserMutation();
   const [unfollowUser] = useUnfollowhUserMutation();
 
   const [showFollower, setShowFollower] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   
+  if (isLoadingUser) {
+    return (
+      <div className="container">
+        <div className="text-center m-5">
+          <div className="spinner-border m-5" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
     <Helmet>
@@ -54,7 +67,7 @@ function Profile() {
                 alt=""
               />
             </div>
-            <div classNameName="profile-right d-flex flex-column ms-5">
+            <div className="profile-right d-flex flex-column ms-5">
               <div className="profile-user-settings d-flex ms-5">
                 <h1 className="profile-user-name h4">{auth.name}</h1>
 
@@ -66,17 +79,29 @@ function Profile() {
               <div className="profile-stats">
                 <ul className="d-flex mt-4">
                   <li className="mx-3">
-                    <b>164</b> post
+                    <b>{user.postCount}</b> post
                   </li>
                   <li className="mx-3">
-                    <a role="button" onClick={() => setShowFollower(true)}>
-                      <b>188</b> followers
-                    </a>
+                  {(user.followerCount > 0 && (
+                      <a role="button" onClick={() => setShowFollower(true)}>
+                        <b>{user.followerCount}</b> followers
+                      </a>
+                    )) || (
+                      <a>
+                        <b>{user.followerCount}</b> followers
+                      </a>
+                    )}
                   </li>
                   <li className="mx-3">
-                    <a role="button" onClick={() => setShowFollowing(true)}>
-                      <b>218</b> following
-                    </a>
+                  {(user.followingCount > 0 && (
+                      <a role="button" onClick={() => setShowFollowing(true)}>
+                        <b>{user.followingCount}</b> following
+                      </a>
+                    )) || (
+                      <a>
+                        <b>{user.followingCount}</b> following
+                      </a>
+                    )}
                   </li>
                 </ul>
               </div>
@@ -92,7 +117,7 @@ function Profile() {
           <i className="fa-solid fa-venus-mars"></i> {auth.gender}
         </p>
         <p className="me-auto">
-        <i class="fa-solid fa-cake-candles"></i> {auth.birthday}
+        <i className="fa-solid fa-cake-candles"></i> {auth.birthday}
         </p>
         <p className="me-auto">
           <i className="fa fa-phone me-2"></i> {auth.phone}

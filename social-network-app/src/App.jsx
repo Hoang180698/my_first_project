@@ -18,7 +18,7 @@ import Liker from "./components/liker/Liker";
 import NotFound from "./pages/notfound/NotFound";
 import MessageBox from "./pages/messenge/MessageBox";
 import Inbox from "./pages/messenge/Inbox";
-
+import { ToastContainer } from 'react-toastify'
 
 function App() {
   return (
@@ -47,6 +47,17 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
+      <ToastContainer 
+        position="top-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"/>
     </>
   );
 }

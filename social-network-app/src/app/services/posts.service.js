@@ -46,11 +46,9 @@ export const postApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
     }),
     updatePost: builder.mutation({
       query: ({ id, ...data }) => {
-        console.log({ id, data });
         return {
           url: `post/${id}`,
           method: "PUT",

@@ -2,6 +2,7 @@ package com.example.snwbackend.service;
 
 import com.example.snwbackend.dto.UserDetailDto;
 import com.example.snwbackend.dto.UserDto;
+import com.example.snwbackend.dto.UserDtoOther;
 import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
@@ -14,6 +15,7 @@ import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,17 +42,37 @@ public class UserService {
     private NotificationRepository notificationRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private UserMapper userMapper;
 
     // Tìm user theo id
-    public UserDetailDto getUserById(Integer id) {
+    public UserDtoOther getUserById(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        return userRepository.findUserDetailDtoById(id, user.getId()).orElseThrow(() -> {
+        UserDetailDto userDetailDto = userRepository.findUserDetailDtoById(id, user.getId()).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + id);
         });
+        UserDtoOther userDtoOther = UserDtoOther
+                .builder()
+                .id(userDetailDto.getId())
+                .address(userDetailDto.getAddress())
+                .avatar(userDetailDto.getAvatar())
+                .biography(userDetailDto.getBiography())
+                .birthday(userDetailDto.getBirthday())
+                .followed(userDetailDto.isFollowed())
+                .name(userDetailDto.getName())
+                .email(userDetailDto.getEmail())
+                .phone(userDetailDto.getPhone())
+                .gender(userDetailDto.getGender())
+                .followerCount(followRepository.countByFollowing_Id(id))
+                .followingCount(followRepository.countByFollower_Id(id))
+                .postCount(postRepository.countByUser_Id(id))
+                .build();
+        return userDtoOther;
     }
 
     // Update thong tin ca nhan
@@ -266,13 +288,23 @@ public class UserService {
 
     // thay doi password
     public StatusResponse changePassword(PasswordRequest request) {
+        if (request.getOldPassword() == request.getNewPassword()) {
+            throw new BadRequestException("The new password must be different from the old password");
+        }
+        if (request.getNewPassword().length() > 20 || request.getNewPassword().length() < 3) {
+            throw new BadRequestException("Password mismatch");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
 
-
-
-        return new StatusResponse("ok");
+        if(passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            return new StatusResponse("ok");
+        } else {
+            throw new BadRequestException("old password is incorrect");
+        }
     }
 }

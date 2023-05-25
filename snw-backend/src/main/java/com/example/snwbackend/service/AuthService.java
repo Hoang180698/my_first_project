@@ -95,4 +95,8 @@ public class AuthService {
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
+
+    public boolean checkEmailExist(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }

@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { data } from "jquery";
 
 // Define a service using a base URL and expected endpoints
 export const userApi = createApi({
@@ -40,7 +41,7 @@ export const userApi = createApi({
             providesTags: ["Post"],
         }),
         deleteAvatar: builder.mutation({
-            query: (id) => ({
+            query: () => ({
                 url: `users/avatar`,
                 method: "DELETE",
             }),
@@ -72,12 +73,17 @@ export const userApi = createApi({
         }),
         getFollower: builder.query({
             query: (userId) => `users/${userId}/follower`,
-            providesTags: ["Post"],
         }),
         getFollowing: builder.query({
             query: (userId) => `users/${userId}/following`,
-            providesTags: ["Post"],
         }),
+        changePassWord: builder.mutation({
+            query: (data) => ({
+                url: `users/change-password`,
+                method: "PUT",
+                body: data
+            })
+        })
     }),
 });
 
@@ -95,4 +101,7 @@ export const {
     useGetFollowerQuery,
     useGetFollowingQuery,
     useRemoveFollowerMutation,
+    useLazyGetFollowingQuery,
+    useLazyGetFollowerQuery,
+    useChangePassWordMutation,
 } = userApi;

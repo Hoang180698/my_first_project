@@ -5,7 +5,6 @@ import { useGetAllSavedPostQuery } from '../../app/services/posts.service';
 
 function SavedPost() {
   const { data, isLoading } = useGetAllSavedPostQuery();
-  const [posts, setPosts] = useState([]);
 
   if (isLoading) {
     return (

@@ -60,6 +60,7 @@ public class PostService {
         Post post = Post.builder()
                 .content(request.getContent())
                 .user(user)
+                .content("")
                 .build();
         return postRepository.save(post);
     }
