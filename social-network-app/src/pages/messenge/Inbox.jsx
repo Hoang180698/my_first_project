@@ -1,50 +1,76 @@
 import React, { useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
-import { useGetContactByIdQuery, useGetMessagesQuery, useLazyGetMessagesQuery } from "../../app/services/chat.service";
+import {
+  useGetContactByIdQuery,
+  useGetMessagesQuery,
+  useLazyGetMessagesQuery,
+} from "../../app/services/chat.service";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useState } from "react";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
 import EmojiPicker from "emoji-picker-react";
+import { formatDate, formatDateTime } from "../../utils/functionUtils";
 
 var stompClient = null;
 function Inbox() {
+  const [isConnected, setIsConnected] = useState(false);
   const { contactId } = useParams();
   const { auth } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [getMessage] = useLazyGetMessagesQuery();
   const [content, setContent] = useState("");
-  const [showPicker, setShowPicker] = useState(false); 
+  const [showPicker, setShowPicker] = useState(false);
   // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(contactId);
-  const { data: contact, isLoading: isLoadingContact } = useGetContactByIdQuery(contactId);
+  const { data: contact, isLoading: isLoadingContact } =
+    useGetContactByIdQuery(contactId);
   const emojiRef = useRef(null);
   const emojiButtonRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-   const fectchData = async () => {
-      let { data } = await getMessage(contactId);
-      setMessages(data);
-   }
-   fectchData();
-   setContent("");
-  },[contactId])
+  const effect = useRef(false);
 
   useEffect(() => {
-    connect();
+    onDisconnect();
+    
+    const fectchData = async () => {
+      try {
+        let { data } = await getMessage(contactId);
+        setMessages(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fectchData();
+    setContent("");
+
+    if(effect.current === true) {
+      connect();
+      effect.current = true;
+    }
+    
+    return () => {
+      onDisconnect();
+      effect.current = true;
+    };
   }, [contactId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (emojiRef.current && !emojiRef.current.contains(event.target) && !emojiButtonRef.current.contains(event.target)) {
+      if (
+        emojiRef.current &&
+        !emojiRef.current.contains(event.target) &&
+        !emojiButtonRef.current.contains(event.target)
+      ) {
         setShowPicker(false);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
-  
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -54,21 +80,22 @@ function Inbox() {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
     stompClient.connect({}, onConnected, onError);
-  }
+  };
 
   const onDisconnect = () => {
-    if (stompClient !== null) {
+    if (isConnected) {
       stompClient.disconnect();
+      setIsConnected(false);
     }
-  }
+  };
 
   const onError = (err) => {
     console.log(err);
   };
 
   const onConnected = () => {
-    stompClient.subscribe("/topic/contact/" + contactId,
-    onMessageReceived);
+    setIsConnected(true);
+    stompClient.subscribe("/topic/contact/" + contactId, onMessageReceived);
   };
 
   const onMessageReceived = (payload) => {
@@ -97,7 +124,7 @@ function Inbox() {
       e.preventDefault();
       handleSendMessage();
     }
-  }
+  };
 
   if (isLoadingContact) {
     return (
@@ -117,22 +144,29 @@ function Inbox() {
   return (
     <div className="d-flex flex-column conversation-container">
       <div className="border-bottom p-3">
-        <Link to={`/u/${contact.user1.id === auth.id ? contact.user2.id : contact.user1.id}`} className="text-dark">
-        <img
-          src={
-            contact.user1.id === auth.id
-              ? contact.user2.avatar
-                ? `http://localhost:8080${contact.user2.avatar}`
+        <Link
+          to={`/u/${
+            contact.user1.id === auth.id ? contact.user2.id : contact.user1.id
+          }`}
+          className="text-dark"
+        >
+          <img
+            src={
+              contact.user1.id === auth.id
+                ? contact.user2.avatar
+                  ? `http://localhost:8080${contact.user2.avatar}`
+                  : "../../../public/user.jpg"
+                : contact.user1.avatar
+                ? `http://localhost:8080${contact.user1.avatar}`
                 : "../../../public/user.jpg"
-              : contact.user1.avatar
-              ? `http://localhost:8080${contact.user1.avatar}`
-              : "../../../public/user.jpg"
-          }
-          className="avatar-inbox ms-4"
-        />
-        <span className="mt-2 inbox-user-name ms-2">
-          {contact.user1.id === auth.id ? contact.user2.name : contact.user1.name}
-        </span>
+            }
+            className="avatar-inbox ms-4"
+          />
+          <span className="mt-2 inbox-user-name ms-2">
+            {contact.user1.id === auth.id
+              ? contact.user2.name
+              : contact.user1.name}
+          </span>
         </Link>
       </div>
       <div className="conversation-content d-flex flex-column-reverse p-3">
@@ -140,13 +174,16 @@ function Inbox() {
           <div
             className={
               m.sender.id === auth.id
-                ? "d-flex message-content-box own-message"
-                : "d-flex message-content-box"
+                ? "d-flex flex-row-reverse message-content-box own-message justify-content-start align-items-center"
+                : "d-flex message-content-box justify-content-start align-items-center"
             }
             key={m.id}
           >
             <p
-              className={m.sender.id === auth.id ? "ms-auto" : "me-auto border"}
+              className={m.sender.id === auth.id ? "" : " border"}
+              data-bs-toggle="tooltip"
+              data-placement="bottom"
+              title={formatDateTime(m.createdAt)}
             >
               {m.content}
             </p>
@@ -154,7 +191,12 @@ function Inbox() {
         ))}
       </div>
       <div className="input-message mx-auto mt-auto mb-3 d-flex border position-relative">
-        <a role="button" className="ms-3 my-auto" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
+        <a
+          role="button"
+          className="ms-3 my-auto"
+          onClick={() => setShowPicker(true)}
+          ref={emojiButtonRef}
+        >
           <i className="fa-sharp fa-regular fa-face-smile"></i>
         </a>
         <TextareaAutosize
@@ -168,17 +210,22 @@ function Inbox() {
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => handleSendMessageOther(e)}
         />
-            {showPicker && (
-                      <div className="emoji-picker" ref={emojiRef}>
-                         <EmojiPicker
-                        height={400}
-                        width={300}
-                        onEmojiClick={onEmojiClick}
-                        autoFocusSearch={false}
-                      />
-                      </div>
-                    )}
-        <button className="btn btn-post-comment btn-block me-2" onClick={handleSendMessage}>Send</button>
+        {showPicker && (
+          <div className="emoji-picker" ref={emojiRef}>
+            <EmojiPicker
+              height={400}
+              width={300}
+              onEmojiClick={onEmojiClick}
+              autoFocusSearch={false}
+            />
+          </div>
+        )}
+        <button
+          className="btn btn-post-comment btn-block me-2"
+          onClick={handleSendMessage}
+        >
+          Send
+        </button>
       </div>
     </div>
   );

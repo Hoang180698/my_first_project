@@ -1,6 +1,7 @@
 package com.example.snwbackend.request;
 
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 @AllArgsConstructor
 @NoArgsConstructor

@@ -13,12 +13,14 @@ import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Empty;
 public class UpdateInfoUserRequest {
 
     @Length(min = 1, max = 25)
+    @Pattern(regexp = "^[_A-z0-9]*((-|\\s)*[_A-z0-9])*$")
     private String name;
 
     @Length(max = 12)
     @Pattern(regexp = "(^[0-9]+$|^$)")
     private String phone;
 
+    @Length(max = 30)
     private String address;
 
     @Length(max = 200)
@@ -26,6 +28,6 @@ public class UpdateInfoUserRequest {
 
     private String gender;
 
-    @Pattern(regexp = "^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$")
+    @Pattern(regexp = "(^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$)|^(?!.*\\S)")
     private String birthday;
 }

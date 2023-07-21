@@ -300,11 +300,11 @@ function PostModal({ postId }) {
                     <i className="fa-regular fa-comment"></i>
                   </span>
                 </a>
-                <a href="#!" className="text-dark ms-3 icon-pmd">
+                {/* <a href="#!" className="text-dark ms-3 icon-pmd">
                   <span>
                     <i className="fa-regular fa-paper-plane"></i>
                   </span>
-                </a>
+                </a> */}
               </div>
               <a role="button" onClick={() => handeleSavePost(post.saved ,post.post.id)} className="text-dark interact">
                 <span>

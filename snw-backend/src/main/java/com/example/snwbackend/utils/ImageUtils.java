@@ -24,10 +24,10 @@ public class ImageUtils {
             throw new BadRequestException("This file is not in the correct format");
         }
 
-        // Kiểm tra dung lượng file (<= 2MB)
+        // Kiểm tra dung lượng file (<= 3MB)
         double fileSize =  (double) (file.getSize() / 1_048_576);
-        if( fileSize > 2) {
-            throw new BadRequestException("file must not exceed 2MB");
+        if( fileSize > 3) {
+            throw new BadRequestException("file must not exceed 3MB");
         }
     }
 

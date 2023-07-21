@@ -12,6 +12,7 @@ import com.example.snwbackend.request.MessageRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,9 @@ public class WebSocketService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     public Message sendMessage(MessageRequest request, Integer contactId) {
@@ -49,6 +53,8 @@ public class WebSocketService {
         messageRepository.save(message);
         contactRepository.save(contact);
 
+        simpMessagingTemplate.convertAndSend("/topic/user/" + contact.getUser1().getId(), contact);
+        simpMessagingTemplate.convertAndSend("/topic/user/" + contact.getUser2().getId(), contact);
         return message;
     }
 }

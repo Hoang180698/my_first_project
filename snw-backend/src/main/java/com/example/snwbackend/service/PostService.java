@@ -60,7 +60,6 @@ public class PostService {
         Post post = Post.builder()
                 .content(request.getContent())
                 .user(user)
-                .content("")
                 .build();
         return postRepository.save(post);
     }
@@ -180,6 +179,7 @@ public class PostService {
             Post post = Post.builder()
                     .imageUrls(urls)
                     .user(user)
+                    .content("")
                     .build();
             return postRepository.save(post);
         } catch (Exception e) {

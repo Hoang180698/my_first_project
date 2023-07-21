@@ -97,6 +97,6 @@ public class AuthService {
     }
 
     public boolean checkEmailExist(String email) {
-        return userRepository.findByEmail(email).isPresent();
+       return userRepository.findByEmail(email).isPresent();
     }
 }

@@ -59,7 +59,16 @@ function EditPassword() {
         setValue("retypeNewPass","");
       })
       .catch((err) => {
-        toast.error("Enter a valid password and try again.");
+        toast.error("Enter a valid password and try again.",  {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          });
         setFocus("oldPass");
         console.log(err);
       });
@@ -114,7 +123,6 @@ function EditPassword() {
                 <label>New password</label>
                 <div className="form-control d-flex align-items-center">
                   <input
-                    ref={newPassRef}
                     required
                     type={showNewPass ? "text" : "password"}
                     className="me-2"

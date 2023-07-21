@@ -47,4 +47,5 @@ export const {
     useGetMessagesQuery,
     useGetContactByIdQuery,
     useLazyGetMessagesQuery,
+    useLazyGetContactsQuery,
 } = chatApi;

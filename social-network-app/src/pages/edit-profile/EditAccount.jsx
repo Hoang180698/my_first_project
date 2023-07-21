@@ -3,6 +3,8 @@ import { useUpdateUserMutation } from "../../app/services/user.service";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useRef } from "react";
+import { event } from "jquery";
 
 function EditAccount() {
 
@@ -16,14 +18,38 @@ function EditAccount() {
     const [biography, setBiography] = useState(auth.biography);
     const [birthday, setBirthday] = useState(auth.birthday);
 
+    const [phoneCorrect, setPhoneCorrect] = useState(true);
+    const [nameCorrect, setNameCorrect] = useState(true);
+
+    const focusPhone = useRef(null);
 
     const handleSetPhone = (event) => {
         const newPhone = event.target.value.replace(/[^\d]/g, '');
         setPhone(newPhone);
+        if(newPhone && (newPhone.length < 9 || newPhone.length > 12)) {
+          setPhoneCorrect(false);
+        } else {
+          setPhoneCorrect(true);
+        }
       }
+
+    const handleSetName = (event) => {
+      const newName = event.target.value;
+      setName(newName);
+      const nameRegex = new RegExp(/^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g)
+      if(!nameRegex.test(newName)){
+        setNameCorrect(false);
+      } else {
+        setNameCorrect(true);
+      }
+    }
 
       const handleUpdateAccount = (e) => {
         e.preventDefault();
+        if (!phoneCorrect) {
+          focusPhone.current.focus();
+          return;
+        } else {
           updateUser({ name, phone, address, gender, biography, birthday })
             .unwrap()
             .then(() => {
@@ -33,6 +59,7 @@ function EditAccount() {
               toast.error("Try again")
               console.log(err);
             });
+        }
       }
 
   return (
@@ -54,20 +81,28 @@ function EditAccount() {
                 type="text"
                 className="form-control"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleSetName(e)}
+                maxLength={25}
               />
+              {!nameCorrect &&   <span style={{ color: "red", fontSize: "11px" }}>
+              No symbols or special chars
+                        </span>}
             </div>
           </div>
           <div className="col-md-6">
             <div className="form-group">
               <label>Phone number</label>
               <input
+                ref={focusPhone}
                 type="text"
                 className="form-control"
                 value={phone}
                 onChange={(e) => handleSetPhone(e)}
                 maxLength={12}
               />
+              {!phoneCorrect &&   <span style={{ color: "red", fontSize: "11px" }}>
+              Please enter a valid phone number
+                        </span>}
             </div>
           </div>
           <div className="col-md-6">
@@ -78,6 +113,7 @@ function EditAccount() {
                 className="form-control"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
+                maxLength={30}
               />
             </div>
           </div>

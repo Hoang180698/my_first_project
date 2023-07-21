@@ -194,11 +194,11 @@ function OwnPost({ p }) {
                     <i class="fa-regular fa-comment"></i>
                   </span>
                 </a>
-                <a href="#!" className="text-dark ms-3 interact">
+                {/* <a href="#!" className="text-dark ms-3 interact">
                   <span>
                     <i class="fa-regular fa-paper-plane"></i>
                   </span>
-                </a>
+                </a> */}
               </div>
               <a role="button" onClick={() => handeleSavePost(p.saved ,p.post.id)} className="text-dark interact">
                 <span>

@@ -6,46 +6,70 @@ import { over } from "stompjs";
 import SockJS from "sockjs-client";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { useGetContactsQuery } from "../../app/services/chat.service";
+import { useGetContactsQuery, useLazyGetContactsQuery } from "../../app/services/chat.service";
 import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import NewMessage from "./NewMessage";
 import { Helmet } from "react-helmet";
+import { formatDate, formatDateTime } from "../../utils/functionUtils";
 
 var stompClient = null;
 function Messenge() {
   const { auth } = useSelector((state) => state.auth);
-  const [messages, setMessages] = useState([]);
-  const [currentContactId, setCurrentContactId] = useState(0);
-  const [content, setContent] = useState("");
+  const [contacts, setContacts] = useState([]);
 
-  const { data, isLoading } = useGetContactsQuery();
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [getContacts] = useLazyGetContactsQuery();
+  // const { data, isLoading } = useGetContactsQuery();
 
   // useEffect(() => {
-  //   // connect();
-  // }, [currentContactId]);
+  //   if(!data) {
+  //     return;
+  //   }
+  //   setContacts(data);
+  // }, [data])
 
-  const handleSendMessage = () => {
-    const newMessage = { senderId: auth.id, content: content };
-    stompClient.send(
-      "/app/message/" + currentContactId,
-      {},
-      JSON.stringify(newMessage)
-    );
-    setContent("");
-  };
+  useEffect(() => {
+    const fectchData = async () => {
+      try {
+        let { data } = await getContacts();
+        setContacts(data);
+      } catch (error) {
+        console.log(error)
+      }
+     
+    };
+    if (isConnected) {
+      stompClient.disconnect();
+      setIsConnected(false);
+    }
+    fectchData();
+    connect();
+
+    return () => {
+      onDisconnect();
+    };
+  }, []);
 
   const onConnected = () => {
+    setIsConnected(true);
     stompClient.subscribe(
-      "/topic/messages/" + currentContactId,
+      "/topic/user/" + auth.id,
       onMessageReceived
     );
   };
 
+  const onDisconnect = () => {
+    if (isConnected) {
+      stompClient.disconnect();
+      setIsConnected(false);
+    }
+  };
+
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
-    let newMess = [payloadData, ...messages];
-    setMessages((oldMess) => [payloadData, ...oldMess]);
+    setContacts((oldContacts) => [payloadData, ...oldContacts.filter((c) => c.id !== payloadData.id)]);
   };
 
   const onError = (err) => {
@@ -57,17 +81,17 @@ function Messenge() {
     stompClient.connect({}, onConnected, onError);
   };
 
-  if (isLoading) {
-    return (
-      <div className="container">
-        <div className="text-center m-5">
-          <div className="spinner-border m-5" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="container">
+  //       <div className="text-center m-5">
+  //         <div className="spinner-border m-5" role="status">
+  //           <span className="sr-only">Loading...</span>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -82,7 +106,7 @@ function Messenge() {
                 <span className="inbox-user-name mx-auto">{auth.name}</span>
                 <NewMessage />
               </div>
-              {data.map((c) => (
+              {contacts.map((c) => (
                 <NavLink
                   className="px-3 py-2 d-flex user-chat-box text-dark"
                   to={`/messenge/inbox/${c.id}`}
@@ -101,15 +125,19 @@ function Messenge() {
                     className="avatar-chat"
                   />
                   <div className="px-2 d-flex flex-column" style={{maxWidth:"75%"}}>
-                    <span className="mt-2 chat-user-name">
+                    <span className="mt-1 chat-user-name" style={{fontWeight:"500"}}>
                       {c.user1.id === auth.id ? c.user2.name : c.user1.name}
                     </span>
                     
                     <span className="last-message mt-0">
-                      {c.lastMessage?.sender.id === auth.id ? "you: " : ""}
+                      {c.lastMessage?.sender.id === auth.id && <b>you: </b>}
                       {c.lastMessage?.content}
                     </span>
+                    <p role="button" className="mb-0 text-muted time-post">
+                  {formatDate(c.lastMessage?.createdAt)}
+                </p>
                   </div>
+                
                 </NavLink>
               ))}
             </div>
