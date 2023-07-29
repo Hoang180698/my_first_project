@@ -1,85 +1,129 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./chat.css";
 import TextareaAutosize from "react-textarea-autosize";
 import InputChat from "../../components/chat/InputChat";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import { useGetContactsQuery, useLazyGetContactsQuery } from "../../app/services/chat.service";
+import {
+  useGetConversationsQuery,
+  useLazyGetConversationsQuery,
+} from "../../app/services/chat.service";
 import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import NewMessage from "./NewMessage";
 import { Helmet } from "react-helmet";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
+import ConversationBox from "../../components/chat/ConversationBox";
+import { closeChatPage, openChatPage, setConversationReceive } from "../../app/slices/chat.slice";
 
 var stompClient = null;
 function Messenge() {
   const { auth } = useSelector((state) => state.auth);
-  const [contacts, setContacts] = useState([]);
+  const { currentConversationId } = useSelector(
+    (state) => state.currentConversationId
+  );
+  const [conversations, setConversations] = useState([]);
+  const dispatch = useDispatch();
 
+  const { conversationReceive } = useSelector((state) => state.chat);
 
   const [isConnected, setIsConnected] = useState(false);
-  const [getContacts] = useLazyGetContactsQuery();
-  // const { data, isLoading } = useGetContactsQuery();
+  const [getConversations] = useLazyGetConversationsQuery();
 
-  // useEffect(() => {
-  //   if(!data) {
-  //     return;
-  //   }
-  //   setContacts(data);
-  // }, [data])
+  const effect = useRef(false);
+  useEffect(() => {
+    if (currentConversationId !== 0 && conversations.length > 0) {
+      const newConversations = conversations.map((c) => {
+        if (c.id.conversationId == currentConversationId) {
+          return { ...c, unreadCount: 0 };
+        } else {
+          return c;
+        }
+      });
+      setConversations(newConversations);
+    }
+  }, [currentConversationId]);
+  useEffect(() => {
+    if (conversationReceive) {
+      setConversations((oldConversations) => [
+        conversationReceive,
+        ...oldConversations.filter(
+          (c) => c.id.conversationId !== conversationReceive.id.conversationId
+        ),
+      ]);
+    }
+  }, [conversationReceive]);
 
   useEffect(() => {
+    dispatch(openChatPage());
     const fectchData = async () => {
       try {
-        let { data } = await getContacts();
-        setContacts(data);
+        let { data } = await getConversations();
+        setConversations(data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-     
     };
-    if (isConnected) {
-      stompClient.disconnect();
-      setIsConnected(false);
-    }
     fectchData();
-    connect();
-
     return () => {
-      onDisconnect();
+      dispatch(closeChatPage());
+      dispatch(setConversationReceive(null));
     };
   }, []);
 
-  const onConnected = () => {
-    setIsConnected(true);
-    stompClient.subscribe(
-      "/topic/user/" + auth.id,
-      onMessageReceived
-    );
-  };
+  // useEffect(() => {
+  //   const fectchData = async () => {
+  //     try {
+  //       let { data } = await getConversations();
+  //       setConversations(data);
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
 
-  const onDisconnect = () => {
-    if (isConnected) {
-      stompClient.disconnect();
-      setIsConnected(false);
-    }
-  };
+  //   };
+  //   fectchData();
+  //   if(effect.current === true) {
+  //     connect();
+  //     effect.current = true;
+  //   }
 
-  const onMessageReceived = (payload) => {
-    const payloadData = JSON.parse(payload.body);
-    setContacts((oldContacts) => [payloadData, ...oldContacts.filter((c) => c.id !== payloadData.id)]);
-  };
+  //   return () => {
+  //     onDisconnect();
+  //     effect.current = true;
+  //   };
+  // }, []);
 
-  const onError = (err) => {
-    console.log(err);
-  };
-  const connect = () => {
-    let Sock = new SockJS("http://localhost:8080/ws");
-    stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError);
-  };
+  // const onConnected = () => {
+  //   setIsConnected(true);
+  //   stompClient.subscribe(
+  //     "/topic/user/" + auth.id,
+  //     onMessageReceived
+  //   );
+  // };
+
+  // const onDisconnect = () => {
+  //   if (isConnected) {
+  //     stompClient.disconnect();
+  //     setIsConnected(false);
+  //   }
+  // };
+
+  // const onMessageReceived = (payload) => {
+  //   const payloadData = JSON.parse(payload.body);
+  //   console.log(payloadData);
+  //   setConversations((oldConversations) => [payloadData, ...oldConversations.filter((c) => c.id.conversationId !== payloadData.id.conversationId)]);
+  // };
+
+  // const onError = (err) => {
+  //   console.log(err);
+  // };
+  // const connect = () => {
+  //   let Sock = new SockJS("http://localhost:8080/ws");
+  //   stompClient = over(Sock);
+  //   stompClient.connect({}, onConnected, onError);
+  // };
 
   // if (isLoading) {
   //   return (
@@ -95,9 +139,9 @@ function Messenge() {
 
   return (
     <>
-    <Helmet>
-      <title>Direct | Hoagram</title>
-    </Helmet>
+      <Helmet>
+        <title>Direct | Hoagram</title>
+      </Helmet>
       <div className="container">
         <div className="col-sm-10 offset-sm-1  messenge-container mt-4 container-chat">
           <div className="d-flex border body-chat">
@@ -106,85 +150,11 @@ function Messenge() {
                 <span className="inbox-user-name mx-auto">{auth.name}</span>
                 <NewMessage />
               </div>
-              {contacts.map((c) => (
-                <NavLink
-                  className="px-3 py-2 d-flex user-chat-box text-dark"
-                  to={`/messenge/inbox/${c.id}`}
-                  key={c.id}
-                >
-                  <img
-                    src={
-                      c.user1.id === auth.id
-                        ? c.user2.avatar
-                          ? `http://localhost:8080${c.user2.avatar}`
-                          : "../../../public/user.jpg"
-                        : c.user1.avatar
-                        ? `http://localhost:8080${c.user1.avatar}`
-                        : "../../../public/user.jpg"
-                    }
-                    className="avatar-chat"
-                  />
-                  <div className="px-2 d-flex flex-column" style={{maxWidth:"75%"}}>
-                    <span className="mt-1 chat-user-name" style={{fontWeight:"500"}}>
-                      {c.user1.id === auth.id ? c.user2.name : c.user1.name}
-                    </span>
-                    
-                    <span className="last-message mt-0">
-                      {c.lastMessage?.sender.id === auth.id && <b>you: </b>}
-                      {c.lastMessage?.content}
-                    </span>
-                    <p role="button" className="mb-0 text-muted time-post">
-                  {formatDate(c.lastMessage?.createdAt)}
-                </p>
-                  </div>
-                
-                </NavLink>
+              {conversations.map((c) => (
+                <ConversationBox data={c} key={c.conversation.id} />
               ))}
             </div>
             <Outlet />
-            {/* <div className="d-flex flex-column conversation-container">
-              <div className="conversation-content d-flex flex-column-reverse p-3">
-                {messages.map((m) => (
-                  <div
-                    className={
-                      m.sender.id === auth.id
-                        ? "d-flex message-content-box own-message"
-                        : "d-flex message-content-box"
-                    }
-                    key={m.id}
-                  >
-                    <p
-                      className={
-                        m.sender.id === auth.id ? "ms-auto" : "me-auto border"
-                      }
-                    >
-                      {m.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="input-message mx-auto mt-auto mb-3 d-flex border">
-                <a role="button" className="ms-3 my-auto">
-                  <i className="fa-sharp fa-regular fa-face-smile"></i>
-                </a>
-                <TextareaAutosize
-                  rows="1"
-                  type="text"
-                  className="form-control ms-2"
-                  maxRows={4}
-                  placeholder="Message..."
-                  autoFocus={true}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-                <button
-                  className="btn btn-post-comment btn-block me-2"
-                  onClick={handleSendMessage}
-                >
-                  Send
-                </button>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>

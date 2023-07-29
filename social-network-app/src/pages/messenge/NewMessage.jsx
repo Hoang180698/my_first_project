@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
-import { useCreateContactMutation } from "../../app/services/chat.service";
+import { useCreateConversationMutation } from "../../app/services/chat.service";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -12,12 +12,12 @@ function NewMessage() {
   const [noRes, setNoRes] = useState(false);
 
   const [searchUser] = useLazySearchUserQuery();
-  const [createContact] = useCreateContactMutation();
+  const [createConversation] = useCreateConversationMutation();
 
   const navigate = useNavigate();
 
-  const handleCreateContact = (id) => {
-    createContact({ userId: id })
+  const handleCreateConversation = (id) => {
+    createConversation({ userId: id })
       .unwrap()
       .then((res) => {
         setShowModal(false);
@@ -116,7 +116,7 @@ function NewMessage() {
                     <button
                       type="button"
                       className="ms-auto btn btn-secondary"
-                      onClick={() => handleCreateContact(u.id)}
+                      onClick={() => handleCreateConversation(u.id)}
                     >
                       Message
                     </button>

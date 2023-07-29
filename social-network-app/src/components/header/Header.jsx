@@ -1,26 +1,107 @@
-
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import { logout } from "../../app/slices/auth.slice";
 import useCreatePost from "../../pages/newPost/useCreatePost";
 import styles from "./Header.module.css";
 import NotifyHeader from "./notify/NotifyHeader";
+import {
+  useGetAllUnreadMessageCountQuery,
+  useResetUnreadCountByConversationIdMutation,
+} from "../../app/services/chat.service";
+import "../chat/init";
+import SockJS from "sockjs-client";
+import { over } from "stompjs";
+import {
+  receiveMessage,
+  setConversationReceive,
+} from "../../app/slices/chat.slice";
 
+var stompClient = null;
 
 function Header() {
   function refreshPage() {
     window.location.reload(false);
   }
+  const [isConnected, setIsConnected] = useState(false);
+  const { currentConversationId } = useSelector(
+    (state) => state.currentConversationId
+  );
+  // const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   const { auth } = useSelector((state) => state.auth);
+  const effect = useRef(false);
   const { onCreatePost } = useCreatePost();
+  const { unreadMessageCount, isOpenChatPage } = useSelector(
+    (state) => state.chat
+  );
+  // const { currentConversationId } = useSelector(
+  //   (state) => state.currentConversationId
+  // );
+  const [resetUnreadMessageCount] =
+    useResetUnreadCountByConversationIdMutation();
   const dispatch = useDispatch();
+  const { data } = useGetAllUnreadMessageCountQuery();
 
+  // useEffect(() => {
+  //   if(data) {
+  //     setUnreadMessageCount(data.unreadMessageCount);
+  //   }
+  // },[data])
+  useEffect(() => {
+    onDisconnect();
+    if (effect.current === true) {
+      connect();
+      effect.current = true;
+    }
+
+    return () => {
+      onDisconnect();
+      effect.current = true;
+    };
+  }, [isOpenChatPage, currentConversationId]);
   const handleLogout = () => {
     dispatch(logout());
   };
 
+  const connect = () => {
+    let Sock = new SockJS("http://localhost:8080/ws");
+    stompClient = over(Sock);
+    stompClient.debug = () => {};
+    stompClient.connect({}, onConnected, onError);
+  };
+
+  const onDisconnect = () => {
+    if (isConnected) {
+      stompClient.disconnect();
+      setIsConnected(false);
+    }
+  };
+
+  const onError = (err) => {
+    console.log(err);
+  };
+
+  const onConnected = () => {
+    setIsConnected(true);
+    stompClient.subscribe("/topic/user/" + auth.id, (payload) => {
+      const payloadData = JSON.parse(payload.body);
+      if (payloadData.id.conversationId !== currentConversationId) {
+        if (payloadData.conversation.lastMessage.sender.id !== auth.id) {
+          dispatch(receiveMessage());
+        }
+        if (isOpenChatPage) {
+          dispatch(setConversationReceive(payloadData));
+        }
+      } else {
+        resetUnreadMessageCount(payloadData.id.conversationId)
+          .unwrap()
+          .then()
+          .catch();
+        dispatch(setConversationReceive({ ...payloadData, unreadCount: 0 }));
+      }
+    });
+  };
 
   return (
     <>
@@ -49,23 +130,39 @@ function Header() {
             >
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li className="nav-item mx-3">
-                  <NavLink to={"/"} className="nav-link" onDoubleClick={refreshPage}>
+                  <NavLink
+                    to={"/"}
+                    className="nav-link"
+                    onDoubleClick={refreshPage}
+                  >
                     <i className="fa-solid fa-house"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
-                  <NavLink to={"/search"} className="nav-link" onDoubleClick={refreshPage}>
+                  <NavLink
+                    to={"/search"}
+                    className="nav-link"
+                    onDoubleClick={refreshPage}
+                  >
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">
                   <NavLink to={"/messenge"} className="nav-link">
-                    <i className="fa-regular fa-message"></i>
+                    <i className="fa-regular fa-message position-relative">
+                      {unreadMessageCount > 0 && (
+                        <span className="unread-message-count-badge">
+                          {unreadMessageCount < 100
+                            ? unreadMessageCount
+                            : "99+"}
+                        </span>
+                      )}
+                    </i>
                   </NavLink>
                 </li>
                 {/* Thong bao */}
                 <li className="nav-item mx-3 dropdown notification-ui">
-                <NotifyHeader />
+                  <NotifyHeader />
                 </li>
                 <li className="nav-item mx-3">
                   <a
@@ -89,7 +186,14 @@ function Header() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <img className={styles.avatar} src={auth.avatar === null ? "../../public/user.jpg" : `http://localhost:8080${auth.avatar}`} />
+                  <img
+                    className={styles.avatar}
+                    src={
+                      auth.avatar === null
+                        ? "../../public/user.jpg"
+                        : `http://localhost:8080${auth.avatar}`
+                    }
+                  />
                 </a>
                 <ul
                   className="dropdown-menu dropdown-menu-lg-end"
@@ -101,12 +205,20 @@ function Header() {
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/edit-profile"} className="dropdown-item" href="#">
+                    <Link
+                      to={"/edit-profile"}
+                      className="dropdown-item"
+                      href="#"
+                    >
                       Edit
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/notifications"} className="dropdown-item" href="#">
+                    <Link
+                      to={"/notifications"}
+                      className="dropdown-item"
+                      href="#"
+                    >
                       Notifications
                     </Link>
                   </li>

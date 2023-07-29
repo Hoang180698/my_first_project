@@ -30,7 +30,7 @@ function App() {
             <Route path="/search" element={<Search />}></Route>
             <Route path="/messenge" element={<Messenge />}>
               <Route path="" element={<MessageBox />}></Route>
-              <Route path="inbox/:contactId" element={<Inbox />}></Route>
+              <Route path="inbox/:conversationId" element={<Inbox />}></Route>
             </Route>
             <Route path="/notifications" element={<Notify />}></Route>
             <Route path="/profile" element={<Profile />}>

@@ -2,51 +2,54 @@ import React, { useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import {
-  useGetContactByIdQuery,
+  useGetConversationByIdQuery,
   useGetMessagesQuery,
   useLazyGetMessagesQuery,
+  useResetUnreadCountByConversationIdMutation,
 } from "../../app/services/chat.service";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useState } from "react";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
 import EmojiPicker from "emoji-picker-react";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
+import InboxHeaderAvatar from "../../components/chat/InboxHeaderAvatar";
+import { setCurrentConversationId } from "../../app/slices/currentConversationId.slice";
 
 var stompClient = null;
 function Inbox() {
   const [isConnected, setIsConnected] = useState(false);
-  const { contactId } = useParams();
+  const { conversationId } = useParams();
   const { auth } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [getMessage] = useLazyGetMessagesQuery();
   const [content, setContent] = useState("");
   const [showPicker, setShowPicker] = useState(false);
-  // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(contactId);
-  const { data: contact, isLoading: isLoadingContact } =
-    useGetContactByIdQuery(contactId);
+  // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(conversationId);
+  const { data: conversation, isLoading: isLoadingconversation, isError } =
+    useGetConversationByIdQuery(conversationId);
   const emojiRef = useRef(null);
   const emojiButtonRef = useRef(null);
   const navigate = useNavigate();
-
+  const [resetUnreadMessageCount] = useResetUnreadCountByConversationIdMutation();
   const effect = useRef(false);
 
+  const dipatch = useDispatch();
   useEffect(() => {
     onDisconnect();
-    
+    dipatch(setCurrentConversationId({ id: Number(conversationId) }))
     const fectchData = async () => {
       try {
-        let { data } = await getMessage(contactId);
+        let { data } = await getMessage(conversationId);
         setMessages(data);
       } catch (error) {
         console.log(error);
       }
     };
-
     fectchData();
     setContent("");
-
+    resetUnreadMessageCount(conversationId).unwrap().then().catch();
     if(effect.current === true) {
       connect();
       effect.current = true;
@@ -54,9 +57,10 @@ function Inbox() {
     
     return () => {
       onDisconnect();
+      dipatch(setCurrentConversationId({ id: 0 }))
       effect.current = true;
     };
-  }, [contactId]);
+  }, [conversationId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -79,6 +83,7 @@ function Inbox() {
   const connect = () => {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
+    stompClient.debug = () => {};
     stompClient.connect({}, onConnected, onError);
   };
 
@@ -95,7 +100,7 @@ function Inbox() {
 
   const onConnected = () => {
     setIsConnected(true);
-    stompClient.subscribe("/topic/contact/" + contactId, onMessageReceived);
+    stompClient.subscribe("/topic/conversation/" + conversationId, onMessageReceived);
   };
 
   const onMessageReceived = (payload) => {
@@ -112,7 +117,7 @@ function Inbox() {
     }
     const newMessage = { senderId: auth.id, content: content };
     stompClient.send(
-      "/app/message/" + contactId,
+      "/app/message/" + conversationId,
       {},
       JSON.stringify(newMessage)
     );
@@ -126,7 +131,7 @@ function Inbox() {
     }
   };
 
-  if (isLoadingContact) {
+  if (isLoadingconversation) {
     return (
       <div className="container">
         <div className="text-center m-5">
@@ -138,36 +143,13 @@ function Inbox() {
     );
   }
 
-  if (!contact && !isLoadingContact) {
+  if (isError) {
     navigate("/messenge");
   }
   return (
     <div className="d-flex flex-column conversation-container">
       <div className="border-bottom p-3">
-        <Link
-          to={`/u/${
-            contact.user1.id === auth.id ? contact.user2.id : contact.user1.id
-          }`}
-          className="text-dark"
-        >
-          <img
-            src={
-              contact.user1.id === auth.id
-                ? contact.user2.avatar
-                  ? `http://localhost:8080${contact.user2.avatar}`
-                  : "../../../public/user.jpg"
-                : contact.user1.avatar
-                ? `http://localhost:8080${contact.user1.avatar}`
-                : "../../../public/user.jpg"
-            }
-            className="avatar-inbox ms-4"
-          />
-          <span className="mt-2 inbox-user-name ms-2">
-            {contact.user1.id === auth.id
-              ? contact.user2.name
-              : contact.user1.name}
-          </span>
-        </Link>
+        <InboxHeaderAvatar conversation={conversation} />
       </div>
       <div className="conversation-content d-flex flex-column-reverse p-3">
         {messages.map((m) => (

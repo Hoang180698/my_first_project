@@ -23,7 +23,6 @@ public class WebSocketController {
     @MessageMapping("/message/{contactId}")
     public Message sendMessage(@DestinationVariable Integer contactId, MessageRequest request){
         Message message = webSocketService.sendMessage(request, contactId);
-        simpMessagingTemplate.convertAndSend("/topic/contact/" + contactId, message);
         return message;
     }
 }

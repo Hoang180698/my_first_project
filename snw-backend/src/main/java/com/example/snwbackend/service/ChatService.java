@@ -1,34 +1,39 @@
 package com.example.snwbackend.service;
 
-import com.example.snwbackend.entity.Contact;
-import com.example.snwbackend.entity.Message;
-import com.example.snwbackend.entity.User;
+import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
-import com.example.snwbackend.repository.ContactRepository;
-import com.example.snwbackend.repository.MessageRepository;
-import com.example.snwbackend.repository.UserRepository;
+import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.ContactRequest;
+import com.example.snwbackend.response.StatusResponse;
+import com.example.snwbackend.response.UnreadMessageCountResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ChatService {
-
-    @Autowired
-    private ContactRepository contactRepository;
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private MessageRepository messageRepository;
 
-    public Contact createContact(ContactRequest request) {
+    @Autowired
+    private ConversationRepository conversationRepository;
+
+    @Autowired
+    private UserConversationRepository userConversationRepository;
+
+    // Tạo chát đơn
+    @Transactional
+    public Conversation createSingleConversation(ContactRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -36,56 +41,88 @@ public class ChatService {
         User user2 = userRepository.findById(request.getUserId()).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + request.getUserId());
         });
-
-        Optional<Contact> contact = contactRepository.getContactBy2User(user.getId(), user2.getId());
-        if(contact.isPresent()) {
-            return contact.get();
+        Optional<Conversation> conversation;
+        if(user.getId() < user2.getId()) {
+            conversation = conversationRepository.findByUser1AndUser2(user, user2);
         } else {
-            Contact newContact = Contact.builder()
-                    .user1(user)
-                    .user2(user2)
-                    .build();
-            return contactRepository.save(newContact);
+            conversation = conversationRepository.findByUser1AndUser2(user2, user);
         }
+        if(conversation.isPresent()) {
+            return conversation.get();
+        }
+        Set<User> users = new LinkedHashSet<>();
+        users.add(user); users.add(user2);
+        Conversation conversation1 = Conversation.builder()
+                .isGroupChat(false).user1(user).user2(user2)
+                .users(users)
+                .build();
+        return conversationRepository.save(conversation1);
     }
 
-    public List<Contact> getAllContact() {
+    // Lấy danh sách các cuộc hội thoại
+    public List<UserConversation> getAllConversation() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
 
-        return contactRepository.getAllContactByUserId(user.getId());
+        return userConversationRepository.findAllById_UserIdOrderByLastMessage(user.getId());
     }
 
-    public List<Message> getAllMessageByContactId(Integer contactId) {
+    // Lấy các tin nhắn trong cuộc hội thoại
+    public List<Message> getAllMessageByConversationId(Integer conversationId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        Contact contact = contactRepository.findById(contactId).orElseThrow(() -> {
-            throw new NotFoundException("Not found contact with id = " + contactId);
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
         });
 
-        if (user.getId() != contact.getUser1().getId() && user.getId() != contact.getUser2().getId()) {
+        if (!conversation.getUsers().contains(user)) {
             throw new BadRequestException("You do not have permission");
         }
 
-        return messageRepository.findAllByContactOrderByCreatedAtDesc(contact);
+        return messageRepository.findAllByConversationOrderByCreatedAtDesc(conversation);
     }
 
-    public Contact getContactById(Integer id) {
+    // Lấy thông tin cuộc hội thoại
+    public Conversation getConversationById(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        Contact contact = contactRepository.findById(id).orElseThrow(() -> {
+
+        Conversation conversation = conversationRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found contact with id = " + id);
         });
-        if (user.getId() != contact.getUser1().getId() && user.getId() != contact.getUser2().getId()) {
+        if (!conversation.getUsers().contains(user)) {
             throw new BadRequestException("You do not have permission");
         }
 
-        return contact;
+        return conversation;
+    }
+
+    // Reset unread count
+    public StatusResponse resetUnreadCountByConversationId(Integer conversationId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        UserConversation userConversation = userConversationRepository.findById_UserIdAndId_ConversationId(user.getId(), conversationId).orElseThrow(()-> {
+            throw new NotFoundException("Not found with id: " + conversationId);
+        });
+        userConversation.setUnreadCount(0);
+        userConversationRepository.save(userConversation);
+        return new StatusResponse("ok");
+    }
+
+    // get all unread count
+    public UnreadMessageCountResponse getAllUnreadCount() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        return new UnreadMessageCountResponse(userConversationRepository.getAllUnreadMessageCountByUserId(user.getId()));
     }
 }

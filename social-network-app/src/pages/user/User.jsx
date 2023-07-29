@@ -13,7 +13,7 @@ import { Modal } from "react-bootstrap";
 import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { toast } from "react-toastify";
-import { useCreateContactMutation } from "../../app/services/chat.service";
+import { useCreateConversationMutation } from "../../app/services/chat.service";
 
 function User() {
   const { userId } = useParams();
@@ -24,7 +24,7 @@ function User() {
   const { auth } = useSelector((state) => state.auth);
   const [followUser] = useFollowhUserMutation();
   const [unfollowUser] = useUnfollowhUserMutation();
-  const [createContact] = useCreateContactMutation();
+  const [createConversation] = useCreateConversationMutation();
 
   const [showModal, setShoModal] = useState(false);
 
@@ -39,8 +39,8 @@ function User() {
     navigate("/profile/");
   }
 
-  const handleCreateContact = (id) => {
-    createContact({ userId: id })
+  const handleCreateConversation = (id) => {
+    createConversation({ userId: id })
       .unwrap()
       .then((res) => {
         navigate(`/messenge/inbox/${res.id}`);
@@ -224,7 +224,7 @@ function User() {
                 <a
                   className="btn pt-2 ms-4 btn-edit-profile"
                   role="button"
-                  onClick={() => handleCreateContact(user.id)}
+                  onClick={() => handleCreateConversation(user.id)}
                 >
                   Message
                 </a>

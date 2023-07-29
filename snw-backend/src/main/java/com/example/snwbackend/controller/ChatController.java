@@ -16,22 +16,32 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("")
-    public ResponseEntity<?> createContact(@RequestBody ContactRequest request) {
-        return new ResponseEntity<>(chatService.createContact(request), HttpStatus.CREATED);
+    public ResponseEntity<?> createConversation(@RequestBody ContactRequest request) {
+        return new ResponseEntity<>(chatService.createSingleConversation(request), HttpStatus.CREATED);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllContact() {
-        return ResponseEntity.ok(chatService.getAllContact());
+    public ResponseEntity<?> getAllConversation() {
+        return ResponseEntity.ok(chatService.getAllConversation());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getContactById(@PathVariable Integer id) {
-        return ResponseEntity.ok(chatService.getContactById(id));
+    public ResponseEntity<?> getConversationById(@PathVariable Integer id) {
+        return ResponseEntity.ok(chatService.getConversationById(id));
     }
 
-    @GetMapping("message/{contactId}")
-    private ResponseEntity<?> getAllMessageByContactId(@PathVariable Integer contactId) {
-        return ResponseEntity.ok(chatService.getAllMessageByContactId(contactId));
+    @GetMapping("message/{conversationId}")
+    public ResponseEntity<?> getAllMessageByConversationId(@PathVariable Integer conversationId) {
+        return ResponseEntity.ok(chatService.getAllMessageByConversationId(conversationId));
+    }
+
+    @PutMapping("read/{conversationId}")
+    public ResponseEntity<?> resetUnreadCountByConversationId(@PathVariable Integer conversationId) {
+        return ResponseEntity.ok(chatService.resetUnreadCountByConversationId(conversationId));
+    }
+
+    @GetMapping("unread-count")
+    public ResponseEntity<?> getAllUnreadCount() {
+        return ResponseEntity.ok((chatService.getAllUnreadCount()));
     }
 }

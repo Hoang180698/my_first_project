@@ -109,7 +109,7 @@ function Post({ p }) {
         <div
           className="modal fade"
           id="popupModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="popupModalLabel"
           aria-hidden="true"

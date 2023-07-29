@@ -5,6 +5,8 @@ import { postApi } from "./services/posts.service";
 import { userApi } from "./services/user.service";
 import authReducer from "./slices/auth.slice";
 import newpostReducer from "./slices/newpost.slice";
+import currentConversationIdReducer from "./slices/currentConversationId.slice"
+import chatReducer from "./slices/chat.slice"
 import { commentApi } from "./services/comment.service";
 import { notificationApi } from "./services/notification.service";
 import { chatApi } from "./services/chat.service";
@@ -20,6 +22,8 @@ const store = configureStore({
         [chatApi.reducerPath]: chatApi.reducer,
         auth: authReducer,
         newpost: newpostReducer,
+        currentConversationId: currentConversationIdReducer,
+        chat: chatReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(

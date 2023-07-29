@@ -14,17 +14,17 @@ export const chatApi = createApi({
           return headers;
         },
       }),
-    tagTypes: ["Post"],
+    tagTypes: ["Post","Unread"],
     endpoints: (builder) => ({
-        getContacts: builder.query({
+        getConversations: builder.query({
             query: () =>  "chat",
             providesTags: ["Post"],
         }),
-        getContactById: builder.query({
+        getConversationById: builder.query({
             query: (id) =>  `chat/${id}`,
             providesTags: ["Post"],
         }),
-        createContact: builder.mutation({
+        createConversation: builder.mutation({
             query: (data) => ({
                 url: "chat",
                 method: "POST",
@@ -33,8 +33,19 @@ export const chatApi = createApi({
             invalidatesTags: ["Post"],
         }),
         getMessages: builder.query({
-            query: (contactId) => `chat/message/${contactId}`, 
+            query: (conversationId) => `chat/message/${conversationId}`, 
             providesTags: ["Post"],
+        }),
+        getAllUnreadMessageCount: builder.query({
+            query: () =>  "chat/unread-count",
+            providesTags: ["Unread"],
+        }),
+        resetUnreadCountByConversationId: builder.mutation({
+            query: (conversationId) => ({
+                url: `chat/read/${conversationId}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Unread"],
         }),
     }),
 });
@@ -42,10 +53,12 @@ export const chatApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-    useCreateContactMutation,
-    useGetContactsQuery,
+    useCreateConversationMutation,
+    useGetConversationsQuery,
     useGetMessagesQuery,
-    useGetContactByIdQuery,
+    useGetConversationByIdQuery,
     useLazyGetMessagesQuery,
-    useLazyGetContactsQuery,
+    useLazyGetConversationsQuery,
+    useGetAllUnreadMessageCountQuery,
+    useResetUnreadCountByConversationIdMutation
 } = chatApi;

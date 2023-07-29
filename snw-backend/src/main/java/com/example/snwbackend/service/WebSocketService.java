@@ -1,14 +1,11 @@
 package com.example.snwbackend.service;
 
-import com.example.snwbackend.entity.Contact;
-import com.example.snwbackend.entity.Message;
-import com.example.snwbackend.entity.User;
+import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
-import com.example.snwbackend.repository.ContactRepository;
-import com.example.snwbackend.repository.MessageRepository;
-import com.example.snwbackend.repository.UserRepository;
+import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.MessageRequest;
+import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -30,31 +27,49 @@ public class WebSocketService {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    @Autowired
+    private UserConversationRepository userConversationRepository;
+
+    @Autowired
+    private ConversationRepository conversationRepository;
+
     @Transactional
-    public Message sendMessage(MessageRequest request, Integer contactId) {
-        Contact contact = contactRepository.findById(contactId).orElseThrow(() -> {
-            throw new NotFoundException("Not found contact with id = " + contactId);
+    public Message sendMessage(MessageRequest request, Integer conversationId) {
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
         });
 
         User user = userRepository.findById(request.getSenderId()).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " +request.getSenderId());
         });
 
-        if(request.getSenderId() != contact.getUser1().getId() && request.getSenderId() != contact.getUser2().getId()) {
-            throw new BadRequestException("Can not send message with id = " +request.getSenderId());
+        if(!conversation.getUsers().contains(user)) {
+            throw new BadRequestException("Can not send message with userId = " +request.getSenderId());
         }
 
         Message message = Message.builder()
                 .content(request.getContent())
-                .sender(user)
-                .contact(contact)
+                .sender(user).type("message")
+                .conversation(conversation)
                 .build();
-        contact.setLastMessage(message);
         messageRepository.save(message);
-        contactRepository.save(contact);
 
-        simpMessagingTemplate.convertAndSend("/topic/user/" + contact.getUser1().getId(), contact);
-        simpMessagingTemplate.convertAndSend("/topic/user/" + contact.getUser2().getId(), contact);
+        simpMessagingTemplate.convertAndSend("/topic/conversation/" + conversationId, message);
+
+        for (User u: conversation.getUsers()) {
+            UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+            if (u.getId() == user.getId()) {
+                simpMessagingTemplate.convertAndSend("/topic/user/" + u.getId(), userConversation);
+                continue;
+            }
+            if(userConversation.getUnreadCount() == null) {
+                userConversation.setUnreadCount(1);
+            } else {
+                userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
+            }
+            simpMessagingTemplate.convertAndSend("/topic/user/" + u.getId(), userConversationRepository.save(userConversation));
+        }
+
         return message;
     }
 }

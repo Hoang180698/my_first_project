@@ -29,20 +29,17 @@ public class Message {
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
-
-    @Column(name = "is-read")
-    private boolean isRead;
+    @Column(name = "type")
+    private String type;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "contactId", nullable = false)
-    private Contact contact;
+    @JoinColumn(name = "conversationId", nullable = false)
+    private Conversation conversation;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        conversation.setLastMessage(this);
     }
 }
