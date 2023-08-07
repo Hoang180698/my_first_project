@@ -154,9 +154,9 @@ function OwnPost({ p }) {
                   <Link to={`/p/${p.post.id}`} className="dropdown-item text-dark">
                   Go to Post
                 </Link>
-                <a className="dropdown-item text-dark" href="#">
+                {/* <a className="dropdown-item text-dark" href="#">
                   <i className="fa fa-pencil me-1"></i>Edit
-                </a>
+                </a> */}
                 <a
                   role="button"
                   className="dropdown-item text-danger"

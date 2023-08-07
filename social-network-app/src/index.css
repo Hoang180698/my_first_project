@@ -544,3 +544,7 @@ textarea {
 	height: 68px;
 }
 
+.newmessage-slected-user-container {
+	max-width: 100%;
+}
+

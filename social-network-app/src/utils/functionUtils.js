@@ -27,22 +27,73 @@ export const formatDate = (dateString) => {
     return Math.floor(b / 60 / 24) + "d";
   } else {
     const year = date.getFullYear();
-    const month = `0${date.getMonth() + 1}`.slice(-2);
-    const day = `0${date.getDate()}`.slice(-2);
-    return `${day}-${month}-${year}`;
+    const month = `${date.getMonth() + 1}`;
+    const day = `${date.getDate()}`;
+    return `${day} ${formatMonth(month)} ${year}`;
   }
 
   // return moment(`${day}-${month}-${year} ${hour}:${min}`, "DD-MM-YYYY h:mm").fromNow();
   // return c/60/1000;
 };
 
+const formatMonth = (month) => {
+  switch (month) {
+    case '1': {
+      return "Feb";
+    }
+    case '2': {
+      return "Jan";
+    }
+    case '3': {
+      return "Mar";
+    }
+    case '4': {
+      return "Apr";
+    }
+    case '5': {
+      return "May";
+    }
+    case '6': {
+      return "Jun";
+    }
+    case '7': {
+      return "Jul";
+    }
+    case '8': {
+      return "Aug";
+    }
+    case '9': {
+      return "Sep";
+    }
+    case '10': {
+      return "Oct";
+    }
+    case '11': {
+      return "Nov";
+    }
+    default:
+      return "Dec"
+  }
+}
+
 export const formatDateTime = (dateString) => {
     const date = new Date(dateString);
 
     const year = date.getFullYear();
-    const month = `0${date.getMonth() + 1}`.slice(-2);
-    const day = `0${date.getDate()}`.slice(-2);
+    const month = `${date.getMonth() + 1}`;
+    const day = `${date.getDate()}`;
     const hour = date.getHours();
     const min = `0${date.getMinutes()}`.slice(-2);
-    return `${day}-${month}-${year} at ${hour}:${min}`;
+    return `${day} ${formatMonth(month)} ${year}, ${hour}:${min}`;
+}
+
+export const calDistanceTimeMinute = (dateString1, dateString2) => {
+  if (!dateString1 || !dateString2) {
+    return 0;
+  }
+
+  const date1 = new Date(dateString1);
+  const date2 = new Date(dateString2);
+
+  return Math.abs((date1 - date2) / 60 / 1000);
 }

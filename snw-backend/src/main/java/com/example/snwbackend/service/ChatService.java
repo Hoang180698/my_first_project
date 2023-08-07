@@ -5,6 +5,7 @@ import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.ContactRequest;
+import com.example.snwbackend.request.CreateConversationRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.response.UnreadMessageCountResponse;
 import jakarta.transaction.Transactional;
@@ -56,7 +57,50 @@ public class ChatService {
                 .isGroupChat(false).user1(user).user2(user2)
                 .users(users)
                 .build();
-        return conversationRepository.save(conversation1);
+        conversationRepository.save(conversation1);
+
+        for (User u: conversation1.getUsers()) {
+            UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation1).get();
+            userConversation.setUnreadCount(0);
+        }
+
+        return conversation1;
+    }
+
+    // Tạo chát nhóm
+    @Transactional
+    public Conversation createGroupChat(CreateConversationRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Set<User> users = userRepository.findByIdIn(request.getUserIds());
+        users.add(user);
+        if(users.size() < 3) {
+            throw new BadRequestException("Need at least 3 people to create group chat");
+        }
+        Conversation conversation = Conversation.builder()
+                .isGroupChat(true)
+                .users(users)
+                .build();
+        Message message = Message.builder()
+                .sender(user).type("START").conversation(conversation).content("")
+                .build();
+        conversationRepository.save(conversation);
+        messageRepository.save(message);
+
+        for (User u: conversation.getUsers()) {
+            if (u.getId() == user.getId()) {
+                UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+                userConversation.setUnreadCount(0);
+                userConversationRepository.save(userConversation);
+            } else {
+                UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+                userConversation.setUnreadCount(1);
+                userConversationRepository.save(userConversation);
+            }
+        }
+        return conversation;
     }
 
     // Lấy danh sách các cuộc hội thoại

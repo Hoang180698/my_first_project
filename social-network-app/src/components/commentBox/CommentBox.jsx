@@ -75,9 +75,6 @@ function CommentBox({ comments }) {
                 >
                   {c.userId === auth.id && (
                     <>
-                      <a className="dropdown-item text-dark" href="#">
-                        Edit
-                      </a>
                       <a
                         role="button"
                         className="dropdown-item text-danger"

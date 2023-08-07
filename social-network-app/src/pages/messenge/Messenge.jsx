@@ -18,7 +18,6 @@ import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import ConversationBox from "../../components/chat/ConversationBox";
 import { closeChatPage, openChatPage, setConversationReceive } from "../../app/slices/chat.slice";
 
-var stompClient = null;
 function Messenge() {
   const { auth } = useSelector((state) => state.auth);
   const { currentConversationId } = useSelector(
@@ -29,10 +28,8 @@ function Messenge() {
 
   const { conversationReceive } = useSelector((state) => state.chat);
 
-  const [isConnected, setIsConnected] = useState(false);
   const [getConversations] = useLazyGetConversationsQuery();
 
-  const effect = useRef(false);
   useEffect(() => {
     if (currentConversationId !== 0 && conversations.length > 0) {
       const newConversations = conversations.map((c) => {

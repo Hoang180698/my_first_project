@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
+    Set<User> findByIdIn(List<Integer> ids);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday, " +
             "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)))"

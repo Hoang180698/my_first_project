@@ -30,7 +30,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/images/read/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                     .exceptionHandling()
@@ -41,7 +40,8 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authenticationProvider(authenticationProvider)
-                    .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers();
 
         return http.build();
     }

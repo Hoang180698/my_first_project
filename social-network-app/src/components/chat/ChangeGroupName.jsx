@@ -1,0 +1,58 @@
+import React from "react";
+import { useState } from "react";
+import { Modal } from "react-bootstrap";
+
+function ChangeGroupName({ conversationId }) {
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  const [name, setName] = useState("");
+
+  return (
+    <>
+      <a onClick={handleShow} className="dropdown-item" role="button">
+        Change group name
+      </a>
+
+      <Modal dialogClassName="modal-width" show={show} centered onHide={handleClose} style={{widows:"inherit"}}>
+        <div className="d-flex border-bottom py-2 position-relative">
+          <h6 className="modal-title mx-auto">Change group name</h6>
+          <button
+            type="button"
+            className="btn-close position-absolute top-5"
+            style={{right:"8px"}}
+            onClick={handleClose}
+          ></button>
+        </div>
+        <div className="my-2 px-3">
+          <span style={{ fontSize: "16px", fontWeight: "350", fontFamily:'sans-serif'}}>
+            Changing the name of a group chat changes it for everyone.
+          </span>
+        </div>
+
+        <div className="d-flex align-items-center px-2 mt-2 mb-2">
+          <input
+            type="text"
+            placeholder="Add a name"
+            className="form-control mx-2"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <hr className="mb-2" />
+        <div className="d-grid gap-2 mx-2 my-2">
+          <button type="button" className="btn btn-primary d-inline" disabled={!name}>
+            {(loadingButton && (
+              <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
+            )) ||
+              "Save"}
+          </button>
+        </div>
+      </Modal>
+    </>
+  );
+}
+
+export default ChangeGroupName;

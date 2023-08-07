@@ -17,7 +17,7 @@ import {
   setConversationReceive,
 } from "../../app/slices/chat.slice";
 
-var stompClient = null;
+export var stompClient = null;
 
 function Header() {
   function refreshPage() {
@@ -35,19 +35,11 @@ function Header() {
   const { unreadMessageCount, isOpenChatPage } = useSelector(
     (state) => state.chat
   );
-  // const { currentConversationId } = useSelector(
-  //   (state) => state.currentConversationId
-  // );
   const [resetUnreadMessageCount] =
     useResetUnreadCountByConversationIdMutation();
   const dispatch = useDispatch();
   const { data } = useGetAllUnreadMessageCountQuery();
 
-  // useEffect(() => {
-  //   if(data) {
-  //     setUnreadMessageCount(data.unreadMessageCount);
-  //   }
-  // },[data])
   useEffect(() => {
     onDisconnect();
     if (effect.current === true) {

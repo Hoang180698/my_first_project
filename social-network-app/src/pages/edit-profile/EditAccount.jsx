@@ -7,60 +7,46 @@ import { useRef } from "react";
 import { event } from "jquery";
 
 function EditAccount() {
+  const { auth } = useSelector((state) => state.auth);
+  const [updateUser] = useUpdateUserMutation();
 
-    const { auth } = useSelector((state) => state.auth);
-    const [updateUser] = useUpdateUserMutation();
+  const [name, setName] = useState(auth.name);
+  const [phone, setPhone] = useState(auth.phone);
+  const [address, setAddress] = useState(auth.address);
+  const [gender, setGender] = useState(auth.gender);
+  const [biography, setBiography] = useState(auth.biography);
+  const [birthday, setBirthday] = useState(auth.birthday);
 
-    const [name, setName] = useState(auth.name);
-    const [phone, setPhone] = useState(auth.phone);
-    const [address, setAddress] = useState(auth.address);
-    const [gender, setGender] = useState(auth.gender);
-    const [biography, setBiography] = useState(auth.biography);
-    const [birthday, setBirthday] = useState(auth.birthday);
+  const [phoneCorrect, setPhoneCorrect] = useState(true);
 
-    const [phoneCorrect, setPhoneCorrect] = useState(true);
-    const [nameCorrect, setNameCorrect] = useState(true);
+  const focusPhone = useRef(null);
 
-    const focusPhone = useRef(null);
-
-    const handleSetPhone = (event) => {
-        const newPhone = event.target.value.replace(/[^\d]/g, '');
-        setPhone(newPhone);
-        if(newPhone && (newPhone.length < 9 || newPhone.length > 12)) {
-          setPhoneCorrect(false);
-        } else {
-          setPhoneCorrect(true);
-        }
-      }
-
-    const handleSetName = (event) => {
-      const newName = event.target.value;
-      setName(newName);
-      const nameRegex = new RegExp(/^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g)
-      if(!nameRegex.test(newName)){
-        setNameCorrect(false);
-      } else {
-        setNameCorrect(true);
-      }
+  const handleSetPhone = (event) => {
+    const newPhone = event.target.value.replace(/[^\d]/g, "");
+    setPhone(newPhone);
+    if ((newPhone && newPhone.length > 9) || !newPhone) {
+      setPhoneCorrect(true);
     }
+  };
 
-      const handleUpdateAccount = (e) => {
-        e.preventDefault();
-        if (!phoneCorrect) {
-          focusPhone.current.focus();
-          return;
-        } else {
-          updateUser({ name, phone, address, gender, biography, birthday })
-            .unwrap()
-            .then(() => {
-              toast.success("successfully updated!");
-            })
-            .catch((err) => {
-              toast.error("Try again")
-              console.log(err);
-            });
-        }
-      }
+  const handleUpdateAccount = (e) => {
+    e.preventDefault();
+    if (phone && (phone.length < 9 || phone.length > 12)) {
+      setPhoneCorrect(false);
+      focusPhone.current.focus();
+      return;
+    } else {
+      updateUser({ name, phone, address, gender, biography, birthday })
+        .unwrap()
+        .then(() => {
+          toast.success("successfully updated!");
+        })
+        .catch((err) => {
+          toast.error("Try again");
+          console.log(err);
+        });
+    }
+  };
 
   return (
     <>
@@ -81,12 +67,9 @@ function EditAccount() {
                 type="text"
                 className="form-control"
                 value={name}
-                onChange={(e) => handleSetName(e)}
+                onChange={(e) => setName(e.target.value)}
                 maxLength={25}
               />
-              {!nameCorrect &&   <span style={{ color: "red", fontSize: "11px" }}>
-              No symbols or special chars
-                        </span>}
             </div>
           </div>
           <div className="col-md-6">
@@ -100,9 +83,11 @@ function EditAccount() {
                 onChange={(e) => handleSetPhone(e)}
                 maxLength={12}
               />
-              {!phoneCorrect &&   <span style={{ color: "red", fontSize: "11px" }}>
-              Please enter a valid phone number
-                        </span>}
+              {!phoneCorrect && (
+                <span style={{ color: "red", fontSize: "11px" }}>
+                  Phone number must be 9-12 digits
+                </span>
+              )}
             </div>
           </div>
           <div className="col-md-6">
@@ -124,6 +109,7 @@ function EditAccount() {
                 className="form-select"
                 aria-label="Default select example"
                 onChange={(e) => setGender(e.target.value)}
+                defaultValue={""}
               >
                 <option value="male" selected={gender === "male"}>
                   Male

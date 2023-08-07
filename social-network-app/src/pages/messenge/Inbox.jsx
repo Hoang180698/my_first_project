@@ -1,9 +1,7 @@
 import React, { useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import TextareaAutosize from "react-textarea-autosize";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   useGetConversationByIdQuery,
-  useGetMessagesQuery,
   useLazyGetMessagesQuery,
   useResetUnreadCountByConversationIdMutation,
 } from "../../app/services/chat.service";
@@ -12,10 +10,13 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
-import EmojiPicker from "emoji-picker-react";
-import { formatDate, formatDateTime } from "../../utils/functionUtils";
+import {
+  calDistanceTimeMinute,
+  formatDateTime,
+} from "../../utils/functionUtils";
 import InboxHeaderAvatar from "../../components/chat/InboxHeaderAvatar";
 import { setCurrentConversationId } from "../../app/slices/currentConversationId.slice";
+import InputChat from "../../components/chat/InputChat";
 
 var stompClient = null;
 function Inbox() {
@@ -24,21 +25,21 @@ function Inbox() {
   const { auth } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [getMessage] = useLazyGetMessagesQuery();
-  const [content, setContent] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
   // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(conversationId);
-  const { data: conversation, isLoading: isLoadingconversation, isError } =
-    useGetConversationByIdQuery(conversationId);
-  const emojiRef = useRef(null);
-  const emojiButtonRef = useRef(null);
+  const {
+    data: conversation,
+    isLoading: isLoadingconversation,
+    isError,
+  } = useGetConversationByIdQuery(conversationId);
   const navigate = useNavigate();
-  const [resetUnreadMessageCount] = useResetUnreadCountByConversationIdMutation();
+  const [resetUnreadMessageCount] =
+    useResetUnreadCountByConversationIdMutation();
   const effect = useRef(false);
 
   const dipatch = useDispatch();
   useEffect(() => {
     onDisconnect();
-    dipatch(setCurrentConversationId({ id: Number(conversationId) }))
+    dipatch(setCurrentConversationId({ id: Number(conversationId) }));
     const fectchData = async () => {
       try {
         let { data } = await getMessage(conversationId);
@@ -48,37 +49,18 @@ function Inbox() {
       }
     };
     fectchData();
-    setContent("");
     resetUnreadMessageCount(conversationId).unwrap().then().catch();
-    if(effect.current === true) {
+    if (effect.current === true) {
       connect();
       effect.current = true;
     }
-    
+
     return () => {
-      onDisconnect();
-      dipatch(setCurrentConversationId({ id: 0 }))
       effect.current = true;
+      onDisconnect();
+      dipatch(setCurrentConversationId({ id: 0 }));
     };
   }, [conversationId]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        emojiRef.current &&
-        !emojiRef.current.contains(event.target) &&
-        !emojiButtonRef.current.contains(event.target)
-      ) {
-        setShowPicker(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [emojiRef]);
 
   const connect = () => {
     let Sock = new SockJS("http://localhost:8080/ws");
@@ -89,7 +71,7 @@ function Inbox() {
 
   const onDisconnect = () => {
     if (isConnected) {
-      stompClient.disconnect();
+      stompClient?.disconnect();
       setIsConnected(false);
     }
   };
@@ -100,35 +82,15 @@ function Inbox() {
 
   const onConnected = () => {
     setIsConnected(true);
-    stompClient.subscribe("/topic/conversation/" + conversationId, onMessageReceived);
+    stompClient.subscribe(
+      "/topic/conversation/" + conversationId,
+      onMessageReceived
+    );
   };
 
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
     setMessages((oldMess) => [payloadData, ...oldMess]);
-  };
-  const onEmojiClick = (e) => {
-    setContent((prevInput) => prevInput + e.emoji);
-  };
-
-  const handleSendMessage = () => {
-    if (content.length === 0) {
-      return;
-    }
-    const newMessage = { senderId: auth.id, content: content };
-    stompClient.send(
-      "/app/message/" + conversationId,
-      {},
-      JSON.stringify(newMessage)
-    );
-    setContent("");
-  };
-
-  const handleSendMessageOther = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
-    }
   };
 
   if (isLoadingconversation) {
@@ -152,63 +114,105 @@ function Inbox() {
         <InboxHeaderAvatar conversation={conversation} />
       </div>
       <div className="conversation-content d-flex flex-column-reverse p-3">
-        {messages.map((m) => (
+        {messages.map((m, index) => (
           <div
             className={
-              m.sender.id === auth.id
-                ? "d-flex flex-row-reverse message-content-box own-message justify-content-start align-items-center"
-                : "d-flex message-content-box justify-content-start align-items-center"
+              m.type === "START"
+                ? "mb-auto d-flex flex-column mt-3"
+                : "d-flex flex-column"
             }
-            key={m.id}
+            key={index}
           >
-            <p
-              className={m.sender.id === auth.id ? "" : " border"}
-              data-bs-toggle="tooltip"
-              data-placement="bottom"
-              title={formatDateTime(m.createdAt)}
-            >
-              {m.content}
-            </p>
+            {(calDistanceTimeMinute(
+              m.createdAt,
+              messages[index + 1]?.createdAt
+            ) > 20 ||
+              index === messages.length - 1) && (
+              <span
+                className="mx-auto mt-4 mb-1"
+                style={{
+                  color: "#65676B",
+                  fontSize: "12px",
+                  fontWeight: "500",
+                }}
+              >
+                {`${formatDateTime(m.createdAt)}`}
+              </span>
+            )}
+
+            {m.sender.id !== auth.id &&
+              conversation.groupChat &&
+              m.type === "MESSAGE" &&
+              (m.sender.id !== messages[index + 1]?.sender.id ||
+                calDistanceTimeMinute(
+                  m.createdAt,
+                  messages[index + 1]?.createdAt
+                ) > 20) && (
+                <>
+                  <span
+                    className="ms-5 mt-3"
+                    style={{ fontSize: "12px", color: "#737373" }}
+                  >
+                    {m.sender.name}
+                  </span>
+                </>
+              )}
+            {m.type === "MESSAGE" && (
+              <div
+                className={
+                  m.sender.id === auth.id
+                    ? "d-flex flex-row-reverse message-content-box own-message"
+                    : "d-flex message-content-box"
+                }
+              >
+                {m.sender.id !== auth.id && (
+                  <div className="mt-auto" style={{ width: "34px" }}>
+                    {(m.sender.id !== messages[index - 1]?.sender.id ||
+                      calDistanceTimeMinute(
+                        m.createdAt,
+                        messages[index - 1]?.createdAt
+                      ) > 20) && (
+                      <>
+                        <span className="avatar-inbox">
+                          <img
+                            src={
+                              m.sender.avatar
+                                ? `http://localhost:8080${m.sender.avatar}`
+                                : "../../../public/user.jpg"
+                            }
+                          />
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <p
+                  className={m.sender.id === auth.id ? "mb-1" : " border mb-1"}
+                  data-bs-toggle="tooltip"
+                  data-placement="bottom"
+                  title={formatDateTime(m.createdAt)}
+                >
+                  {m.content}
+                </p>
+              </div>
+            )}
+            {m.type === "START" && (
+              <div
+                className="d-flex flex-column"
+                style={{ marginBottom: "150px" }}
+              >
+                <span className="mx-auto mt-2">
+                  {m.sender.id === auth.id
+                    ? `You created this group`
+                    : `${m.sender.name} created this group`}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>
-      <div className="input-message mx-auto mt-auto mb-3 d-flex border position-relative">
-        <a
-          role="button"
-          className="ms-3 my-auto"
-          onClick={() => setShowPicker(true)}
-          ref={emojiButtonRef}
-        >
-          <i className="fa-sharp fa-regular fa-face-smile"></i>
-        </a>
-        <TextareaAutosize
-          rows="1"
-          type="text"
-          className="ms-2 my-auto"
-          maxRows={4}
-          placeholder="Message..."
-          autoFocus={true}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={(e) => handleSendMessageOther(e)}
-        />
-        {showPicker && (
-          <div className="emoji-picker" ref={emojiRef}>
-            <EmojiPicker
-              height={400}
-              width={300}
-              onEmojiClick={onEmojiClick}
-              autoFocusSearch={false}
-            />
-          </div>
-        )}
-        <button
-          className="btn btn-post-comment btn-block me-2"
-          onClick={handleSendMessage}
-        >
-          Send
-        </button>
-      </div>
+      <InputChat stompClient={stompClient} conversationId={conversationId} />
     </div>
   );
 }

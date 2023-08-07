@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 function PostModal({ postId }) {
   const { auth } = useSelector((state) => state.auth);
@@ -234,6 +235,9 @@ function PostModal({ postId }) {
                   className="dropdown-menu dropdown-menu-lg-end"
                   aria-labelledby="dropdownMenu2"
                 >
+                  <Link to={`/p/${post.post.id}`} className="dropdown-item text-dark">
+                  Go to Post
+                </Link>
                   {post.userId === auth.id && (
                     <>
                       {/* <a className="dropdown-item text-dark" role="button">

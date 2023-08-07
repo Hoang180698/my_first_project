@@ -36,6 +36,9 @@ public class Conversation {
     @JoinColumn(name = "user2_id")
     private User user2;
 
+    @Column(name = "name")
+    private String name;
+
     @ManyToMany
     @JoinTable(name = "user_conversation",
             joinColumns = @JoinColumn(name = "conversation_id"),
@@ -44,6 +47,9 @@ public class Conversation {
 
     @PrePersist
     protected void onCreate() {
+        if (user1 == null || user2 == null) {
+            return;
+        }
         if (user1.getId() > user2.getId()) {
             User temp = user1;
             user1 = user2;

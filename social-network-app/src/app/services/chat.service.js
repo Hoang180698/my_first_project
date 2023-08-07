@@ -18,7 +18,6 @@ export const chatApi = createApi({
     endpoints: (builder) => ({
         getConversations: builder.query({
             query: () =>  "chat",
-            providesTags: ["Post"],
         }),
         getConversationById: builder.query({
             query: (id) =>  `chat/${id}`,
@@ -30,7 +29,13 @@ export const chatApi = createApi({
                 method: "POST",
                 body: (data)
             }),
-            invalidatesTags: ["Post"],
+        }),
+        createGroupChat: builder.mutation({
+            query: (data) => ({
+                url: "chat/group-chat",
+                method: "POST",
+                body: (data)
+            }),
         }),
         getMessages: builder.query({
             query: (conversationId) => `chat/message/${conversationId}`, 
@@ -60,5 +65,6 @@ export const {
     useLazyGetMessagesQuery,
     useLazyGetConversationsQuery,
     useGetAllUnreadMessageCountQuery,
-    useResetUnreadCountByConversationIdMutation
+    useResetUnreadCountByConversationIdMutation,
+    useCreateGroupChatMutation
 } = chatApi;

@@ -14,7 +14,7 @@ function NewPost() {
   const { offCreatePost } = useCreatePost();
 
   const [content, setContent] = useState("");
-
+  const [loadingButton, setLoadingButton] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -75,6 +75,7 @@ function NewPost() {
   };
 
   const handleCreatePost = (data) => {
+    setLoadingButton(true);
     createPost(data)
       .unwrap()
       .then(() => {
@@ -83,19 +84,18 @@ function NewPost() {
         setSelectedImages([]);
         offCreatePost();
         toast.success("Create post successfully");
-
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        setLoadingButton(false);
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
         console.log(err);
+        setLoadingButton(false);
       });
   };
 
   const handlePost = () => {
     if (selectedFiles.length !== 0) {
+      setLoadingButton(true);
       const formData = new FormData();
       selectedFiles.forEach((file) => {
         formData.append("files", file);
@@ -115,14 +115,13 @@ function NewPost() {
               setSelectedFiles([]);
               setSelectedImages([]);
               offCreatePost();
+              setLoadingButton(false);
             });
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
         })
         .catch((err) => {
           toast.error("Something went wrong. Please try again.");
           console.log(err);
+          setLoadingButton(false);
         });
     } else {
       const newPost = {
@@ -215,9 +214,15 @@ function NewPost() {
                 role="button"
                 onClick={handlePost}
                 className="btn btn-success"
-                disabled={content === "" && selectedImages.length === 0}
+                disabled={
+                  (content === "" && selectedImages.length === 0) ||
+                  loadingButton
+                }
               >
-                Post
+                {(loadingButton && (
+                  <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
+                )) ||
+                  "Chat"}
               </button>
             </div>
           </div>

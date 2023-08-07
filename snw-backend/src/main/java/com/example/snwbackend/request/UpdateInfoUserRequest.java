@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Empty;
+import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.FieldValue;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +14,6 @@ import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Empty;
 public class UpdateInfoUserRequest {
 
     @Length(min = 1, max = 25)
-    @Pattern(regexp = "^[_A-z0-9]*((-|\\s)*[_A-z0-9])*$")
     private String name;
 
     @Length(max = 12)

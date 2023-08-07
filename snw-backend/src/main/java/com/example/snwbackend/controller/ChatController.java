@@ -2,6 +2,7 @@ package com.example.snwbackend.controller;
 
 
 import com.example.snwbackend.request.ContactRequest;
+import com.example.snwbackend.request.CreateConversationRequest;
 import com.example.snwbackend.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,11 @@ public class ChatController {
     @PostMapping("")
     public ResponseEntity<?> createConversation(@RequestBody ContactRequest request) {
         return new ResponseEntity<>(chatService.createSingleConversation(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("group-chat")
+    public ResponseEntity<?> createGroupChat(@RequestBody CreateConversationRequest request) {
+        return new ResponseEntity<>(chatService.createGroupChat(request), HttpStatus.CREATED);
     }
 
     @GetMapping("")

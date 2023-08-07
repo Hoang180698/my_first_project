@@ -21,6 +21,7 @@ function Login() {
     login({ email, password })
       .unwrap()
       .then(() => {
+        window.location.reload(false);
         toast.success("Login success");
         setTimeout(() => {
           navigate("/");

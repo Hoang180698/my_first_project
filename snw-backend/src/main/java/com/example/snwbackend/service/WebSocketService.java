@@ -4,13 +4,17 @@ import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
+import com.example.snwbackend.request.CreateConversationRequest;
 import com.example.snwbackend.request.MessageRequest;
 import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class WebSocketService {
@@ -49,7 +53,7 @@ public class WebSocketService {
 
         Message message = Message.builder()
                 .content(request.getContent())
-                .sender(user).type("message")
+                .sender(user).type("MESSAGE")
                 .conversation(conversation)
                 .build();
         messageRepository.save(message);
@@ -62,14 +66,22 @@ public class WebSocketService {
                 simpMessagingTemplate.convertAndSend("/topic/user/" + u.getId(), userConversation);
                 continue;
             }
-            if(userConversation.getUnreadCount() == null) {
-                userConversation.setUnreadCount(1);
-            } else {
-                userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
-            }
+            userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
             simpMessagingTemplate.convertAndSend("/topic/user/" + u.getId(), userConversationRepository.save(userConversation));
         }
 
         return message;
+    }
+
+    @Transactional
+    public void sendNewGroupChat(Integer groupChatId) {
+        Conversation conversation = conversationRepository.findById(groupChatId).get();
+        if(conversation == null) {
+            return;
+        }
+        for (User u: conversation.getUsers()) {
+            UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+            simpMessagingTemplate.convertAndSend("/topic/user/" + u.getId(), userConversation);
+        }
     }
 }
