@@ -50,7 +50,7 @@ export const chatApi = createApi({
                 url: `chat/read/${conversationId}`,
                 method: "PUT",
             }),
-            invalidatesTags: ["Unread"],
+            invalidatesTags: ["Unread", "Post"],
         }),
     }),
 });

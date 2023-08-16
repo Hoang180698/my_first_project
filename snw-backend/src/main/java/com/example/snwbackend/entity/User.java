@@ -62,7 +62,7 @@ public class User implements UserDetails, Serializable {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority("ROLE_" + this.role)); // ROLE_USER, ROLE_ADMIN
-        return null;
+        return roles;
     }
 
     @Override

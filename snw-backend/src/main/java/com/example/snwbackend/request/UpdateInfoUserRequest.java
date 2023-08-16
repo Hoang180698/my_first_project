@@ -14,10 +14,11 @@ import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.FieldVa
 public class UpdateInfoUserRequest {
 
     @Length(min = 1, max = 25)
+    @Pattern(regexp = "^[^@!~`#$%^()\\\\&*=+}{;'\":?/><|,.]*$", message = "No symbols or special chars in name")
     private String name;
 
     @Length(max = 12)
-    @Pattern(regexp = "(^[0-9]+$|^$)")
+    @Pattern(regexp = "(^[0-9]+$|^$)", message = "Not valid phone")
     private String phone;
 
     @Length(max = 30)

@@ -2,6 +2,7 @@ package com.example.snwbackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.LinkedHashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Setter
 @Builder
 @Entity
+@ToString
 @Table(name = "Conversation")
 public class Conversation {
     @Id

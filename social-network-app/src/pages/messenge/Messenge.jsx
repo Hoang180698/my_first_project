@@ -70,70 +70,6 @@ function Messenge() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const fectchData = async () => {
-  //     try {
-  //       let { data } = await getConversations();
-  //       setConversations(data);
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-
-  //   };
-  //   fectchData();
-  //   if(effect.current === true) {
-  //     connect();
-  //     effect.current = true;
-  //   }
-
-  //   return () => {
-  //     onDisconnect();
-  //     effect.current = true;
-  //   };
-  // }, []);
-
-  // const onConnected = () => {
-  //   setIsConnected(true);
-  //   stompClient.subscribe(
-  //     "/topic/user/" + auth.id,
-  //     onMessageReceived
-  //   );
-  // };
-
-  // const onDisconnect = () => {
-  //   if (isConnected) {
-  //     stompClient.disconnect();
-  //     setIsConnected(false);
-  //   }
-  // };
-
-  // const onMessageReceived = (payload) => {
-  //   const payloadData = JSON.parse(payload.body);
-  //   console.log(payloadData);
-  //   setConversations((oldConversations) => [payloadData, ...oldConversations.filter((c) => c.id.conversationId !== payloadData.id.conversationId)]);
-  // };
-
-  // const onError = (err) => {
-  //   console.log(err);
-  // };
-  // const connect = () => {
-  //   let Sock = new SockJS("http://localhost:8080/ws");
-  //   stompClient = over(Sock);
-  //   stompClient.connect({}, onConnected, onError);
-  // };
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="container">
-  //       <div className="text-center m-5">
-  //         <div className="spinner-border m-5" role="status">
-  //           <span className="sr-only">Loading...</span>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <>
       <Helmet>
@@ -143,13 +79,15 @@ function Messenge() {
         <div className="col-sm-10 offset-sm-1  messenge-container mt-4 container-chat">
           <div className="d-flex border body-chat">
             <div className="sidebar-chat border-end pt-1">
-              <div className="border-bottom mb-2 p-3 d-flex">
+              <div className="border-bottom d-flex" style={{padding: "17px"}}>
                 <span className="inbox-user-name mx-auto">{auth.name}</span>
                 <NewMessage />
               </div>
+              <div className="conversation-list pt-2">
               {conversations.map((c) => (
                 <ConversationBox data={c} key={c.conversation.id} />
               ))}
+              </div>
             </div>
             <Outlet />
           </div>

@@ -59,7 +59,7 @@ function Search() {
       <Helmet>
         <title>Search | Hoagram</title>
       </Helmet>
-      <div classNameName="h-100 ">
+      <div className="h-100 ">
         <div className="d-flex justify-content-center h-100">
           <div className="searchbar my-5">
             <input
@@ -88,8 +88,8 @@ function Search() {
             </div>
           )}
           {users.length > 0 &&
-            users.map((u) => (
-              <SearchBox u={u} follow={handleFollow} unfollow={handleUnfollow} />
+            users.map((u, index) => (
+              <SearchBox u={u} follow={handleFollow} unfollow={handleUnfollow} key={index}/>
             ))}
         </div>
       </div>

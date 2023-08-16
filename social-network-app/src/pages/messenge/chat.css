@@ -3,10 +3,14 @@
 }
 .sidebar-chat {
     width: 33%;
+    display: flex;
+    flex-direction: column;
+}
+.conversation-list {
     height: 100%;
-    display: block;
     overflow-y: auto;
 }
+
 .body-chat {
     height: 100%;
 }
@@ -34,6 +38,7 @@
     white-space: nowrap;
     overflow: hidden;
 	text-overflow: ellipsis;
+    color: #737373;
 }
 .user-chat-box {
     position: relative;
@@ -89,6 +94,7 @@
     border-radius: 50%;
 }
 
+
 .inbox-user-name {
     font-weight: 500;
     white-space: nowrap;
@@ -105,10 +111,20 @@
 .message-unread {
     font-weight:500;
 }
-.message-unread .chat-user-name {
+
+.message-unread .last-message {
+    color: #000;
     font-weight: 700;
 }
 
+.time-last-message {
+    font-size: 12px;
+    color: #737373;
+    font-weight: 500;
+}
+.message-unread .time-last-message {
+    color: #000;
+}
 .message-badge {
     display: inline-block;
 	height: 8px;

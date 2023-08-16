@@ -14,15 +14,15 @@ import {
   calDistanceTimeMinute,
   formatDateTime,
 } from "../../utils/functionUtils";
-import InboxHeaderAvatar from "../../components/chat/InboxHeaderAvatar";
 import { setCurrentConversationId } from "../../app/slices/currentConversationId.slice";
 import InputChat from "../../components/chat/InputChat";
+import InboxHeader from "../../components/chat/InboxHeader";
 
 var stompClient = null;
 function Inbox() {
   const [isConnected, setIsConnected] = useState(false);
   const { conversationId } = useParams();
-  const { auth } = useSelector((state) => state.auth);
+  const { auth, token } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [getMessage] = useLazyGetMessagesQuery();
   // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(conversationId);
@@ -59,6 +59,7 @@ function Inbox() {
       effect.current = true;
       onDisconnect();
       dipatch(setCurrentConversationId({ id: 0 }));
+      resetUnreadMessageCount(conversationId).unwrap().then().catch();
     };
   }, [conversationId]);
 
@@ -66,7 +67,11 @@ function Inbox() {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
     stompClient.debug = () => {};
-    stompClient.connect({}, onConnected, onError);
+    stompClient.connect(
+      { Authorization: `Bearer ${token}` },
+      onConnected,
+      onError
+    );
   };
 
   const onDisconnect = () => {
@@ -84,13 +89,17 @@ function Inbox() {
     setIsConnected(true);
     stompClient.subscribe(
       "/topic/conversation/" + conversationId,
-      onMessageReceived
+      onMessageReceived,
+      { Authorization: `Bearer ${token}` }
     );
   };
 
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
     setMessages((oldMess) => [payloadData, ...oldMess]);
+    if(["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
+      resetUnreadMessageCount(conversationId).unwrap().then().catch();
+    }
   };
 
   if (isLoadingconversation) {
@@ -111,7 +120,7 @@ function Inbox() {
   return (
     <div className="d-flex flex-column conversation-container">
       <div className="border-bottom p-3">
-        <InboxHeaderAvatar conversation={conversation} />
+        <InboxHeader conversation={conversation} stompClient={stompClient} />
       </div>
       <div className="conversation-content d-flex flex-column-reverse p-3">
         {messages.map((m, index) => (
@@ -123,11 +132,13 @@ function Inbox() {
             }
             key={index}
           >
-            {(calDistanceTimeMinute(
-              m.createdAt,
-              messages[index + 1]?.createdAt
-            ) > 20 ||
-              index === messages.length - 1) && (
+            {((m.type === "MESSAGE" &&
+              (calDistanceTimeMinute(
+                m.createdAt,
+                messages[index + 1]?.createdAt
+              ) > 20 ||
+                messages[index + 1]?.type === "START")) ||
+              m.type === "START" || index === messages.length -1) && (
               <span
                 className="mx-auto mt-4 mb-1"
                 style={{
@@ -147,7 +158,8 @@ function Inbox() {
                 calDistanceTimeMinute(
                   m.createdAt,
                   messages[index + 1]?.createdAt
-                ) > 20) && (
+                ) > 20 ||
+                messages[index + 1]?.type !== "MESSAGE") && (
                 <>
                   <span
                     className="ms-5 mt-3"
@@ -206,6 +218,26 @@ function Inbox() {
                   {m.sender.id === auth.id
                     ? `You created this group`
                     : `${m.sender.name} created this group`}
+                </span>
+              </div>
+            )}
+            {(m.type === "NAMED" ||
+              m.type === "ADDED" ||
+              m.type === "LEAVE") && (
+              <div
+                className="d-flex flex-column"
+                style={{ fontSize: "12px", color: "#737373" }}
+              >
+                <span
+                  className="mx-auto mt-2 mb-1 text-center"
+                  data-bs-toggle="tooltip"
+                  data-placement="bottom"
+                  title={formatDateTime(m.createdAt)}
+                  style={{ maxWidth: "70%", wordWrap: "break-word" }}
+                >
+                  {m.sender.id === auth.id
+                    ? `You ${m.content}.`
+                    : `${m.sender.name} ${m.content}.`}
                 </span>
               </div>
             )}

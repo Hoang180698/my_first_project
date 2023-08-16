@@ -1,5 +1,6 @@
 package com.example.snwbackend.controller;
 
+import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.request.PasswordRequest;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
 import com.example.snwbackend.service.UserService;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +28,10 @@ public class UserController {
 
     // Cập nhật thông tin User
     @PutMapping("")
-    public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateInfoUserRequest request) {
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateInfoUserRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
         return ResponseEntity.ok(userService.updateUser(request));
     }
 

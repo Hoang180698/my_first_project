@@ -18,8 +18,10 @@ function EditAccount() {
   const [birthday, setBirthday] = useState(auth.birthday);
 
   const [phoneCorrect, setPhoneCorrect] = useState(true);
+  const [nameCorrect, setNameCorrect] = useState(true);
 
   const focusPhone = useRef(null);
+  const regex = /^[^@!~`#$%^()\\&*=+}{;'":?/><|,.]*$/;
 
   const handleSetPhone = (event) => {
     const newPhone = event.target.value.replace(/[^\d]/g, "");
@@ -28,13 +30,23 @@ function EditAccount() {
       setPhoneCorrect(true);
     }
   };
-
+  const handleSetName = (e) => {
+      setName(e.target.value);
+      if(regex.test(e.target.value)) {
+        setNameCorrect(true);
+      } else {
+        setNameCorrect(false);
+      }
+  }
   const handleUpdateAccount = (e) => {
     e.preventDefault();
     if (phone && (phone.length < 9 || phone.length > 12)) {
       setPhoneCorrect(false);
       focusPhone.current.focus();
-      return;
+      return; 
+    } else if(!regex.test(name)) {
+      setNameCorrect(false);
+
     } else {
       updateUser({ name, phone, address, gender, biography, birthday })
         .unwrap()
@@ -59,7 +71,7 @@ function EditAccount() {
         <h3 className="mb-4">Account Settings</h3>
 
         <form className="row" onSubmit={handleUpdateAccount}>
-          <div className="col-md-6">
+          <div className="col-md-6" style={{height:"90px"}}>
             <div className="form-group">
               <label>Name</label>
               <input
@@ -67,12 +79,17 @@ function EditAccount() {
                 type="text"
                 className="form-control"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleSetName(e)}
                 maxLength={25}
               />
+               {!nameCorrect && (
+                <span style={{ color: "red", fontSize: "11px" }}>
+                  No symbols or special chars 
+                </span>
+              )}
             </div>
           </div>
-          <div className="col-md-6">
+          <div className="col-md-6" style={{height:"90px"}}>
             <div className="form-group">
               <label>Phone number</label>
               <input

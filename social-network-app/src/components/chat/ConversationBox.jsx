@@ -53,8 +53,8 @@ function ConversationBox({ data }) {
             <div>
               <img
                 src={
-                  user.avatar
-                    ? `http://localhost:8080${user.avatar}`
+                  users[0].avatar
+                    ? `http://localhost:8080${users[0].avatar}`
                     : "../../../public/user.jpg"
                 }
                 className="avatar-chat"
@@ -81,8 +81,16 @@ function ConversationBox({ data }) {
                   : `${lastMessage?.sender.name} created this group`}
               </span>
             )}
+
+              {(lastMessage.type === "NAMED" || lastMessage.type === "ADDED" || lastMessage.type ==="LEAVE") && (
+                <span className="last-message mt-0">
+                {lastMessage?.sender.id === auth.id
+                  ? `You ${lastMessage?.content}`
+                  : `${lastMessage?.sender.name} ${lastMessage?.content}`}
+              </span>
+              )}
             {/*  */}
-            <p role="button" className="mb-0 text-muted time-post">
+            <p role="button" className="mb-0 time-last-message">
               {formatDate(lastMessage?.createdAt)}
             </p>
           </div>
@@ -123,7 +131,7 @@ function ConversationBox({ data }) {
               ? `You: ${data.conversation.lastMessage?.content}`
               : data.conversation.lastMessage?.content}
           </span>
-          <p role="button" className="mb-0 text-muted time-post">
+          <p role="button" className="mb-0 time-last-message">
             {formatDate(data.conversation.lastMessage?.createdAt)}
           </p>
         </div>

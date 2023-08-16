@@ -2,8 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ChangeGroupName from "./ChangeGroupName";
+import AddPeople from "./AddPeople";
+import LeaveGroup from "./LeaveGroup";
 
-function InboxHeaderAvatar({ conversation }) {
+function InboxHeader({ conversation, stompClient }) {
   const { auth } = useSelector((state) => state.auth);
 
   if (conversation.groupChat) {
@@ -25,7 +27,7 @@ function InboxHeaderAvatar({ conversation }) {
               }
             />
           </span>
-          <span className="avatar-inbox">
+          {users.length > 1 && ( <span className="avatar-inbox">
             <img
               src={
                 users[1]?.avatar
@@ -33,7 +35,8 @@ function InboxHeaderAvatar({ conversation }) {
                   : "../../../public/user.jpg"
               }
             />
-          </span>
+          </span>)}
+         
           {users.length > 2 && (
             <span className="avatar-inbox">
               <img
@@ -76,9 +79,9 @@ function InboxHeaderAvatar({ conversation }) {
                 className="dropdown-menu"
                 aria-labelledby="dropdownMenu2"
               >
-                  <li><ChangeGroupName conversationId={conversation.id}/></li>
-                  <li><a className="dropdown-item" role="button">Add people</a></li>
-                  <li><a className="dropdown-item text-danger" role="button">Leave group</a></li>
+                  <li><ChangeGroupName conversation={conversation} stompClient={stompClient}/></li>
+                  <li><AddPeople conversation={conversation} stompClient={stompClient}/></li>
+                  <li><LeaveGroup stompClient={stompClient} conversationId={conversation.id}/></li>
           
               </ul>
         </div>
@@ -94,7 +97,8 @@ function InboxHeaderAvatar({ conversation }) {
       : conversation.users[0];
   return (
     <>
-      <Link to={`/u/${user.id}`} className="text-dark">
+    <div className="d-flex">
+    <Link to={`/u/${user.id}`} className="text-dark">
         <img
           src={
             user.avatar
@@ -105,8 +109,27 @@ function InboxHeaderAvatar({ conversation }) {
         />
         <span className="mt-2 inbox-user-name ms-2">{user.name}</span>
       </Link>
+      <div
+                className="ms-auto"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-bars"></i>
+              </div>
+              <ul
+                className="dropdown-menu"
+                aria-labelledby="dropdownMenu2"
+              >
+                 
+                  <li><a className="dropdown-item" role="button">{"Nothing :))"}</a></li>
+                  
+
+              </ul>
+    </div>
+     
     </>
   );
 }
 
-export default InboxHeaderAvatar;
+export default InboxHeader;

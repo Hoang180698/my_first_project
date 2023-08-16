@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { stompClient } from "../../components/header/Header";
 
 function NewMessage() {
-  const { auth } = useSelector((state) => state.auth);
+  const { auth, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [term, setTerm] = useState("");
@@ -76,13 +76,13 @@ function NewMessage() {
         .then((res) => {
           stompClient.send(
             "/app/sendNewGroupChat/" + res.id,
-            {},
+            { Authorization: `Bearer ${token}` },
             JSON.stringify()
           );
           setTimeout(() => {
             handleOffModal();
             navigate(`/messenge/inbox/${res.id}`);
-          }, 1200)
+          }, 1500)
         })
         .catch(() => {
           setLoadingButton(false);
@@ -146,14 +146,15 @@ function NewMessage() {
           <div className="mt-3">
             <div className="d-flex align-items-center">
               <b>To:</b>
+              <div className="form-control ms-2 me-2">
               <input
                 type="text"
                 placeholder="Search..."
-                className="form-control ms-2"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 onKeyDown={(e) => handleSearchOther(e)}
               />
+              </div>
             </div>
           </div>
           <div className="slected-userchat-box mb-2 mt-1">

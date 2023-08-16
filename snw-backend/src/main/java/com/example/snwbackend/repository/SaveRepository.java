@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface SaveRepository extends JpaRepository<Save, Integer> {
     Optional<Save> findByUserAndPost(User user, Post post);
     void deleteByPost(Post post);
+
 }

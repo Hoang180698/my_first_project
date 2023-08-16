@@ -5,7 +5,7 @@ import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.ContactRequest;
-import com.example.snwbackend.request.CreateConversationRequest;
+import com.example.snwbackend.request.UpsertConversationRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.response.UnreadMessageCountResponse;
 import jakarta.transaction.Transactional;
@@ -54,7 +54,7 @@ public class ChatService {
         Set<User> users = new LinkedHashSet<>();
         users.add(user); users.add(user2);
         Conversation conversation1 = Conversation.builder()
-                .isGroupChat(false).user1(user).user2(user2)
+                .user1(user).user2(user2)
                 .users(users)
                 .build();
         conversationRepository.save(conversation1);
@@ -69,7 +69,7 @@ public class ChatService {
 
     // Tạo chát nhóm
     @Transactional
-    public Conversation createGroupChat(CreateConversationRequest request) {
+    public Conversation createGroupChat(UpsertConversationRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);

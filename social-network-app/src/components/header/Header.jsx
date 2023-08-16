@@ -29,7 +29,7 @@ function Header() {
   );
   // const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
-  const { auth } = useSelector((state) => state.auth);
+  const { auth, token } = useSelector((state) => state.auth);
   const effect = useRef(false);
   const { onCreatePost } = useCreatePost();
   const { unreadMessageCount, isOpenChatPage } = useSelector(
@@ -60,12 +60,12 @@ function Header() {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
     stompClient.debug = () => {};
-    stompClient.connect({}, onConnected, onError);
+    stompClient.connect({ Authorization: `Bearer ${token}` }, onConnected, onError);
   };
 
   const onDisconnect = () => {
     if (isConnected) {
-      stompClient.disconnect();
+      stompClient?.disconnect();
       setIsConnected(false);
     }
   };
@@ -76,7 +76,7 @@ function Header() {
 
   const onConnected = () => {
     setIsConnected(true);
-    stompClient.subscribe("/topic/user/" + auth.id, (payload) => {
+    stompClient.subscribe("/users/topic/chat", (payload) => {
       const payloadData = JSON.parse(payload.body);
       if (payloadData.id.conversationId !== currentConversationId) {
         if (payloadData.conversation.lastMessage.sender.id !== auth.id) {
@@ -86,13 +86,9 @@ function Header() {
           dispatch(setConversationReceive(payloadData));
         }
       } else {
-        resetUnreadMessageCount(payloadData.id.conversationId)
-          .unwrap()
-          .then()
-          .catch();
         dispatch(setConversationReceive({ ...payloadData, unreadCount: 0 }));
       }
-    });
+    }, { Authorization: `Bearer ${token}` });
   };
 
   return (

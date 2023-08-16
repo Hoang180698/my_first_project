@@ -11,4 +11,5 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Integer> {
     List<Message> findAllByConversationOrderByCreatedAtDesc(Conversation conversation);
+    void deleteAllByConversation(Conversation conversation);
 }

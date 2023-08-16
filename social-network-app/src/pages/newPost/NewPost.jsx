@@ -222,7 +222,7 @@ function NewPost() {
                 {(loadingButton && (
                   <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
                 )) ||
-                  "Chat"}
+                  "Post"}
               </button>
             </div>
           </div>

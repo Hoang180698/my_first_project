@@ -111,6 +111,10 @@ public class PostService {
         if (user.getId() != post.getUser().getId()) {
             throw new BadRequestException("You do not have permission to delete this post");
         }
+        for (String url: post.getImageUrls()) {
+            Integer imgId = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1));
+            imageRepository.deleteById(imgId);
+        }
         likeRepository.deleteByPost(post);
         commentRepository.deleteAllByPost(post);
         notificationRepository.deleteAllByPost(post);

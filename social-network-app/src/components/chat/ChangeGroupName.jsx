@@ -1,14 +1,40 @@
 import React from "react";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
-function ChangeGroupName({ conversationId }) {
+function ChangeGroupName({ conversation, stompClient }) {
+  const { auth, token } = useSelector((state) => state.auth);
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
   const [loadingButton, setLoadingButton] = useState(false);
 
-  const [name, setName] = useState("");
+  const handleClose = () => {
+    setShow(false);
+    setLoadingButton(false);
+    setName(conversation.name);
+  };
+  const handleShow = () => setShow(true);
+ 
+
+  const [name, setName] = useState(conversation.name);
+
+  const handleNamedGroupChat = () => {
+    setLoadingButton(true);
+    stompClient.send(
+      "/app/message/named/" + conversation.id,
+      { Authorization: `Bearer ${token}` },
+      JSON.stringify({ name: name})
+    );
+    setTimeout(() => {
+      handleClose();
+    }, 1000);
+  }
+
+  const handleNamedGroupChatOther = (e) => {
+      if (e.key === "Enter") {
+        handleNamedGroupChat();
+    };
+  }
 
   return (
     <>
@@ -33,17 +59,20 @@ function ChangeGroupName({ conversationId }) {
         </div>
 
         <div className="d-flex align-items-center px-2 mt-2 mb-2">
+          <div className="form-control">
           <input
             type="text"
             placeholder="Add a name"
-            className="form-control mx-2"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => handleNamedGroupChatOther(e)}
+            maxLength={50}
           />
+          </div> 
         </div>
         <hr className="mb-2" />
         <div className="d-grid gap-2 mx-2 my-2">
-          <button type="button" className="btn btn-primary d-inline" disabled={!name}>
+          <button type="button" className="btn btn-primary d-inline" disabled={name === conversation.name} onClick={handleNamedGroupChat}>
             {(loadingButton && (
               <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
             )) ||

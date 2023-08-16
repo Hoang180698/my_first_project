@@ -84,7 +84,7 @@ function EditPassword() {
       >
         <h3 className="mb-4">Password Settings</h3>
         <form onSubmit={handleSubmit(handleChangePassword)}>
-          <div className="row">
+          <div className="row" style={{height:"114px"}}>
             <div className="col-md-6">
               <div className="form-group">
                 <label>Old password</label>

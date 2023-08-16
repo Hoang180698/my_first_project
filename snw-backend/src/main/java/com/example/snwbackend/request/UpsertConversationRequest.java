@@ -11,6 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class CreateConversationRequest {
+public class UpsertConversationRequest {
     private List<Integer> userIds;
 }

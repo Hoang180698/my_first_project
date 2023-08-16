@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 
 function InputChat({ conversationId, stompClient }) {
-  const { auth } = useSelector((state) => state.auth);
+  const { auth, token } = useSelector((state) => state.auth);
 
   const [content, setContent] = useState("");
   const [showPicker, setShowPicker] = useState(false);
@@ -45,10 +45,10 @@ function InputChat({ conversationId, stompClient }) {
     if (content.length === 0) {
       return;
     }
-    const newMessage = { senderId: auth.id, content: content };
+    const newMessage = { content: content };
     stompClient.send(
       "/app/message/" + conversationId,
-      {},
+      { Authorization: `Bearer ${token}` },
       JSON.stringify(newMessage)
     );
     setContent("");

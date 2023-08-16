@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-
-public class MessageRequest {
-    private String content;
+public class NamedGroupChatRequest {
+    private String name;
 }
