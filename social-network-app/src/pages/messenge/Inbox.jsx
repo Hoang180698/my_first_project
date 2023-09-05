@@ -15,8 +15,13 @@ import {
   formatDateTime,
 } from "../../utils/functionUtils";
 import { setCurrentConversationId } from "../../app/slices/currentConversationId.slice";
-import InputChat from "../../components/chat/InputChat";
-import InboxHeader from "../../components/chat/InboxHeader";
+const InputChat = React.lazy(() => import("../../components/chat/InputChat"));
+import { Suspense } from "react";
+import Loading3dot from "../../components/loading/Loading3dot";
+import { toast } from "react-toastify";
+const InboxHeader = React.lazy(() =>
+  import("../../components/chat/InboxHeader")
+);
 
 var stompClient = null;
 function Inbox() {
@@ -25,34 +30,124 @@ function Inbox() {
   const { auth, token } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
   const [getMessage] = useLazyGetMessagesQuery();
-  // const { data: oldMessage, isLoading: isLoadingMes } = useGetMessagesQuery(conversationId);
+  const listMessageRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  // const [totalPages, setTotalPages] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const {
     data: conversation,
     isLoading: isLoadingconversation,
     isError,
   } = useGetConversationByIdQuery(conversationId);
   const navigate = useNavigate();
-  const [resetUnreadMessageCount] =
-    useResetUnreadCountByConversationIdMutation();
+  const [resetUnreadMessageCount] = useResetUnreadCountByConversationIdMutation();
   const effect = useRef(false);
+  const loadMoreRef = useRef(null);
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && !isLast && !loading) {
+      setCurrentPage(Math.floor(messages.length / 10));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loadMoreRef, options]);
+
+  const scrollTo = () => {
+    listMessageRef.current.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+  const handleScroll = () => {
+    if (listMessageRef.current) {
+      // const { scrollTop, scrollHeight, clientHeight } = listMessageRef.current;
+      // if (
+      //   scrollTop + scrollHeight < clientHeight + 2 &&
+      //   !loading &&
+      //   currentPage < totalPages - 1
+      // ) {
+      //   setLoading(true);
+      //   setCurrentPage(currentPage + 1);
+      // }
+      if (listMessageRef.current.scrollTop < -1000) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    }
+  };
+  useEffect(() => {
+    const fectchData = () => {
+      if (currentPage > 0 && !isLast) {
+        setLoading(true);
+        getMessage({
+          conversationId,
+          page: currentPage,
+          pageSize: 10,
+        })
+          .unwrap()
+          .then((data) => {
+            const filterData = data.content.filter((x) => {
+              return !messages.some((existingItem) => existingItem.id === x.id);
+            });
+            setMessages((pre) => [...pre, ...filterData]);
+            setIsLast(data.last);
+          })
+          .catch((err) => {
+            console.log(err)
+            toast.error("Error on page load.");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+    };
+    fectchData();
+  }, [currentPage]);
 
   const dipatch = useDispatch();
   useEffect(() => {
     onDisconnect();
     dipatch(setCurrentConversationId({ id: Number(conversationId) }));
     const fectchData = async () => {
+      setLoading(true)
       try {
-        let { data } = await getMessage(conversationId);
-        setMessages(data);
+        let { data } = await getMessage({
+          conversationId,
+          page: 0,
+          pageSize: 10,
+        });
+        setMessages(data.content);
+        setIsLast(data.last);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fectchData();
     resetUnreadMessageCount(conversationId).unwrap().then().catch();
     if (effect.current === true) {
       connect();
-      effect.current = true;
     }
 
     return () => {
@@ -60,6 +155,10 @@ function Inbox() {
       onDisconnect();
       dipatch(setCurrentConversationId({ id: 0 }));
       resetUnreadMessageCount(conversationId).unwrap().then().catch();
+      setMessages([]);
+      setCurrentPage(0);
+      setIsLast(false);
+      setLoading(false);
     };
   }, [conversationId]);
 
@@ -97,7 +196,7 @@ function Inbox() {
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
     setMessages((oldMess) => [payloadData, ...oldMess]);
-    if(["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
+    if (["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
       resetUnreadMessageCount(conversationId).unwrap().then().catch();
     }
   };
@@ -118,11 +217,22 @@ function Inbox() {
     navigate("/messenge");
   }
   return (
-    <div className="d-flex flex-column conversation-container">
+    <div className="d-flex flex-column conversation-container position-relative">
       <div className="border-bottom p-3">
-        <InboxHeader conversation={conversation} stompClient={stompClient} />
+        <Suspense fallback={<Loading3dot />}>
+          <InboxHeader conversation={conversation} stompClient={stompClient} />
+        </Suspense>
       </div>
-      <div className="conversation-content d-flex flex-column-reverse p-3">
+      {showScrollButton && (
+        <span onClick={scrollTo} className="scrollButtonInbox">
+          <i className="fa-solid fa-circle-arrow-down"></i>
+        </span>
+      )}
+      <div
+        ref={listMessageRef}
+        onScroll={handleScroll}
+        className="conversation-content d-flex flex-column-reverse p-3"
+      >
         {messages.map((m, index) => (
           <div
             className={
@@ -138,7 +248,8 @@ function Inbox() {
                 messages[index + 1]?.createdAt
               ) > 20 ||
                 messages[index + 1]?.type === "START")) ||
-              m.type === "START" || index === messages.length -1) && (
+              m.type === "START" ||
+              index === messages.length - 1) && (
               <span
                 className="mx-auto mt-4 mb-1"
                 style={{
@@ -183,7 +294,8 @@ function Inbox() {
                       calDistanceTimeMinute(
                         m.createdAt,
                         messages[index - 1]?.createdAt
-                      ) > 20) && (
+                      ) > 20 ||
+                      messages[index - 1]?.type !== "MESSAGE") && (
                       <>
                         <span className="avatar-inbox">
                           <img
@@ -243,8 +355,20 @@ function Inbox() {
             )}
           </div>
         ))}
+        {loading && (
+          <div className="container">
+            <div className="text-center m-2">
+              <div className="spinner-border m-2" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={loadMoreRef}></div>
       </div>
-      <InputChat stompClient={stompClient} conversationId={conversationId} />
+      <Suspense>
+        <InputChat stompClient={stompClient} conversationId={conversationId} />
+      </Suspense>
     </div>
   );
 }

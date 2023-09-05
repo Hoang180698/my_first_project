@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 
 function InputChat({ conversationId, stompClient }) {
-  const { auth, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
 
   const [content, setContent] = useState("");
   const [showPicker, setShowPicker] = useState(false);

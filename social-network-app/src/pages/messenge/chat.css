@@ -101,6 +101,7 @@
     overflow: hidden;
 	text-overflow: ellipsis;
     max-width: 250px;
+    font-size: 20px;
 }
 
 .new-message-footer {
@@ -232,5 +233,28 @@
 }
 .modal-width {
     width: 400px;
+}
+.tabchat-show{
+    color: #000;
+    font-size: 16px;
+}
+.conversation-activiti {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 10px;
+}
+.user-chat-box:hover .conversation-activiti {
+    display: block;
+}
+.member-group-chat:hover {
+    background-color: #e3e3e3;
+}
+.scrollButtonInbox{
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    font-size: 30px;
+    color: #1877F2;
 }
 

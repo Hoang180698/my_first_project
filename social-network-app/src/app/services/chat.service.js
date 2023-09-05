@@ -16,13 +16,20 @@ export const chatApi = createApi({
       }),
     tagTypes: ["Post","Unread"],
     endpoints: (builder) => ({
+        // Lấy danh sách các cuộc trò chuyện
         getConversations: builder.query({
-            query: () =>  "chat",
+            query: ({ page, pageSize }) =>  `chat?page=${page}&pageSize=${pageSize}`,
         }),
+        // Lấy danh sách các cuộc trò chuyện trong kho lưu trữ
+        getArchiveConversations: builder.query({
+            query: ({ page, pageSize }) =>  `chat/archive?page=${page}&pageSize=${pageSize}`,
+        }),
+        // Lấy thông tin cuộc hôị thoại theo id
         getConversationById: builder.query({
             query: (id) =>  `chat/${id}`,
             providesTags: ["Post"],
         }),
+        // Tạo chát đơn
         createConversation: builder.mutation({
             query: (data) => ({
                 url: "chat",
@@ -30,6 +37,7 @@ export const chatApi = createApi({
                 body: (data)
             }),
         }),
+        // Tạo chát nhóm
         createGroupChat: builder.mutation({
             query: (data) => ({
                 url: "chat/group-chat",
@@ -37,8 +45,9 @@ export const chatApi = createApi({
                 body: (data)
             }),
         }),
+        // Lấy danh sách tin nhắn
         getMessages: builder.query({
-            query: (conversationId) => `chat/message/${conversationId}`, 
+            query: ({conversationId, page, pageSize}) => `chat/message/${conversationId}?page=${page}&pageSize=${pageSize}`, 
             providesTags: ["Post"],
         }),
         getAllUnreadMessageCount: builder.query({
@@ -51,6 +60,13 @@ export const chatApi = createApi({
                 method: "PUT",
             }),
             invalidatesTags: ["Unread", "Post"],
+        }),
+        toggleArchiveChat: builder.mutation({
+            query: (conversationId) => ({
+                url: `chat/archive-chat/${conversationId}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Unread"],
         }),
     }),
 });
@@ -66,5 +82,7 @@ export const {
     useLazyGetConversationsQuery,
     useGetAllUnreadMessageCountQuery,
     useResetUnreadCountByConversationIdMutation,
-    useCreateGroupChatMutation
+    useCreateGroupChatMutation,
+    useLazyGetArchiveConversationsQuery,
+    useToggleArchiveChatMutation,
 } = chatApi;

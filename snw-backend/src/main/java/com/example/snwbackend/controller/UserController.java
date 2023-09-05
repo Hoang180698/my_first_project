@@ -37,20 +37,34 @@ public class UserController {
 
     // Tìm kiếm user
     @GetMapping("search")
-    public ResponseEntity<?> searchUser(@RequestParam String term) {
-        return ResponseEntity.ok(userService.searchUser(term));
+    public ResponseEntity<?> searchUser(@RequestParam String term,
+                                        @RequestParam(required = false, defaultValue = "0") Integer page,
+                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService.searchUser(term, page, pageSize));
     }
 
     // Lấy danh sách following
     @GetMapping("{id}/following")
-    public ResponseEntity<?> getUsersFollowing(@PathVariable Integer id) {
-        return ResponseEntity.ok(userService.getUsersFollowing(id));
+    public ResponseEntity<?> getUsersFollowing(@PathVariable Integer id,
+                                               @RequestParam(required = false, defaultValue = "0") Integer page,
+                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService.getUsersFollowing(id, page, pageSize));
     }
 
     // Lấy danh sách follower
     @GetMapping("{id}/follower")
-    public ResponseEntity<?> getUsersFollower(@PathVariable Integer id) {
-        return ResponseEntity.ok(userService.getUsersFollower(id));
+    public ResponseEntity<?> getUsersFollower(@PathVariable Integer id,
+                                              @RequestParam(required = false, defaultValue = "0") Integer page,
+                                              @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService.getUsersFollower(id, page, pageSize));
+    }
+
+    // Lấy danh sách user like post
+    @GetMapping("likes/post/{postId}")
+    public ResponseEntity<?> getAllUserLikePost(@PathVariable Integer postId,
+                                                @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService. getAllUserLikePost(postId, page, pageSize));
     }
 
     // Xóa User
@@ -90,11 +104,6 @@ public class UserController {
         return ResponseEntity.ok(userService.removeFollower(id));
     }
 
-    // Lấy danh sách user like post
-    @GetMapping("likes/post/{postId}")
-    public ResponseEntity<?> getAllUserLikePost(@PathVariable Integer postId) {
-        return ResponseEntity.ok(userService. getAllUserLikePost(postId));
-    }
 
     // Thay doi pass
     @PutMapping("change-password")

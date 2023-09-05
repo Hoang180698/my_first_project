@@ -35,8 +35,6 @@ function Header() {
   const { unreadMessageCount, isOpenChatPage } = useSelector(
     (state) => state.chat
   );
-  const [resetUnreadMessageCount] =
-    useResetUnreadCountByConversationIdMutation();
   const dispatch = useDispatch();
   const { data } = useGetAllUnreadMessageCountQuery();
 
@@ -79,7 +77,7 @@ function Header() {
     stompClient.subscribe("/users/topic/chat", (payload) => {
       const payloadData = JSON.parse(payload.body);
       if (payloadData.id.conversationId !== currentConversationId) {
-        if (payloadData.conversation.lastMessage.sender.id !== auth.id) {
+        if (payloadData.conversation.lastMessage.sender.id !== auth.id && !payloadData.isArchive) {
           dispatch(receiveMessage());
         }
         if (isOpenChatPage) {

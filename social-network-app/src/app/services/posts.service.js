@@ -17,8 +17,7 @@ export const postApi = createApi({
   tagTypes: ["Post"],
   endpoints: (builder) => ({
     getPosts: builder.query({
-      query: () => "post",
-      providesTags: ["Post"],
+      query: ({page, pageSize}) => `post?page=${page}&pageSize=${pageSize}`,
     }),
     getPostById: builder.query({
       query: (id) => `post/${id}`,
@@ -29,33 +28,15 @@ export const postApi = createApi({
       providesTags: ["Post"],
     }),
     getPostByUserId: builder.query({
-      query: (userId) => `post/user-post/${userId}`,
-      providesTags: ["Post"],
+      query: ({userId, page, pageSize}) => `post/user-post/${userId}?page=${page}&pageSize=${pageSize}`,
     }),
+    // Tạo post
     createPost: builder.mutation({
       query: (data) => ({
-        url: "post",
+        url: `post/create-post`,
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Post"],
-    }),
-    createPostWithImages: builder.mutation({
-      query: (data) => ({
-        url: `post/create`,
-        method: "POST",
-        body: data,
-      }),
-    }),
-    updatePost: builder.mutation({
-      query: ({ id, ...data }) => {
-        return {
-          url: `post/${id}`,
-          method: "PUT",
-          body: data,
-        };
-      },
-      invalidatesTags: ["Post"],
     }),
     deletePost: builder.mutation({
       query: (id) => ({
@@ -75,7 +56,7 @@ export const postApi = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
-    dislikePost: builder.mutation({
+    unlikePost: builder.mutation({
       query: (id) => ({
         url: `post/${id}/dislike`,
         method: "DELETE",
@@ -107,13 +88,13 @@ export const {
   useDeletePostMutation,
   useGetPostByIdQuery,
   useGetPostsQuery,
-  useUpdatePostMutation,
   useGetAllMyPostsQuery,
-  useCreatePostWithImagesMutation,
   useGetPostByUserIdQuery,
   useLikePostMutation,
-  useDislikePostMutation,
+  useUnlikePostMutation,
   useSavePostMutation,
   useUnSavePostMutation,
   useGetAllSavedPostQuery,
+  useLazyGetPostByUserIdQuery,
+  useLazyGetPostsQuery,
 } = postApi;

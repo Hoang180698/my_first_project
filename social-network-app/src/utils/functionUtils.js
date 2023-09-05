@@ -16,6 +16,11 @@ export const formatDate = (dateString) => {
   const c = moment() - date;
 
   const b = Math.floor(c / 60 / 1000);
+  const d = Math.floor(c / 1000);
+
+  if (d < 60 && d > 10) {
+    return d + "s";
+  }
 
   if (b == 0) {
     return "now";

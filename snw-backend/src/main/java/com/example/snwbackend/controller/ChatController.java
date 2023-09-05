@@ -27,8 +27,15 @@ public class ChatController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllConversation() {
-        return ResponseEntity.ok(chatService.getAllConversation());
+    public ResponseEntity<?> getAllConversation( @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                 @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(chatService.getAllConversation(page, pageSize));
+    }
+
+    @GetMapping("archive")
+    public ResponseEntity<?> getAllArchiveConversation( @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(chatService.getAllArchiveConversation(page, pageSize));
     }
 
     @GetMapping("{id}")
@@ -37,8 +44,10 @@ public class ChatController {
     }
 
     @GetMapping("message/{conversationId}")
-    public ResponseEntity<?> getAllMessageByConversationId(@PathVariable Integer conversationId) {
-        return ResponseEntity.ok(chatService.getAllMessageByConversationId(conversationId));
+    public ResponseEntity<?> getAllMessageByConversationId(@PathVariable Integer conversationId,
+                                                           @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(chatService.getAllMessageByConversationId(conversationId, page, pageSize));
     }
 
     @PutMapping("read/{conversationId}")
@@ -49,5 +58,10 @@ public class ChatController {
     @GetMapping("unread-count")
     public ResponseEntity<?> getAllUnreadCount() {
         return ResponseEntity.ok((chatService.getAllUnreadCount()));
+    }
+
+    @PutMapping("archive-chat/{conversationId}")
+    public ResponseEntity<?> toggleSetArchiveChat(@PathVariable Integer conversationId) {
+        return ResponseEntity.ok(chatService.toggleSetArchiveChat(conversationId));
     }
 }

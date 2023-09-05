@@ -31,8 +31,10 @@ public class CommentController {
 
     // Lấy danh sách comment của 1 post
     @GetMapping("/post/{postId}")
-    public ResponseEntity<?> getAllCommentByPostId(@PathVariable Integer postId) {
-        return ResponseEntity.ok(commentService.getAllCommentByPostId(postId));
+    public ResponseEntity<?> getAllCommentByPostId(@PathVariable Integer postId,
+                                                   @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(commentService.getAllCommentByPostId(postId, page, pageSize));
     }
 
     // Sửa comment

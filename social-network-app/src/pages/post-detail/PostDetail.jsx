@@ -29,7 +29,7 @@ function PostDetail() {
 
   const navigate = useNavigate();
 
-  const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
+  const { data: post, isLoading: isLoadingPost, isError } = useGetPostByIdQuery(postId);
   const { data: comments, isLoading: isLoadingComments } =
     useGetCommentByPostIdQuery(postId);
 
@@ -167,7 +167,7 @@ function PostDetail() {
     );
   }
 
-  if (!post && !isLoadingPost) {
+  if (isError) {
     return(
       <div className='container'>
       <h3 className='text-center mt-5'>Sorry, this page isn't available.</h3>
@@ -234,7 +234,7 @@ function PostDetail() {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <i class="fa-solid fa-ellipsis"></i>
+                    <i className="fa-solid fa-ellipsis"></i>
                   </a>
                   <ul
                     className="dropdown-menu dropdown-menu-lg-end"
@@ -288,12 +288,12 @@ function PostDetail() {
                     </a>
                     <a role="button" className="text-dark ms-3 interact" onClick={handleFocusInput}>
                       <span>
-                        <i class="fa-regular fa-comment"></i>
+                        <i className="fa-regular fa-comment"></i>
                       </span>
                     </a>
                     <a href="#!" className="text-dark ms-3 interact">
                       <span>
-                        <i class="fa-regular fa-paper-plane"></i>
+                        <i className="fa-regular fa-paper-plane"></i>
                       </span>
                     </a>
                   </div>
@@ -320,7 +320,7 @@ function PostDetail() {
                 {/* <!-- Comment Input --> */}
                 <div className="input-group mb-3 form-comment form-control">
                     <a role="button" className="emoji-icon" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
-                      <i class="fa-sharp fa-regular fa-face-smile"></i>
+                      <i className="fa-sharp fa-regular fa-face-smile"></i>
                     </a>
                     <TextareaAutosize
                       rows="1"

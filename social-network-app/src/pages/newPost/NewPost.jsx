@@ -1,9 +1,7 @@
 import { Button } from "bootstrap/dist/js/bootstrap.bundle";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  useCreatePostMutation,
-  useCreatePostWithImagesMutation,
-  useUpdatePostMutation,
+  useCreatePostMutation
 } from "../../app/services/posts.service";
 import useCreatePost from "./useCreatePost";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +20,7 @@ function NewPost() {
   // const [uploadMultiImage] = useUploadMultiImagesMutation();
   const emojiRef = useRef(null);
   const emojiButtonRef = useRef(null);
-
   const [createPost] = useCreatePostMutation();
-  const [createPostWithImages] = useCreatePostWithImagesMutation();
-  const [updatePost] = useUpdatePostMutation();
   const navigate = useNavigate();
 
   const onEmojiClick = (e) => {
@@ -74,62 +69,30 @@ function NewPost() {
     setSelectedImages([]);
   };
 
-  const handleCreatePost = (data) => {
-    setLoadingButton(true);
-    createPost(data)
-      .unwrap()
-      .then(() => {
-        setContent("");
-        setSelectedFiles([]);
-        setSelectedImages([]);
-        offCreatePost();
-        toast.success("Create post successfully");
-        setLoadingButton(false);
-      })
-      .catch((err) => {
-        toast.error("Something went wrong. Please try again.");
-        console.log(err);
-        setLoadingButton(false);
-      });
-  };
-
   const handlePost = () => {
-    if (selectedFiles.length !== 0) {
-      setLoadingButton(true);
-      const formData = new FormData();
+    setLoadingButton(true);
+    const formData = new FormData();
+    if (selectedFiles.length > 0) {
       selectedFiles.forEach((file) => {
         formData.append("files", file);
       });
-      createPostWithImages(formData)
-        .unwrap()
-        .then((res) => {
-          const newData = {
-            id: res.id,
-            content: content,
-          };
-          updatePost(newData)
-            .unwrap()
-            .then(() => {
-              toast.success("Create post successfully");
-              setContent("");
-              setSelectedFiles([]);
-              setSelectedImages([]);
-              offCreatePost();
-              setLoadingButton(false);
-            });
-        })
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-          setLoadingButton(false);
-        });
-    } else {
-      const newPost = {
-        content,
-      };
-      handleCreatePost(newPost);
-    }
-  };
+    } 
+    formData.append("content", content);
+    createPost(formData)
+    .unwrap()
+    .then(() => {
+      toast.success("Create post successfully");
+      setContent("");
+      setSelectedFiles([]);
+      setSelectedImages([]);
+      offCreatePost();
+      setLoadingButton(false);
+    }).catch((err) => {
+      toast.error("Something went wrong. Please try again.");
+      console.log(err);
+      setLoadingButton(false);
+    });
+  }
   const renderPhotos = (source) => {
     return source.map((photo) => {
       return <img src={photo} key={photo} />;

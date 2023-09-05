@@ -3,7 +3,6 @@ import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import ImageSlider from "../imageSlider/ImageSlider";
 import {
   useDeletePostMutation,
-  useDislikePostMutation,
   useLikePostMutation,
   useSavePostMutation,
   useUnSavePostMutation,
@@ -18,12 +17,12 @@ import { toast } from "react-toastify";
 function OwnPost({ p }) {
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
-  const [dislikePost] = useDislikePostMutation();
+  // const [dislikePost] = useDislikePostMutation();
   const [savePost] = useSavePostMutation();
   const [unSavePost] = useUnSavePostMutation();
 
   const [showMore, setShowMore] = useState(false);
-  const [showPostModal, shetShowPostModal] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
 
   const handleDeletePost = (id) => {
@@ -86,7 +85,7 @@ function OwnPost({ p }) {
   return (
     <>
      {showLikerModal && (
-        <Modal centered show={showLikerModal}>
+        <Modal centered show={showLikerModal} dialogClassName="modal-width">
           <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Likes</h6>
@@ -97,9 +96,9 @@ function OwnPost({ p }) {
         </Modal>
       )}
        {showPostModal && (
-      <Modal centered show={showPostModal} size={p.post.imageUrls.length > 0 ? "xl" : "lg"}>
+      <Modal centered show={showPostModal} size={p.post.imageUrls.length > 0 ? "xl" : "lg"} >
         <div className="d-flex post-modal-container">
-        <a role='button' className="btn-close btn-close-white btn-close-pmd" onClick={() => shetShowPostModal(false)}>
+        <a role='button' className="btn-close btn-close-white btn-close-pmd" onClick={() => setShowPostModal(false)}>
         </a>
           <PostModal postId={p.post.id}/>
         </div>
@@ -145,7 +144,7 @@ function OwnPost({ p }) {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <i class="fa-solid fa-ellipsis"></i>
+                <i className="fa-solid fa-ellipsis"></i>
               </a>
               <ul
                 className="dropdown-menu dropdown-menu-lg-end"
@@ -186,12 +185,12 @@ function OwnPost({ p }) {
                   className={p.liked ? "text-danger mr-2 interact" : "text-dark mr-2 interact"}
                 >
                   <span>
-                  <i class={p.liked ? "fa fa-heart" : "fa-regular fa-heart"}></i>
+                  <i className={p.liked ? "fa fa-heart" : "fa-regular fa-heart"}></i>
                   </span>
                 </a>
-                <a onClick={() => shetShowPostModal(true)} className="text-dark ms-3 interact">
+                <a onClick={() => setShowPostModal(true)} className="text-dark ms-3 interact">
                   <span>
-                    <i class="fa-regular fa-comment"></i>
+                    <i className="fa-regular fa-comment"></i>
                   </span>
                 </a>
                 {/* <a href="#!" className="text-dark ms-3 interact">

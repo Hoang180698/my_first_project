@@ -62,6 +62,7 @@ body {
 
 /* home page */
 
+
 .post-image{
 	height: 100%;
 	width: 100%;
@@ -98,7 +99,7 @@ body {
 	max-width: 100%;
 	max-height: 750px;
 	height: 700px;
-	object-fit: contain;
+	object-fit: cover;
 }
 .post-block__content pre {
 	font-size: 15px;
@@ -502,7 +503,7 @@ textarea:focus{
 	top: 40px;
 }
 .comment-box-content{
-	width: 90%;
+	width: 92%;
 }
 
 /* Modal user */
@@ -546,5 +547,42 @@ textarea {
 
 .newmessage-slected-user-container {
 	max-width: 100%;
+}
+
+.form-control input{
+	border: none;
+	outline: none;
+	width: 100%;
+}
+/* post list */
+.list-post-img {
+	width: 250px;
+	height: 300px;
+	object-fit: cover;
+	display: block;
+}
+.post-list-box:hover img{
+	opacity: 0.8;
+}
+
+.post-list-box:hover .post-list-middle {
+	display: block;
+}
+
+.post-list-box {
+	height: 300px;
+	width: 250px;
+	position: relative;
+}
+
+.post-list-middle {
+	transition: .5s ease;
+	display: none;
+	position: absolute;
+	text-align: center;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-60%, -60%);
+	top: 50%;
+	left: 50%;
 }
 

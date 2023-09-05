@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,9 @@ public class WebSocketService {
 
     @Transactional
     public Message sendMessage(MessageRequest request, Integer conversationId, SimpMessageHeaderAccessor accessor) {
+        if(request.getContent().isEmpty()) {
+            return null;
+        }
         Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
             throw new NotFoundException("Not found contact with id = " + conversationId);
         });
@@ -80,7 +84,7 @@ public class WebSocketService {
                 continue;
             }
             userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
-            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversationRepository.save(userConversation));
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
         }
 
         return message;
@@ -122,7 +126,7 @@ public class WebSocketService {
             throw new BadRequestException("You not in this conversation");
         }
         conversation.setName(request.getName());
-        conversationRepository.save(conversation);
+//        conversationRepository.save(conversation);
 
         Message message = Message.builder()
                 .content("named the group " +request.getName())
@@ -140,7 +144,7 @@ public class WebSocketService {
                 continue;
             }
             userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
-            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversationRepository.save(userConversation));
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
         }
 
     }
@@ -168,7 +172,7 @@ public class WebSocketService {
         Set<User> oldUser = conversation.getUsers();
         oldUser.addAll(users);
         conversation.setUsers(oldUser);
-        conversationRepository.save(conversation);
+//        conversationRepository.save(conversation);
 
         String content = "added ";
         for (User u: users) {
@@ -194,8 +198,11 @@ public class WebSocketService {
             } else {
                 userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
             }
+            if (userConversation.getIsArchive() == null) {
+                userConversation.setIsArchive(false);
+            }
 
-            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversationRepository.save(userConversation));
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
         }
     }
 
@@ -236,7 +243,7 @@ public class WebSocketService {
             for (User u: conversation.getUsers()) {
                 UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
                 userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
-                simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversationRepository.save(userConversation));
+                simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
             }
         }
     }

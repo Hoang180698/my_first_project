@@ -4,11 +4,12 @@ import { Link } from "react-router-dom";
 import ChangeGroupName from "./ChangeGroupName";
 import AddPeople from "./AddPeople";
 import LeaveGroup from "./LeaveGroup";
+import MemberGroup from "./MemberGroup";
 
 function InboxHeader({ conversation, stompClient }) {
   const { auth } = useSelector((state) => state.auth);
 
-  if (conversation.groupChat) {
+  if (conversation.groupChat === true) {
     const users = conversation.users;
     const groupName = conversation.name
       ? conversation.name
@@ -17,7 +18,7 @@ function InboxHeader({ conversation, stompClient }) {
         }${users[4] ? ",..." : ""}`;
     return (
       <>
-        <div className="avatars-inbox ms-4 d-flex">
+        <div className="avatars-inbox ms-4 d-flex" onClick={() => setShow(true)}>
           <span className="avatar-inbox">
             <img
               src={
@@ -27,16 +28,18 @@ function InboxHeader({ conversation, stompClient }) {
               }
             />
           </span>
-          {users.length > 1 && ( <span className="avatar-inbox">
-            <img
-              src={
-                users[1]?.avatar
-                  ? `http://localhost:8080${users[1].avatar}`
-                  : "../../../public/user.jpg"
-              }
-            />
-          </span>)}
-         
+          {users.length > 1 && (
+            <span className="avatar-inbox">
+              <img
+                src={
+                  users[1]?.avatar
+                    ? `http://localhost:8080${users[1].avatar}`
+                    : "../../../public/user.jpg"
+                }
+              />
+            </span>
+          )}
+
           {users.length > 2 && (
             <span className="avatar-inbox">
               <img
@@ -65,25 +68,43 @@ function InboxHeader({ conversation, stompClient }) {
               +{users.length - 3}
             </span>
           )}
-          <span className="mt-2 inbox-user-name ms-2">{groupName}</span>
+          <span className="inbox-user-name ms-2">{groupName}</span>
 
           <div
-                className="ms-auto"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="fa-solid fa-bars"></i>
-              </div>
-              <ul
-                className="dropdown-menu"
-                aria-labelledby="dropdownMenu2"
-              >
-                  <li><ChangeGroupName conversation={conversation} stompClient={stompClient}/></li>
-                  <li><AddPeople conversation={conversation} stompClient={stompClient}/></li>
-                  <li><LeaveGroup stompClient={stompClient} conversationId={conversation.id}/></li>
-          
-              </ul>
+            className="ms-auto"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </div>
+          <ul
+            className="dropdown-menu"
+            aria-labelledby="dropdownMenu2"
+            style={{ fontWeight: "bold" }}
+          >
+            <li>
+              <ChangeGroupName
+                conversation={conversation}
+                stompClient={stompClient}
+              />
+            </li>
+            <li>
+              <AddPeople
+                conversation={conversation}
+                stompClient={stompClient}
+              />
+            </li>
+            <li>
+              <MemberGroup users={conversation.users} />
+            </li>
+            <li className="border-top">
+              <LeaveGroup
+                stompClient={stompClient}
+                conversationId={conversation.id}
+              />
+            </li>
+          </ul>
         </div>
       </>
     );
@@ -97,37 +118,34 @@ function InboxHeader({ conversation, stompClient }) {
       : conversation.users[0];
   return (
     <>
-    <div className="d-flex">
-    <Link to={`/u/${user.id}`} className="text-dark">
-        <img
-          src={
-            user.avatar
-              ? `http://localhost:8080${user.avatar}`
-              : "../../../public/user.jpg"
-          }
-          className="avatar-inbox ms-4"
-        />
-        <span className="mt-2 inbox-user-name ms-2">{user.name}</span>
-      </Link>
-      <div
-                className="ms-auto"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="fa-solid fa-bars"></i>
-              </div>
-              <ul
-                className="dropdown-menu"
-                aria-labelledby="dropdownMenu2"
-              >
-                 
-                  <li><a className="dropdown-item" role="button">{"Nothing :))"}</a></li>
-                  
-
-              </ul>
-    </div>
-     
+      <div className="d-flex">
+        <Link to={`/u/${user.id}`} className="text-dark">
+          <img
+            src={
+              user.avatar
+                ? `http://localhost:8080${user.avatar}`
+                : "../../../public/user.jpg"
+            }
+            className="avatar-inbox ms-4"
+          />
+          <span className="mt-2 inbox-user-name ms-2">{user.name}</span>
+        </Link>
+        <div
+          className="ms-auto"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i className="fa-solid fa-bars"></i>
+        </div>
+        <ul className="dropdown-menu" aria-labelledby="dropdownMenu2">
+          <li>
+            <a className="dropdown-item" role="button">
+              {"Nothing :))"}
+            </a>
+          </li>
+        </ul>
+      </div>
     </>
   );
 }

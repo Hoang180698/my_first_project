@@ -87,3 +87,18 @@ a{
 .time-post {
 	font-size: 13px;
 }
+
+.scroll-button-home-page {
+	position: absolute;
+	bottom: 140px;
+	right: 60px;
+	display: inline;
+    background-color: #d41b1b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+	font-size: 20px;
+}

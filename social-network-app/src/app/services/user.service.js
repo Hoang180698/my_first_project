@@ -17,6 +17,7 @@ export const userApi = createApi({
     }),
     tagTypes: ["Post"],
     endpoints: (builder) => ({
+        // update user
         updateUser: builder.mutation({
             query: (data) => ({
                 url: "users",
@@ -24,6 +25,7 @@ export const userApi = createApi({
                 body: data,
             }),
         }),
+        // update avatar
         uploadAvatar: builder.mutation({
             query: (data) => ({
                 url: "users/avatar",
@@ -32,8 +34,9 @@ export const userApi = createApi({
             }),
             invalidatesTags: ["Post"],
         }),
+        // search user
         searchUser: builder.query({
-            query: (term) => `users/search?term=${term}`,
+            query: ({term, page, pageSize}) => `users/search?term=${term}&page=${page}&pageSize=${pageSize}`,
             providesTags: ["Post"],
         }),
         getUserById: builder.query({
@@ -67,15 +70,15 @@ export const userApi = createApi({
             }),
             invalidatesTags: ["Post"],
         }),
+        // get users like 1 post
         getUserLikePost: builder.query({
-            query: (postId) => `users/likes/post/${postId}`,
-            providesTags: ["Post"],
+            query: ({postId, page, pageSize}) => `users/likes/post/${postId}?page=${page}&pageSize=${pageSize}`,
         }),
         getFollower: builder.query({
-            query: (userId) => `users/${userId}/follower`,
+            query: ({userId, page, pageSize}) => `users/${userId}/follower?page=${page}&pageSize=${pageSize}`,
         }),
         getFollowing: builder.query({
-            query: (userId) => `users/${userId}/following`,
+            query: ({userId, page, pageSize}) => `users/${userId}/following?page=${page}&pageSize=${pageSize}`,
         }),
         changePassWord: builder.mutation({
             query: (data) => ({
@@ -104,4 +107,5 @@ export const {
     useLazyGetFollowingQuery,
     useLazyGetFollowerQuery,
     useChangePassWordMutation,
+    useLazyGetUserLikePostQuery,
 } = userApi;

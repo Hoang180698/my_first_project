@@ -105,7 +105,7 @@ function SearchBox({ u, follow, unfollow }) {
               to={u.id !== auth.id ? `/u/${u.id}` : "/profile/"}
               className="me-2"
             >
-              <a className="text-dark">
+              <div className="text-dark">
                 <img
                   src={
                     u.avatar
@@ -115,16 +115,16 @@ function SearchBox({ u, follow, unfollow }) {
                   alt="User"
                   className="author-img-search"
                 />
-              </a>
+              </div>
             </Link>
             <Link
               to={u.id !== auth.id ? `/u/${u.id}` : "/profile/"}
               className="d-flex flex-column search-info"
             >
               <div className="text-start ps-1">
-                <a className="text-dark">
+                <div className="text-dark">
                   <h6>{u.name}</h6>
-                </a>
+                </div>
               </div>
               <div className="text-start ps-1 search-p">
                 {u.id === auth.id && <p className="mb-0 ms-2">you</p>}

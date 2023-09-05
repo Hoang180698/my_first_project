@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  useDeletePostMutation,
   useGetAllMyPostsQuery,
 } from "../../app/services/posts.service";
 import OwnPost from "../../components/post/OwnPost";
@@ -10,13 +9,13 @@ function ProfilePost() {
 
   if (isLoading) {
     return (
-      <dic className="container">
+      <div className="container">
         <div className="text-center m-5">
           <div className="spinner-border" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
-      </dic>
+      </div>
     );
   }
   if (data.length === 0) {

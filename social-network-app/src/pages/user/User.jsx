@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useFollowhUserMutation,
   useGetUserByIdQuery,
   useUnfollowhUserMutation,
 } from "../../app/services/user.service";
-import { useGetPostByUserIdQuery } from "../../app/services/posts.service";
+import {
+  useLazyGetPostByUserIdQuery, useLikePostMutation, useSavePostMutation, useUnSavePostMutation, useUnlikePostMutation,
+} from "../../app/services/posts.service";
 import Post from "../../components/post/Post";
 import { useSelector } from "react-redux";
 import { post } from "jquery";
@@ -14,17 +16,23 @@ import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { toast } from "react-toastify";
 import { useCreateConversationMutation } from "../../app/services/chat.service";
+import PostList from "../../components/post/PostList";
+import { useEffect } from "react";
 
 function User() {
   const { userId } = useParams();
   const { data: user, isLoading: isLoadingUser } = useGetUserByIdQuery(userId);
-  const { data: posts, isLoading: isLoadingPosts } =
-    useGetPostByUserIdQuery(userId);
+  const [getPosts] = useLazyGetPostByUserIdQuery();
 
   const { auth } = useSelector((state) => state.auth);
   const [followUser] = useFollowhUserMutation();
   const [unfollowUser] = useUnfollowhUserMutation();
   const [createConversation] = useCreateConversationMutation();
+  const [posts, setPosts] = useState([]);
+  const [likePost] = useLikePostMutation();
+  const [unlikePost] = useUnlikePostMutation();
+  const [savePost] = useSavePostMutation();
+  const [unsavePost] = useUnSavePostMutation();
 
   const [showModal, setShoModal] = useState(false);
 
@@ -38,6 +46,86 @@ function User() {
   if (auth.id === Number(userId)) {
     navigate("/profile/");
   }
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const loadMoreRef = useRef(null);
+
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && !isLast && !loading) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loadMoreRef, options]);
+
+  useEffect(() => {
+    if (currentPage > 0 && !isLast) {
+      setLoading(true);
+      getPosts({ userId: userId, page: currentPage, pageSize: 8 })
+        .unwrap()
+        .then((data) => {
+          const filterData = data.content.filter((x) => {
+            return posts.some((existingItem) => existingItem.post.id !== x.post.id);
+          });
+          setPosts((pre) => [...pre, ...filterData]);
+          setIsLast(data.last);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error on page load.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    const fectchData = async () => {
+      setLoading(true);
+      try {
+        const { data } = await getPosts({
+          userId: userId,
+          page: 0,
+          pageSize: 8,
+        });
+        setPosts(data.content);
+      } catch (error) {
+        console.log(error);
+        toast.error("Error on page load.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fectchData();
+
+    return () => {
+      setPosts([]);
+      setCurrentPage(0);
+      setIsLast(false);
+      setLoading(false);
+    };
+  }, [userId]);
 
   const handleCreateConversation = (id) => {
     createConversation({ userId: id })
@@ -87,7 +175,79 @@ function User() {
       });
   };
 
-  if (isLoadingUser || isLoadingPosts) {
+  const handleLikePost = (postId, liked) => {
+    if (liked) {
+      unlikePost(postId)
+        .unwrap()
+        .then((res) => {
+            const newPosts = posts.map((p) => {
+              if(p.post.id === postId) {
+                const nPost = { ...p.post, likeCount: res.likeCount};
+                return { ...p, liked: false, post: nPost};
+              }
+              return p;
+            });
+            setPosts(newPosts);
+        })
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      likePost(postId)
+        .unwrap()
+        .then((res) => {
+          const newPosts = posts.map((p) => {
+            if(p.post.id === postId) {
+              const nPost = { ...p.post, likeCount: res.likeCount};
+              return { ...p, liked: true, post: nPost};
+            }
+            return p;
+          });
+          setPosts(newPosts);
+        })
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    }
+  }
+
+  const handeleSavePost = (saved, postId) => {
+    if(saved) {
+      unsavePost(postId).unwrap()
+        .then(() => {
+          const newPosts = posts.map((p) => {
+            if(p.post.id === postId) {
+              return { ...p, saved: false};
+            }
+            return p;
+          });
+          setPosts(newPosts);
+        })
+        .catch((err) =>{
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    } else {
+      savePost(postId).unwrap()
+        .then(() => {
+          const newPosts = posts.map((p) => {
+            if(p.post.id === postId) {
+              return { ...p, saved: true};
+            }
+            return p;
+          });
+          setPosts(newPosts);
+        })
+        .catch((err) => {
+          toast.error("Something went wrong. Please try again.");
+          console.log(err);
+        });
+    }
+  };
+
+  if (isLoadingUser) {
     return (
       <div className="container">
         <div className="text-center m-5">
@@ -112,7 +272,7 @@ function User() {
   return (
     <>
       {showFollower && (
-        <Modal centered show={showFollower}>
+        <Modal centered show={showFollower} dialogClassName="modal-width">
           <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Followers</h6>
@@ -127,7 +287,7 @@ function User() {
         </Modal>
       )}
       {showFollowing && (
-        <Modal centered show={showFollowing}>
+        <Modal centered show={showFollowing} dialogClassName="modal-width">
           <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Following</h6>
@@ -282,19 +442,36 @@ function User() {
       </div>
       {/* post */}
       <div className="border-top ">
-        <section className="main-content">
+        <div className="main-content">
           <div className="container">
             <br />
 
-            <div className="row">
-              {posts.length === 0 && (
-                <h1 className="text-center">No have post</h1>
+            <div className="row ms-2">
+              {(posts.length === 0 && isLast) && (
+                <div className="d-grid text-center">
+                  <span style={{ fontSize: "30px" }}>
+                    <i className="fa-solid fa-camera-retro"></i>
+                  </span>
+                  <span style={{ fontSize: "30px", fontWeight: "bold" }}>
+                    No Posts Yet
+                  </span>
+                </div>
               )}
               {post.length > 0 &&
-                posts.map((p) => <Post p={p} key={p.post.id} />)}
+                posts.map((p) => <PostList key={p.id} post={p} likePost={handleLikePost} savePost={handeleSavePost}/>)}
+              <span ref={loadMoreRef}></span>
+              {loading && (
+                <div className="container">
+                  <div className="text-center m-2">
+                    <div className="spinner-border m-2" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </>
   );

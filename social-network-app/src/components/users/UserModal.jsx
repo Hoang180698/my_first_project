@@ -25,13 +25,13 @@ function UserModal({ u, follow, unfollow }) {
         follow(id);
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1000);
+        }, 500);
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
         setTimeout(() => {
           setLoadingButton(false);
-        }, 1000);
+        }, 500);
         console.log(err);
       });
   };

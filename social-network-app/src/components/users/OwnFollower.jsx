@@ -3,7 +3,6 @@ import Modal from "react-bootstrap/Modal";
 import {
   useRemoveFollowerMutation,
 } from "../../app/services/user.service";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 

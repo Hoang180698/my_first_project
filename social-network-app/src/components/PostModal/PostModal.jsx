@@ -7,14 +7,6 @@ import {
   useAddCommentMutation,
   useGetCommentByPostIdQuery,
 } from "../../app/services/comment.service";
-import {
-  useDeletePostMutation,
-  useDislikePostMutation,
-  useGetPostByIdQuery,
-  useLikePostMutation,
-  useSavePostMutation,
-  useUnSavePostMutation,
-} from "../../app/services/posts.service";
 import { useState } from "react";
 import { useRef } from "react";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
@@ -25,13 +17,14 @@ import Modal from "react-bootstrap/Modal";
 import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { useDeletePostMutation } from "../../app/services/posts.service";
 
-function PostModal({ postId }) {
+function PostModal({ post, likePost, savePost }) {
   const { auth } = useSelector((state) => state.auth);
 
-  const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
+  // const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
   const { data: comments, isLoading: isLoadingComments } =
-    useGetCommentByPostIdQuery(postId);
+    useGetCommentByPostIdQuery(post.post.id);
 
   const [showMore, setShowMore] = useState(false);
   const [text, setText] = useState("");
@@ -39,15 +32,11 @@ function PostModal({ postId }) {
   const emojiRef = useRef(null);
   const emojiButtonRef = useRef(null);
   const textareaRef = useRef(null);
+  const [deletePost] = useDeletePostMutation();
 
   const [showLikerModal, setShowLikerModal] = useState(false);
 
-  const [deletePost] = useDeletePostMutation();
-  const [likePost] = useLikePostMutation();
-  const [dislikePost] = useDislikePostMutation();
   const [addComment] = useAddCommentMutation();
-  const [savePost] = useSavePostMutation();
-  const [unSavePost] = useUnSavePostMutation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -91,51 +80,17 @@ function PostModal({ postId }) {
   };
 
   const handeleSavePost = (saved, postId) => {
-    if(saved) {
-      unSavePost(postId).unwrap()
-        .then()
-        .catch((err) =>{
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    } else {
-      savePost(postId).unwrap()
-        .then()
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    }
+    savePost(saved, postId);
   };
-
+  
   const handleLikePost = (liked, postId) => {
-    if (liked) {
-      dislikePost(postId)
-        .unwrap()
-        .then(() => {
-          //   alert("dislike");
-        })
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(first)(err);
-        })
-    } else {
-      likePost(postId)
-        .unwrap()
-        .then(() => {
-          //   alert("liked");
-        })
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    }
+    likePost(postId, liked);
   };
 
   const handleAddComment = () => {
     if (text.length > 0) {
-      const newData = { content: text }
-      addComment({ postId, data: newData})
+      const newData = { content: text };
+      addComment({ postId: post.post.id, data: newData })
         .unwrap()
         .then(() => {
           setText("");
@@ -154,7 +109,7 @@ function PostModal({ postId }) {
     }
   };
 
-  if (isLoadingPost || isLoadingComments) {
+  if (isLoadingComments) {
     return (
       <div className="container">
         <div className="text-center m-5">
@@ -169,7 +124,7 @@ function PostModal({ postId }) {
   return (
     <>
       {showLikerModal && (
-        <Modal centered show={showLikerModal}>
+        <Modal centered show={showLikerModal} dialogClassName="modal-width">
           <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Likes</h6>
@@ -217,7 +172,14 @@ function PostModal({ postId }) {
                     {post.userName}
                   </a>
                 </h5>
-                <p role="button" className="mb-0 text-muted" style={{ fontSize: "14px" }} data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(post.post.createdAt)}>
+                <p
+                  role="button"
+                  className="mb-0 text-muted"
+                  style={{ fontSize: "14px" }}
+                  data-bs-toggle="tooltip"
+                  data-placement="bottom"
+                  title={formatDateTime(post.post.createdAt)}
+                >
                   {formatDate(post.post.createdAt)}
                 </p>
               </div>
@@ -229,15 +191,18 @@ function PostModal({ postId }) {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <i class="fa-solid fa-ellipsis"></i>
+                  <i className="fa-solid fa-ellipsis"></i>
                 </a>
                 <ul
                   className="dropdown-menu dropdown-menu-lg-end"
                   aria-labelledby="dropdownMenu2"
                 >
-                  <Link to={`/p/${post.post.id}`} className="dropdown-item text-dark">
-                  Go to Post
-                </Link>
+                  <Link
+                    to={`/p/${post.post.id}`}
+                    className="dropdown-item text-dark"
+                  >
+                    Go to Post
+                  </Link>
                   {post.userId === auth.id && (
                     <>
                       {/* <a className="dropdown-item text-dark" role="button">
@@ -259,15 +224,24 @@ function PostModal({ postId }) {
               </div>
             </div>
             <div className="ms-1 pe-2 content-post-modal">
-            {post.post.content.length > 250 && (
-              <pre> {showMore ? post.post.content : `${post.post.content.substring(0, 240)}...`}
-              <b role="button" onClick={() => setShowMore(!showMore)}>{showMore ? "\nShow less" : " Show more"}</b></pre>
-            )}
-            {post.post.content.length <= 250 && <pre>{post.post.content}</pre>}  
+              {post.post.content.length > 250 && (
+                <pre>
+                  {" "}
+                  {showMore
+                    ? post.post.content
+                    : `${post.post.content.substring(0, 240)}...`}
+                  <b role="button" onClick={() => setShowMore(!showMore)}>
+                    {showMore ? "\nShow less" : " Show more"}
+                  </b>
+                </pre>
+              )}
+              {post.post.content.length <= 250 && (
+                <pre>{post.post.content}</pre>
+              )}
             </div>
           </div>
 
-          <div class="comment-pmd ms-3 mt-2 me-3">
+          <div className="comment-pmd ms-3 mt-2 me-3">
             {comments.length === 0 && (
               <>
                 <h4 className="text-center mt-5">No comments yet.</h4>
@@ -277,7 +251,7 @@ function PostModal({ postId }) {
             <CommentBox comments={comments} />
           </div>
         </div>
-        <div className="border footer-pmd-content d-flex flex-column">
+        <div className="footer-pmd-content d-flex flex-column">
           <div className="mx-3 mt-2">
             <div className="d-flex justify-content-between">
               <div className="d-flex">
@@ -310,20 +284,33 @@ function PostModal({ postId }) {
                   </span>
                 </a> */}
               </div>
-              <a role="button" onClick={() => handeleSavePost(post.saved ,post.post.id)} className="text-dark interact">
+              <a
+                role="button"
+                onClick={() => handeleSavePost(post.saved, post.post.id)}
+                className="text-dark interact"
+              >
                 <span>
-                  <i className={post.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
+                  <i
+                    className={
+                      post.saved
+                        ? "fa-solid fa-bookmark text-warning"
+                        : "fa-regular fa-bookmark"
+                    }
+                  ></i>
                 </span>
               </a>
             </div>
             <div className="mb-0 d-flex count-interact">
-              <span
-                role="button"
-                className="text-dark"
-                onClick={() => setShowLikerModal(true)}
-              >
-                {post.post.likeCount} likes
-              </span>
+              {post.post.likeCount > 0 && (
+                <span
+                  role="button"
+                  className="text-dark"
+                  onClick={() => setShowLikerModal(true)}
+                >
+                  {post.post.likeCount} likes
+                </span>
+              )}
+              
               <span className="text-dark ms-auto">
                 {comments.length} comments
               </span>
@@ -337,7 +324,7 @@ function PostModal({ postId }) {
               onClick={() => setShowPicker(true)}
               ref={emojiButtonRef}
             >
-              <i class="fa-sharp fa-regular fa-face-smile"></i>
+              <i className="fa-sharp fa-regular fa-face-smile"></i>
             </a>
             <TextareaAutosize
               rows="1"
@@ -371,11 +358,15 @@ function PostModal({ postId }) {
                 post
                 {/* <i className="fa fa-paper-plane"></i> */}
               </button>
-               {text.length > 100 && 
-                <span className={text.length > 239 ? "text-danger ms-2 mt-2" : "ms-2 mt-2"} style={{fontSize: "11px"}}>{`${text.length}/240`}</span>  
-               } 
-                  
-            </div>    
+              {text.length > 100 && (
+                <span
+                  className={
+                    text.length > 239 ? "text-danger ms-2 mt-2" : "ms-2 mt-2"
+                  }
+                  style={{ fontSize: "11px" }}
+                >{`${text.length}/240`}</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

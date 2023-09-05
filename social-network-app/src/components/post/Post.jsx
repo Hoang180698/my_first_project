@@ -2,84 +2,32 @@ import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import ImageSlider from "../imageSlider/ImageSlider";
-import {
-  useDislikePostMutation,
-  useLikePostMutation,
-  useSavePostMutation,
-  useUnSavePostMutation,
-} from "../../app/services/posts.service";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import PostModal from "../PostModal/PostModal";
 import Liker from "../liker/Liker";
-import { toast } from "react-toastify";
 
-function Post({ p }) {
-  
-  const [likePost] = useLikePostMutation();
-  const [dislikePost] = useDislikePostMutation();
-  const [savePost] = useSavePostMutation();
-  const [unSavePost] = useUnSavePostMutation();
-
+function Post({ p, likePost, savePost }) {
   const likerRef = useRef(null);
-
   const [showMore, setShowMore] = useState(false);
-  const [showPostModal, shetShowPostModal] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
 
   const handleOfLikerModal = () => {
     likerRef.current.removeChild(likerRef.current.children[0]);
     setShowLikerModal(false);
   }
-  const handleLikePost = (liked, postId) => {
-    if (liked) {
-      dislikePost(postId)
-        .unwrap()
-        .then(() => {
-          //   alert("dislike");
-        })
-        .catch((err) =>{
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    } else {
-      likePost(postId)
-        .unwrap()
-        .then(() => {
-          //   alert("liked");
-        })
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    }
+  const handleLikePost = (postId, liked) => {
+    likePost(postId, liked);
   };
   const handeleSavePost = (saved, postId) => {
-    if(saved) {
-      unSavePost(postId).unwrap()
-        .then(() => {
-         
-        })
-        .catch((err) =>{
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    } else {
-      savePost(postId).unwrap()
-        .then(() => {
-          
-        })
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    }
+    savePost(saved, postId);
   };
 
   return (
     <>
       {showLikerModal && (
-        <Modal centered show={true}>
+        <Modal centered show={true} dialogClassName="modal-width">
           <div className="modal-content px-2" ref={likerRef}>
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Likes</h6>
@@ -93,15 +41,15 @@ function Post({ p }) {
         <Modal
           centered
           show={showPostModal}
-          size={p.post.imageUrls > 0 ? "xl" : "lg"}
+          size={p.post.imageUrls.length > 0 ? "xl" : "lg"}
         >
           <div className="d-flex post-modal-container">
             <a
               role="button"
               className="btn-close btn-close-white btn-close-pmd"
-              onClick={() => shetShowPostModal(false)}
+              onClick={() => setShowPostModal(false)}
             ></a>
-            <PostModal postId={p.post.id} />
+            <PostModal post={p} likePost={likePost} savePost={savePost}/>
           </div>
         </Modal>
       )}
@@ -215,7 +163,7 @@ function Post({ p }) {
               <div className="d-flex">
                 <a
                   role="button"
-                  onClick={() => handleLikePost(p.liked, p.post.id)}
+                  onClick={() => handleLikePost(p.post.id, p.liked)}
                   className={
                     p.liked
                       ? "text-danger mr-2 interact"
@@ -232,7 +180,7 @@ function Post({ p }) {
                 </a>
                 <a
                   className="text-dark ms-3 interact"
-                  onClick={() => shetShowPostModal(true)}
+                  onClick={() => setShowPostModal(true)}
                 >
                   <span>
                     <i className="fa-regular fa-comment"></i>

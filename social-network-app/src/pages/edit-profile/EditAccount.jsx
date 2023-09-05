@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRef } from "react";
-import { event } from "jquery";
 
 function EditAccount() {
   const { auth } = useSelector((state) => state.auth);
@@ -21,7 +20,7 @@ function EditAccount() {
   const [nameCorrect, setNameCorrect] = useState(true);
 
   const focusPhone = useRef(null);
-  const regex = /^[^@!~`#$%^()\\&*=+}{;'":?/><|,.]*$/;
+  const regex = /^[^@!~`#$%^\\&*=+}{;'":?/><|,.]*$/;
 
   const handleSetPhone = (event) => {
     const newPhone = event.target.value.replace(/[^\d]/g, "");
@@ -83,8 +82,8 @@ function EditAccount() {
                 maxLength={25}
               />
                {!nameCorrect && (
-                <span style={{ color: "red", fontSize: "11px" }}>
-                  No symbols or special chars 
+                <span style={{ color: "red", fontSize: "11px" }}>                  
+                    Cannot contain the characters "~ ` @ ! $ % # ^..."
                 </span>
               )}
             </div>

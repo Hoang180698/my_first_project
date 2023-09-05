@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { postApi } from '../services/posts.service';
 
 const initialState = {
-    count: 0,
+    postIds: [],
 }
 
 const newpostSlice = createSlice({
@@ -12,18 +12,11 @@ const newpostSlice = createSlice({
   extraReducers: (builder) => {
     builder.addMatcher(
       postApi.endpoints.createPost.matchFulfilled,
-      (state) => {
-        state.count += 1;
+      (state, action) => {
+        state.postIds.push(action.payload.id);
         return state;
       }
     );
-    builder.addMatcher(
-        postApi.endpoints.createPostWithImages.matchFulfilled,
-        (state) => {
-          state.count += 1;
-          return state;
-        }
-      );
   },
 });
 

@@ -14,6 +14,8 @@ import com.example.snwbackend.response.ImageResponse;
 import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -100,16 +102,19 @@ public class UserService {
     }
 
     // Tìm kiếm user theo tên
-    public List<UserDetailDto> searchUser(String term) {
+    public Page<UserDetailDto> searchUser(String term, Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        return userRepository.findByKeyword(term, user.getId());
+        Page<User> users = userRepository.findByKeywordOther(term, PageRequest.of(page, pageSize));
+        Page<UserDetailDto> userDetailDtos = users.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(user.getId(), u.getId())));
+        return userDetailDtos;
     }
 
     // Lấy danh sách user đang follow
-    public List<UserDetailDto> getUsersFollowing(Integer id) {
+    public Page<UserDetailDto> getUsersFollowing(Integer id, Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User auth = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -118,22 +123,40 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + id);
         });
-
-        return userRepository.getUsersFollowing(id, auth.getId());
+        Page<User> users = userRepository.getUsersFollowingOther(id, PageRequest.of(page,pageSize));
+        Page<UserDetailDto> userDetailDtos = users.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(auth.getId(), u.getId())));
+        return userDetailDtos;
     }
 
     // Lấy danh sách follower
-    public List<UserDetailDto> getUsersFollower(Integer id) {
+    public Page<UserDetailDto> getUsersFollower(Integer id, Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User auth = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + id);
         });
+        Page<User> users = userRepository.getUsersFollowerOther(id, PageRequest.of(page,pageSize));
+        Page<UserDetailDto> userDetailDtos = users.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(auth.getId(), u.getId())));
+        return userDetailDtos;
+    }
 
-        return userRepository.getUsersFollower(id, auth.getId());
+    // Danh sách user like post
+    public Page<UserDetailDto> getAllUserLikePost(Integer postId, Integer page, Integer pageSize) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with id = " + postId);
+        });
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Page<User> users = userRepository.findUserDetailDtoLikePostOther(postId, PageRequest.of(page,pageSize));
+        Page<UserDetailDto> userDetailDtos = users.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(user.getId(), u.getId())));
+        return userDetailDtos;
     }
 
     public void deleteUserById(Integer id) {
@@ -174,6 +197,7 @@ public class UserService {
             throw new RuntimeException("Upload image error");
         }
     }
+
 
     // Xóa avatar
     @Transactional
@@ -249,7 +273,6 @@ public class UserService {
             throw new BadRequestException("Have not followed this user");
         });
         followRepository.delete(follow);
-
         // Xoa thong bao
         notificationRepository.deleteByUserAndSenderAndType(userFl, user, "follow");
 
@@ -273,19 +296,6 @@ public class UserService {
         followRepository.delete(follow);
 
         return new StatusResponse("ok");
-    }
-
-    // Danh sách user like post
-    public List<UserDetailDto> getAllUserLikePost(Integer postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with id = " + postId);
-        });
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
-
-        return userRepository.findUserDetailDtoLikePost(postId, user.getId());
     }
 
 

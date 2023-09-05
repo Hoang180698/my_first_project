@@ -13,12 +13,11 @@ import ProfilePost from "./pages/profile/ProfilePost";
 import SavedPost from "./pages/profile/SavedPost";
 import Search from "./pages/search/Search";
 import User from "./pages/user/User";
-import PostDetail from "./pages/post-detail/PostDetail";
-import Liker from "./components/liker/Liker";
 import NotFound from "./pages/notfound/NotFound";
 import MessageBox from "./pages/messenge/MessageBox";
 import Inbox from "./pages/messenge/Inbox";
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from "react-toastify";
+import PostDetailPage from "./pages/post-detail/PostDetailPage";
 
 function App() {
   return (
@@ -27,7 +26,9 @@ function App() {
         <Route element={<Private />}>
           <Route path="/" element={<Layout />}>
             <Route path="/" element={<HomePage />}></Route>
-            <Route path="/search" element={<Search />}></Route>
+            <Route path="/search" element={<Search />}>
+              <Route path="/search/:key" element={<Search />}></Route>
+            </Route>
             <Route path="/messenge" element={<Messenge />}>
               <Route path="" element={<MessageBox />}></Route>
               <Route path="inbox/:conversationId" element={<Inbox />}></Route>
@@ -39,15 +40,14 @@ function App() {
             </Route>
             <Route path="/edit-profile" element={<Edit />}></Route>
             <Route path="/u/:userId" element={<User />}></Route>
-            <Route path="/p/:postId" element={<PostDetail />}></Route>
-            <Route path="/likes" element={<Liker />}></Route>
+            <Route path="/p/:postId" element={<PostDetailPage />}></Route>
             <Route path="*" element={<NotFound />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={1500}
         hideProgressBar={false}
@@ -57,7 +57,8 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"/>
+        theme="light"
+      />
     </>
   );
 }

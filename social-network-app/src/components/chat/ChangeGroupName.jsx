@@ -4,7 +4,7 @@ import { Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
 function ChangeGroupName({ conversation, stompClient }) {
-  const { auth, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const [show, setShow] = useState(false);
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -38,7 +38,7 @@ function ChangeGroupName({ conversation, stompClient }) {
 
   return (
     <>
-      <a onClick={handleShow} className="dropdown-item" role="button">
+      <a onClick={handleShow} className="dropdown-item" role="button"  style={{fontWeight:"500"}}>
         Change group name
       </a>
 

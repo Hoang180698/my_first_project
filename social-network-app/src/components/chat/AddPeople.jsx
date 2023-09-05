@@ -1,93 +1,93 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
-import {
-  useCreateConversationMutation,
-  useCreateGroupChatMutation,
-} from "../../app/services/chat.service";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function AddPeople({ conversation, stompClient }) {
-    const { auth, token } = useSelector((state) => state.auth);
-    const oldUserIds = conversation.users.map(u => {return u.id})
+  const { token } = useSelector((state) => state.auth);
+  const oldUserIds = conversation.users.map((u) => {
+    return u.id;
+  });
 
-    const [showModal, setShowModal] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [term, setTerm] = useState("");
-    const [noRes, setNoRes] = useState(false);
-    const [loadingButton, setLoadingButton] = useState(false);
-  
-    const [selectedUsers, setSelectedUsers] = useState([]);
-    const [searchUser] = useLazySearchUserQuery();
-    const [createConversation] = useCreateConversationMutation();
-    const [createGroupChat] = useCreateGroupChatMutation();
-  
-    const navigate = useNavigate();
-  
-    const handleAddUsers = (u) => {
-      if (selectedUsers.filter((x) => x.id === u.id).length === 0) {
-        setSelectedUsers((oldData) => [...oldData, u]);
-      } else {
-        setSelectedUsers((oldData) => oldData.filter((x) => x.id !== u.id));
-      }
-    };
-  
-    const handleRemoveUserSelect = (id) => {
-      setSelectedUsers((oldData) => oldData.filter((x) => x.id !== id));
-    };
-  
-    const handleAddPeople = () => {
-      const userIds = selectedUsers.map(u => {return u.id})
-      setLoadingButton(true);
-      stompClient.send(
-        "/app/message/add-people/" + conversation.id,
-        { Authorization: `Bearer ${token}` },
-        JSON.stringify({ userIds })
-      );
-      setTimeout(() => {
-        handleOffModal();
-      }, 1500);
-    };
-  
-    const handleOffModal = () => {
-      setShowModal(false);
-      setNoRes(false);
-      setTerm("");
-      setUsers([]);
-      setSelectedUsers([]);
-      setLoadingButton(false);
-    };
-  
-    const handleSearch = async () => {
-      if (term === "") {
-        return;
-      } else {
-        try {
-          let { data } = await searchUser(term);
-          const filterData = data.filter((x) => !oldUserIds.includes(x.id))
-          if (data.length > 0) {
-            setNoRes(false);
-          } else {
-            setNoRes(true);
-          }
-          setUsers(filterData);
-        } catch (error) {
-          console.log(error);
+  const [showModal, setShowModal] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [term, setTerm] = useState("");
+  const [noRes, setNoRes] = useState(false);
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [searchUser] = useLazySearchUserQuery();
+
+  const handleAddUsers = (u) => {
+    if (selectedUsers.filter((x) => x.id === u.id).length === 0) {
+      setSelectedUsers((oldData) => [...oldData, u]);
+    } else {
+      setSelectedUsers((oldData) => oldData.filter((x) => x.id !== u.id));
+    }
+  };
+
+  const handleRemoveUserSelect = (id) => {
+    setSelectedUsers((oldData) => oldData.filter((x) => x.id !== id));
+  };
+
+  const handleAddPeople = () => {
+    const userIds = selectedUsers.map((u) => {
+      return u.id;
+    });
+    setLoadingButton(true);
+    stompClient.send(
+      "/app/message/add-people/" + conversation.id,
+      { Authorization: `Bearer ${token}` },
+      JSON.stringify({ userIds })
+    );
+    setTimeout(() => {
+      handleOffModal();
+    }, 1500);
+  };
+
+  const handleOffModal = () => {
+    setShowModal(false);
+    setNoRes(false);
+    setTerm("");
+    setUsers([]);
+    setSelectedUsers([]);
+    setLoadingButton(false);
+  };
+
+  const handleSearch = async () => {
+    if (term === "") {
+      return;
+    } else {
+      try {
+        let { data } = await searchUser(term);
+        const filterData = data.filter((x) => !oldUserIds.includes(x.id));
+        if (filterData.length > 0) {
+          setNoRes(false);
+        } else {
+          setNoRes(true);
         }
+        setUsers(filterData);
+      } catch (error) {
+        console.log(error);
       }
-    };
-    const handleSearchOther = (e) => {
-      if (e.key === "Enter") {
-        handleSearch();
-      }
-    };
+    }
+  };
+  const handleSearchOther = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
   return (
     <>
-      <a onClick={() => setShowModal(true)} className="dropdown-item" role="button">
+      <a
+        onClick={() => setShowModal(true)}
+        className="dropdown-item"
+        role="button"
+        style={{ fontWeight: "500" }}
+      >
         Add people
       </a>
-        <Modal centered show={showModal} onHide={handleOffModal}>
+      <Modal centered show={showModal} onHide={handleOffModal}>
         <div className="modal-content px-2">
           <div className="d-flex border-bottom py-2">
             <h6 className="modal-title mx-auto">Add people</h6>
@@ -101,15 +101,14 @@ function AddPeople({ conversation, stompClient }) {
             <div className="d-flex align-items-center">
               <b>To:</b>
               <div className="form-control ms-2 me-2">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                onKeyDown={(e) => handleSearchOther(e)}
-              />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  onKeyDown={(e) => handleSearchOther(e)}
+                />
               </div>
-             
             </div>
           </div>
           <div className="slected-userchat-box mb-2 mt-1">
@@ -179,7 +178,7 @@ function AddPeople({ conversation, stompClient }) {
         </div>
       </Modal>
     </>
-  )
+  );
 }
 
-export default AddPeople
+export default AddPeople;

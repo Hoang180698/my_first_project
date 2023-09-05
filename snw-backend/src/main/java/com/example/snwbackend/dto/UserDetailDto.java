@@ -20,4 +20,17 @@ public class UserDetailDto {
     private String gender;
     private String birthday;
     private boolean followed;
+
+    public UserDetailDto(User user, boolean followed) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.phone = user.getPhone();
+        this.address = user.getAddress();
+        this.biography = user.getBiography();
+        this.avatar = user.getAvatar();
+        this.gender = user.getGender();
+        this.birthday = user.getBirthday();
+        this.email = user.getEmail();
+        this.followed = followed;
+    }
 }

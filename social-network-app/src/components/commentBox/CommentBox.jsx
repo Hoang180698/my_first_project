@@ -13,11 +13,11 @@ function CommentBox({ comments }) {
     deleteComment(id)
       .unwrap()
       .then(() => {
-        toast.success("Removed")
+        toast.success("Removed");
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
-        console.log(err)
+        console.log(err);
       });
   };
 
@@ -39,21 +39,39 @@ function CommentBox({ comments }) {
                       alt="User img"
                       className="author-img author-img--small me-2"
                     />
-                    {c.userName} <span>.</span>
+                    {c.userName}
                   </Link>{" "}
-                  <small className="text-muted" role="button" data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(c.createdAt)}>
+                  {/* <small
+                    className="text-muted"
+                    role="button"
+                    data-bs-toggle="tooltip"
+                    data-placement="bottom"
+                    title={formatDateTime(c.createdAt)}
+                  >
                     {formatDate(c.createdAt)}
-                  </small>
+                  </small> */}
                 </h6>
                 <p className="mb-0">{c.content}</p>
 
-                <div className="d-flex ms-5">
-                  <a href="#!" className="text-dark me-2 interact-comment me-4">
+                <div className="d-flex ms-4">
+                  <span className="text-dark ms-3 me-2 interact-comment">
+                    <small
+                      style={{fontSize:"12px"}}
+                      className="text-muted"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-placement="bottom"
+                      title={formatDateTime(c.createdAt)}
+                    >
+                      {formatDate(c.createdAt)}
+                    </small>
+                  </span>
+                  {/* <a href="#!" className="text-dark me-2 interact-comment me-4">
                     <span>
-                      <i class="fa-regular fa-heart"></i>
+                      <i className="fa-regular fa-heart"></i>
                     </span>
-                  </a>
-                  <a href="#!" className="text-dark me-2 interact-comment">
+                  </a> */}
+                  <a href="#!" className="text-dark ms-3 me-2 interact-comment">
                     <span>Reply</span>
                   </a>
                 </div>
@@ -67,7 +85,7 @@ function CommentBox({ comments }) {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <i class="fa-solid fa-ellipsis"></i>
+                  <i className="fa-solid fa-ellipsis"></i>
                 </a>
                 <ul
                   className="dropdown-menu dropdown-menu-lg-end"

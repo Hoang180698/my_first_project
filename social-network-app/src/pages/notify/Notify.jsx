@@ -5,8 +5,6 @@ import {
   useGetAllNotificationQuery,
   useSeenNotificationMutation,
 } from "../../app/services/notification.service";
-import { formatDate, formatDateTime } from "../../utils/functionUtils";
-import { Link } from "react-router-dom";
 import NotifyBox from "../../components/notifyBox/NotifyBox";
 import { Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet";

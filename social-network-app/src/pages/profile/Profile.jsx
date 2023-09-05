@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { NavLink, Outlet } from "react-router-dom";
 import "./Profile.css";
-import { useFollowhUserMutation, useGetUserByIdQuery, useUnfollowhUserMutation } from "../../app/services/user.service";
+import { useGetUserByIdQuery } from "../../app/services/user.service";
 import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { Modal } from "react-bootstrap";
@@ -13,9 +13,6 @@ function Profile() {
   const { auth } = useSelector((state) => state.auth);
 
   const { data: user, isLoading: isLoadingUser } = useGetUserByIdQuery(auth.id);
-  
-  const [followUser] = useFollowhUserMutation();
-  const [unfollowUser] = useUnfollowhUserMutation();
 
   const [showFollower, setShowFollower] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
@@ -37,7 +34,7 @@ function Profile() {
       <title>Profile | Hoagram</title>
     </Helmet>
      {showFollower && (
-      <Modal centered show={true}>
+      <Modal centered show={true} dialogClassName="modal-width">
          <div className="modal-content px-2">
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Followers</h6>
@@ -48,7 +45,7 @@ function Profile() {
       </Modal>
     )}
     {showFollowing && (
-        <Modal centered show={true}>
+        <Modal centered show={true} dialogClassName="modal-width">
         <div className="modal-content px-2">
            <div className="d-flex border-bottom py-2">
              <h6 className="modal-title mx-auto">Following</h6>

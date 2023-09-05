@@ -4,6 +4,8 @@ import com.example.snwbackend.entity.Conversation;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.entity.UserConversation;
 import com.example.snwbackend.entity.UserConversationKey;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,9 +18,9 @@ public interface UserConversationRepository extends JpaRepository<UserConversati
     Optional<UserConversation> findByUserAndConversation(User user, Conversation conversation);
     Optional<UserConversation> findById_UserIdAndId_ConversationId(Integer userId, Integer conversationId);
 
-    @Query("select uc from UserConversation uc where uc.id.userId = ?1 order by uc.conversation.lastMessage.createdAt DESC ")
-    List<UserConversation> findAllById_UserIdOrderByLastMessage(Integer userId);
+    @Query("select uc from UserConversation uc where uc.id.userId = ?1 and uc.isArchive = ?2 order by uc.conversation.lastMessage.createdAt DESC ")
+    Page<UserConversation> findAllById_UserIdOrderByLastMessage(Integer userId, Boolean isArchive, Pageable pageable);
 
-    @Query("select SUM(uc.unreadCount) from UserConversation uc where uc.id.userId = ?1")
+    @Query("select SUM(uc.unreadCount) from UserConversation uc where uc.id.userId = ?1 and uc.isArchive = false ")
     Integer getAllUnreadMessageCountByUserId(Integer userId);
 }

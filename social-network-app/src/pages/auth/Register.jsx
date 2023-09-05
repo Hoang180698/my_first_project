@@ -26,7 +26,7 @@ function Register() {
         .email("Email must be a valid email")
         .required("Email is not empty")
         .typeError(""),
-      name: yup.string().required("The name is not empty").matches(/^[^@!~`#$%^()\\&*=+}{;'":?/><|,.]*$/, "No symbols or special chars"),
+      name: yup.string().required("The name is not empty").matches(/^[^@!~`#$%^\\&*=+}{;'":?/><|,.]*$/, "Cannot contain the characters \"~ ` @ ! $ % # ^...\""),
       password: yup
         .string()
         .required("Password is not empty")

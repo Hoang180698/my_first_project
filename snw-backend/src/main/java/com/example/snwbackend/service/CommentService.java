@@ -127,7 +127,7 @@ public class CommentService {
     }
 
     // Lấy comments của 1 post
-    public List<CommentDto> getAllCommentByPostId(Integer postId) {
+    public List<CommentDto> getAllCommentByPostId(Integer postId, Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);

@@ -10,6 +10,7 @@ import App from './App'
 import store from './app/store';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css'
+import "./pages/messenge/chat.css"
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

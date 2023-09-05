@@ -31,5 +31,7 @@ public class UserConversation {
     @Column(name = "unread_count")
     private Integer unreadCount;
 
+    @Column(name = "is_Archive")
+    private Boolean isArchive;
 }
 

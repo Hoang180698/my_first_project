@@ -29,6 +29,7 @@ function LeaveGroup({ stompClient, conversationId }) {
         onClick={handleShow}
         className="dropdown-item text-danger"
         role="button"
+        style={{fontWeight:"500"}}
       >
         Leave group
       </a>

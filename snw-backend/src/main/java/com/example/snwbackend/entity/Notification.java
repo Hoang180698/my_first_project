@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor

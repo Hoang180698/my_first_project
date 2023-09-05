@@ -10,6 +10,8 @@ import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.response.UnreadMessageCountResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +64,7 @@ public class ChatService {
         for (User u: conversation1.getUsers()) {
             UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation1).get();
             userConversation.setUnreadCount(0);
+            userConversation.setIsArchive(false);
         }
 
         return conversation1;
@@ -84,7 +87,7 @@ public class ChatService {
                 .users(users)
                 .build();
         Message message = Message.builder()
-                .sender(user).type("START").conversation(conversation).content("")
+                .sender(user).type("START").conversation(conversation).content("created this group")
                 .build();
         conversationRepository.save(conversation);
         messageRepository.save(message);
@@ -93,28 +96,38 @@ public class ChatService {
             if (u.getId() == user.getId()) {
                 UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
                 userConversation.setUnreadCount(0);
-                userConversationRepository.save(userConversation);
+                userConversation.setIsArchive(false);
             } else {
                 UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
                 userConversation.setUnreadCount(1);
-                userConversationRepository.save(userConversation);
+                userConversation.setIsArchive(false);
             }
         }
         return conversation;
     }
 
     // Lấy danh sách các cuộc hội thoại
-    public List<UserConversation> getAllConversation() {
+    public Page<UserConversation> getAllConversation(Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
 
-        return userConversationRepository.findAllById_UserIdOrderByLastMessage(user.getId());
+        return userConversationRepository.findAllById_UserIdOrderByLastMessage(user.getId(), false, PageRequest.of(page, pageSize));
+    }
+
+    // Lấy danh sách các cuộc hội thoại trong kho
+    public Page<UserConversation> getAllArchiveConversation(Integer page, Integer pageSize) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+
+        return userConversationRepository.findAllById_UserIdOrderByLastMessage(user.getId(), true, PageRequest.of(page, pageSize));
     }
 
     // Lấy các tin nhắn trong cuộc hội thoại
-    public List<Message> getAllMessageByConversationId(Integer conversationId) {
+    public Page<Message> getAllMessageByConversationId(Integer conversationId, Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
@@ -127,7 +140,7 @@ public class ChatService {
             throw new BadRequestException("You do not have permission");
         }
 
-        return messageRepository.findAllByConversationOrderByCreatedAtDesc(conversation);
+        return messageRepository.findAllByConversationOrderByCreatedAtDesc(conversation, PageRequest.of(page, pageSize));
     }
 
     // Lấy thông tin cuộc hội thoại
@@ -168,5 +181,19 @@ public class ChatService {
             throw new NotFoundException("Not found user with email = " + email);
         });
         return new UnreadMessageCountResponse(userConversationRepository.getAllUnreadMessageCountByUserId(user.getId()));
+    }
+
+
+    public StatusResponse toggleSetArchiveChat(Integer conversationId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        UserConversation userConversation = userConversationRepository.findById_UserIdAndId_ConversationId(user.getId(), conversationId).orElseThrow(() -> {
+            throw new NotFoundException("You aren't in conversation have id: " + conversationId);
+        });
+        userConversation.setIsArchive(!userConversation.getIsArchive());
+        userConversationRepository.save(userConversation);
+        return new StatusResponse("ok");
     }
 }
