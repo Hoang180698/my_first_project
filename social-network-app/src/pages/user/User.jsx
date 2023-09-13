@@ -85,7 +85,7 @@ function User() {
         .unwrap()
         .then((data) => {
           const filterData = data.content.filter((x) => {
-            return posts.some((existingItem) => existingItem.post.id !== x.post.id);
+            return !posts.some((existingItem) => existingItem.post.id === x.post.id);
           });
           setPosts((pre) => [...pre, ...filterData]);
           setIsLast(data.last);
@@ -443,10 +443,10 @@ function User() {
       {/* post */}
       <div className="border-top ">
         <div className="main-content">
-          <div className="container">
+          <div className="d-flex justify-content-center">
             <br />
 
-            <div className="row ms-2">
+            <div className="row" style={{maxWidth:"1050px"}}>
               {(posts.length === 0 && isLast) && (
                 <div className="d-grid text-center">
                   <span style={{ fontSize: "30px" }}>

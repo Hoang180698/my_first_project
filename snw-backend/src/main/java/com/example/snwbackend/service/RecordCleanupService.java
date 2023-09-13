@@ -1,6 +1,8 @@
 package com.example.snwbackend.service;
 
 import com.example.snwbackend.repository.NotificationRepository;
+import com.example.snwbackend.repository.RefreshTokenRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,20 @@ public class RecordCleanupService {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Scheduled(cron = "0 0 0 * * MON")
+    @Transactional
     public void deleteRecordsOlderThanOneHour() {
         // Đặt điều kiện để xóa các bản ghi cũ hơn 1 giờ
         LocalDateTime oneMonthAgo = LocalDateTime.now().minus(1, ChronoUnit.MONTHS);
         notificationRepository.deleteAllByCreatedAtBefore(oneMonthAgo);
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    @Transactional
+    public void deleteRefreshToken() {
+       refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now());
     }
 }

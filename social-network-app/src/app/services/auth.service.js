@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { data } from "jquery";
 
 // Define a service using a base URL and expected endpoints
 export const authApi = createApi({
@@ -21,8 +22,40 @@ export const authApi = createApi({
                 body: data,
             }),
         }),
-        checkEmailExist: builder.query({
-            query: (email) => `check-email?email=${email}`
+        checkEmailExist: builder.mutation({
+            query: (data) => ({
+                url: `check-email`,
+                method: "POST",
+                body: data
+            })
+        }),
+        resendEmailActivation: builder.mutation({
+            query: (data) => ({
+                url: `resend-email`,
+                method: "PUT",
+                body: data,
+            })
+        }),
+        forgotPassword: builder.mutation({
+            query: (data) => ({
+                url: "forgot-password",
+                method: "POST",
+                body: data,
+            })
+        }),
+        refreshToken: builder.mutation({
+            query: (data) => ({
+                url: "refresh-token",
+                method: "POST",
+                body: data,
+            })
+        }),
+        logOut: builder.mutation({
+            query: (data) => ({
+                url: "log-out",
+                method: "POST",
+                body: data,
+            })
         })
     }),
 });
@@ -30,5 +63,6 @@ export const authApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-    useLoginMutation, useRegisterMutation, useLazyCheckEmailExistQuery,
+    useLoginMutation, useRegisterMutation,useCheckEmailExistMutation, useResendEmailActivationMutation,
+    useForgotPasswordMutation, useRefreshTokenMutation, useLogOutMutation,
 } = authApi;

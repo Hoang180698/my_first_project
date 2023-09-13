@@ -6,6 +6,8 @@ import com.example.snwbackend.entity.Notification;
 import com.example.snwbackend.entity.Post;
 import com.example.snwbackend.entity.User;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +20,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     Optional<Notification> findByUserAndSenderAndType(User user, User sender, String type);
 
-    List<Notification> findAllByUserOrderByCreatedAtDesc(User user);
+    Page<Notification> findAllByUser_IdOrderByCreatedAtDesc(Integer userId, Pageable pageable);
 
     Optional<Notification> findByUserAndSenderAndPostAndType(User user, User sender, Post post, String type);
 

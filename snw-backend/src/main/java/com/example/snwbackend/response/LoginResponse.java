@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LoginResponse {
     private UserDto auth;
     private String token;
+    private String refreshToken;
 
     @JsonProperty("isAuthenticated")
     private Boolean isAuthenticated;

@@ -17,18 +17,26 @@ export const postApi = createApi({
   tagTypes: ["Post"],
   endpoints: (builder) => ({
     getPosts: builder.query({
-      query: ({page, pageSize}) => `post?page=${page}&pageSize=${pageSize}`,
+      query: ({ page, pageSize }) => `post?page=${page}&pageSize=${pageSize}`,
     }),
     getPostById: builder.query({
       query: (id) => `post/${id}`,
       providesTags: ["Post"],
     }),
+    //get saved post
     getAllSavedPost: builder.query({
-      query: () => `post/save`,
-      providesTags: ["Post"],
+      query: ({ page, pageSize }) =>
+        `post/save?page=${page}&pageSize=${pageSize}`,
     }),
+    // get post of user
     getPostByUserId: builder.query({
-      query: ({userId, page, pageSize}) => `post/user-post/${userId}?page=${page}&pageSize=${pageSize}`,
+      query: ({ userId, page, pageSize }) =>
+        `post/user-post/${userId}?page=${page}&pageSize=${pageSize}`,
+    }),
+    // get new post by ids
+    getPostByListId: builder.query({
+      query: (ids) =>
+        `post/get-new-post?ids=${ids}`,
     }),
     // Tạo post
     createPost: builder.mutation({
@@ -44,10 +52,6 @@ export const postApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["Post"],
-    }),
-    getAllMyPosts: builder.query({
-      query: () => "post/user-post",
-      providesTags: ["Post"],
     }),
     likePost: builder.mutation({
       query: (id) => ({
@@ -77,7 +81,6 @@ export const postApi = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
-
   }),
 });
 
@@ -88,7 +91,6 @@ export const {
   useDeletePostMutation,
   useGetPostByIdQuery,
   useGetPostsQuery,
-  useGetAllMyPostsQuery,
   useGetPostByUserIdQuery,
   useLikePostMutation,
   useUnlikePostMutation,
@@ -97,4 +99,6 @@ export const {
   useGetAllSavedPostQuery,
   useLazyGetPostByUserIdQuery,
   useLazyGetPostsQuery,
+  useLazyGetAllSavedPostQuery,
+  useLazyGetPostByListIdQuery,
 } = postApi;

@@ -14,8 +14,9 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllNotificationByUser() {
-        return ResponseEntity.ok(notificationService.getAllNotificationByUser());
+    public ResponseEntity<?> getAllNotificationByUser( @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                       @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(notificationService.getAllNotificationByUser(page, pageSize));
     }
 
     @PutMapping("")

@@ -2,17 +2,17 @@ import React, { useEffect, useState } from "react";
 import "./sass/style.scss";
 import {
 	useDeleteAllNotificationMutation,
-  useGetAllNotificationQuery,
+  useLazyGetAllNotificationQuery,
   useSeenNotificationMutation,
 } from "../../app/services/notification.service";
 import NotifyBox from "../../components/notifyBox/NotifyBox";
 import { Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
+import { useRef } from "react";
 
 function Notify() {
-  const { data, isLoading } = useGetAllNotificationQuery();
-
+  const [getNotifications] = useLazyGetAllNotificationQuery();
   const [seenNotifycation] = useSeenNotificationMutation();
 
   const [showModal, setShowModal] = useState(false);
@@ -22,27 +22,87 @@ function Notify() {
   const handleDelteteAllNotification = () => {
 	deleteAllNotification().unwrap().then(() => {
 		toast.success("Removed all");
+		setNotifications([]);
 	}).catch((err) => {
 		toast.error("Something went wrong. Please try again.");
 		console.log(err);
 	});
+  };
+  const handleDeletenotify = (id) => {
+	setNotifications((pre) => pre.filter((x) => x.id !==id))
   }
+  const [notifications, setNotifications] = useState([]);
+  const [currentPageSize, setCurrentPageSize] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const loadMoreRef = useRef(null);
+
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && !isLast && !loading) {
+      setCurrentPageSize(notifications.length + 10);
+    }
+  };
 
   useEffect(() => {
-    seenNotifycation().unwrap().then().catch();
-  }, []);
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
 
-  if (isLoading) {
-    return (
-      <>
-        <div className="text-center m-5">
-          <div className="spinner-border m-5" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
-      </>
-    );
-  }
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loadMoreRef, options]);
+
+  useEffect(() => {
+    if (currentPageSize > 0 && !isLast) {
+      setLoading(true);
+      getNotifications({ page: 0, pageSize: currentPageSize })
+        .unwrap()
+        .then((data) => {
+        //   const filterData = data.content.filter((x) => {
+        //     return !notifications.some((existingItem) => existingItem.id === x.id);
+        //   });
+          setNotifications(data.content);
+          setIsLast(data.last);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [currentPageSize]);
+
+  useEffect(() => {
+    const fectchData = async () => {
+		setLoading(true);
+      try {
+        const { data } = await getNotifications({page:0, pageSize:10});
+        setNotifications(data.content);
+      } catch (error) {
+        console.log(error);
+      } finally {
+		setLoading(false);
+	  }
+    }
+    fectchData();
+	seenNotifycation().unwrap().then().catch();
+
+	return () => {
+		setCurrentPageSize(0);
+	}
+  },[])
 
   return (
     <>
@@ -51,7 +111,7 @@ function Notify() {
 			Notification | Hoagram
 		</title>
 	</Helmet>
-	{data.length > 0 && (
+	{notifications.length > 0 && (
 		<Modal show={showModal} centered>
 		<div className="modal-content">
 					  <div className="modal-header d-flex justify-content-center flex-column">
@@ -89,7 +149,7 @@ function Notify() {
             <h3 className="mb-3 heading-line">
               Notifications <i className="fa fa-bell text-muted"></i>
             </h3>
-			{data.length > 0 && (
+			{notifications.length > 0 && (
 				 <button className="ms-auto me-3 btn rm-all-notification" onClick={() => setShowModal(true)}>
 				 <i className="fa fa-trash me-1"></i>
 				  Remove all
@@ -98,18 +158,28 @@ function Notify() {
           </div>
 
           <div className="notification-ui_dd-content">
-			{data.length === 0 && (
+			{(notifications.length === 0 && isLast) && (
 				<p className="text-center mt-3 mx-4" style={{fontSize: "24px"}}>
 				When someone likes or comments on one of your posts, you'll see it here.
 				</p>
 			)}
-            {data.length > 0 && data.map((n) => <NotifyBox n={n} key={n.id} />)}
+            {notifications.length > 0 && notifications.map((n) => <NotifyBox n={n} key={n.id} deleteNotify={handleDeletenotify}/>)}
+			<span className="ms-1" ref={loadMoreRef}></span>
+              {loading && (
+                <div className="container">
+                  <div className="text-center m-2">
+                    <div className="spinner-border m-2" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
 
           <div className="text-center">
-            <a href="#" className="dark-link load-more">
+            {/* <a href="#" className="dark-link load-more">
               Load more activity
-            </a>
+            </a> */}
           </div>
         </div>
       </section>

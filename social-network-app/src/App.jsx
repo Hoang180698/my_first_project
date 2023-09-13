@@ -18,6 +18,7 @@ import MessageBox from "./pages/messenge/MessageBox";
 import Inbox from "./pages/messenge/Inbox";
 import { ToastContainer } from "react-toastify";
 import PostDetailPage from "./pages/post-detail/PostDetailPage";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />}/>
       </Routes>
       <ToastContainer
         position="top-right"

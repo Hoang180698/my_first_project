@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
@@ -14,11 +15,14 @@ function ChangeGroupName({ conversation, stompClient }) {
     setName(conversation.name);
   };
   const handleShow = () => setShow(true);
- 
-
   const [name, setName] = useState(conversation.name);
 
+  useEffect(() => {
+    setName(conversation.name);
+  },[conversation.name])
+
   const handleNamedGroupChat = () => {
+    const newName = name;
     setLoadingButton(true);
     stompClient.send(
       "/app/message/named/" + conversation.id,
@@ -27,6 +31,7 @@ function ChangeGroupName({ conversation, stompClient }) {
     );
     setTimeout(() => {
       handleClose();
+      setName(newName);
     }, 1000);
   }
 

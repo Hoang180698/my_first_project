@@ -2,13 +2,11 @@ package com.example.snwbackend.request;
 
 import lombok.*;
 
-import java.util.List;
-
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class UpsertPostRequest {
-    private String content;
+public class EmailRequest {
+    private String email;
 }

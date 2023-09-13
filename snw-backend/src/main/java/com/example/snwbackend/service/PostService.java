@@ -6,7 +6,6 @@ import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.CreatePostRequest;
-import com.example.snwbackend.request.UpsertPostRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
@@ -19,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PostService {
@@ -155,22 +155,16 @@ public class PostService {
         return postDtos;
     }
 
-    // lấy danh post của mình
-    public List<PostDto> getAllMyPost(Integer page, Integer pageSize) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
-        return postRepository.getPDtoByUser(user.getId(), user.getId());
-    }
-
     // Get saved posts
-    public List<PostDto> getAllSavedPost(Integer page, Integer pageSize) {
+    public Page<PostDto> getAllSavedPost(Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        return postRepository.getAllSavedPost(user.getId());
+        Page<Post> posts = postRepository.getSavedPosts(user.getId(), PageRequest.of(page, pageSize));
+        Page<PostDto> postDtos = posts.map((post -> new PostDto(post,
+                likeRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId()), true)));
+        return postDtos;
     };
 
     // Tạo post với images
@@ -353,5 +347,20 @@ public class PostService {
         } catch (Exception e) {
             throw new RuntimeException("Upload post error");
         }
+    }
+
+    public List<PostDto> getPostsByIds(List<Integer> ids) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Set<Post> posts = postRepository.findByIdIn(ids);
+        List<PostDto> postDtos = posts.stream()
+                .map((post) -> new PostDto(post,
+                likeRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId()), saveRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId())))
+                .toList().stream()
+                .sorted(((o1, o2) -> o2.getPost().getCreatedAt().compareTo(o1.getPost().getCreatedAt())))
+                .toList();
+        return postDtos;
     }
 }

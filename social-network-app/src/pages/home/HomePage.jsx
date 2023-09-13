@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useLazyGetPostsQuery, useLikePostMutation, useSavePostMutation, useUnSavePostMutation, useUnlikePostMutation } from "../../app/services/posts.service";
+import { useDeletePostMutation, useLazyGetPostByListIdQuery, useLazyGetPostsQuery, useLikePostMutation, useSavePostMutation, useUnSavePostMutation, useUnlikePostMutation } from "../../app/services/posts.service";
 import useCreatePost from "../newPost/useCreatePost";
 import "./sass/style.scss";
 // import ImageSlider from "../../components/imageSlider/ImageSlider";
@@ -18,14 +18,15 @@ function HomePage() {
   const { onCreatePost } = useCreatePost();
   const [showScrollButton, setShowScrollButton] = useState(false);
   const pageRef = useRef(null);
+  const [deletePost] = useDeletePostMutation();
 
   const [loading, setLoading] = useState(false);
   const [isLast, setIsLast] = useState(false);
   const [posts, setPosts] = useState([]);
   const [getPosts] = useLazyGetPostsQuery();
+  const [getNewPosts] = useLazyGetPostByListIdQuery();
   const [currentPage, setCurrentPage] = useState(0);
   const loadMoreRef = useRef(null);
-
   const [likePost] = useLikePostMutation();
   const [unlikePost] = useUnlikePostMutation();
   const [savePost] = useSavePostMutation();
@@ -43,6 +44,24 @@ function HomePage() {
       setCurrentPage(Math.floor(posts.length / 5));
     }
   };
+
+  useEffect(() => {
+    if(postIds.length > 0) {
+      let ids = postIds.join();
+      getNewPosts(ids).unwrap()
+      .then((data) => {
+        console.log(data)
+        const filterData = data.filter((x) => {
+          return !posts.some(
+            (existingItem) => existingItem.post.id === x.post.id
+          );
+        });
+        setPosts([ ...filterData, ...posts ]);
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+  },[postIds])
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleIntersection, options);
@@ -64,8 +83,8 @@ function HomePage() {
         .unwrap()
         .then((data) => {
           const filterData = data.content.filter((x) => {
-            return posts.some(
-              (existingItem) => existingItem.post.id !== x.post.id
+            return !posts.some(
+              (existingItem) => existingItem.post.id === x.post.id
             );
           });
           setPosts((pre) => [...pre, ...filterData]);
@@ -89,7 +108,7 @@ function HomePage() {
           page: 0,
           pageSize: 5,
         });
-        setPosts(data.content);
+        setPosts((pre) => [ ...pre, ...data.content]);
       } catch (error) {
         console.log(error);
         toast.error("Error on page load.");
@@ -194,6 +213,20 @@ function HomePage() {
     }
   };
 
+  const handleDeletePost = (id) => {
+    deletePost(id)
+      .unwrap()
+      .then(() =>{
+        toast.success("You delete the post!");
+        setPosts(pre => pre.filter((p) => p.post.id !== id));
+      })
+      .catch((err) => {
+        toast.error("Something went wrong. Please try again.");
+        console.log(err);
+      });
+};
+
+
   return (
     <>
       <Helmet>
@@ -244,8 +277,8 @@ function HomePage() {
           <div className="row">
             {posts.length > 0 &&
               posts.map((p, index) => (
-                <div key={p.post.id}>
-                  <Post p={p} likePost={handleLikePost} savePost={handeleSavePost}/>
+                <div key={index}>
+                  <Post p={p} likePost={handleLikePost} savePost={handeleSavePost} deletePost={handleDeletePost}/>
                   {index === posts.length - 2 &&  <span ref={loadMoreRef}></span>}
                 </div>
               ))}

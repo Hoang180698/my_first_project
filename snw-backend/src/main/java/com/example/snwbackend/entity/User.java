@@ -57,6 +57,9 @@ public class User implements UserDetails, Serializable {
     @Column(name = "role")
     private String role;
 
+    @JsonIgnore
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -92,6 +95,6 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }

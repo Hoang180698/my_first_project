@@ -9,6 +9,7 @@ import { userApi } from "../services/user.service";
 const defaultState = {
   auth: null,
   token: null,
+  refreshToken: null,
   isAuthenticated: false,
 };
 
@@ -31,6 +32,7 @@ const authSlice = createSlice({
       (state, action) => {
         state.auth = action.payload.auth;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
         state.isAuthenticated = action.payload.isAuthenticated;
 
         setDataToLocalStorage("authSnw", state);
@@ -57,6 +59,14 @@ const authSlice = createSlice({
       (state, action) => {
         // console.log(action.payload)
         state.auth.avatar = null;
+        setDataToLocalStorage("authSnw", state);
+      },
+    );
+    builder.addMatcher(
+      authApi.endpoints.refreshToken.matchFulfilled,
+      (state, action) => {
+        // console.log(action.payload)
+        state.token = action.payload.accessToken;
         setDataToLocalStorage("authSnw", state);
       },
     );

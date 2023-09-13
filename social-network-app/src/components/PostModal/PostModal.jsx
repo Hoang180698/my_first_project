@@ -17,9 +17,8 @@ import Modal from "react-bootstrap/Modal";
 import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { useDeletePostMutation } from "../../app/services/posts.service";
 
-function PostModal({ post, likePost, savePost }) {
+function PostModal({ post, likePost, savePost, deletePost }) {
   const { auth } = useSelector((state) => state.auth);
 
   // const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
@@ -32,9 +31,13 @@ function PostModal({ post, likePost, savePost }) {
   const emojiRef = useRef(null);
   const emojiButtonRef = useRef(null);
   const textareaRef = useRef(null);
-  const [deletePost] = useDeletePostMutation();
-
   const [showLikerModal, setShowLikerModal] = useState(false);
+
+  const [showDeletePost, setShowdeletePost] = useState(false);
+
+  const handleClose = () => {
+    setShowdeletePost(false);
+  };
 
   const [addComment] = useAddCommentMutation();
 
@@ -63,26 +66,15 @@ function PostModal({ post, likePost, savePost }) {
   const handleFocusInput = () => {
     textareaRef.current.focus();
   };
-
-  const handleDeletePost = (id) => {
-    let isConfirm = window.confirm(
-      "Are you sure you want to delete this post?"
-    );
-    if (isConfirm) {
-      deletePost(id)
-        .unwrap()
-        .then(() => toast.success("You delete the post!"))
-        .catch((err) => {
-          toast.error("Something went wrong. Please try again.");
-          console.log(err);
-        });
-    }
+  const handleDeletePost = () => {
+    deletePost(post.post.id);
+    setShowdeletePost(false);
   };
 
   const handeleSavePost = (saved, postId) => {
     savePost(saved, postId);
   };
-  
+
   const handleLikePost = (liked, postId) => {
     likePost(postId, liked);
   };
@@ -143,6 +135,40 @@ function PostModal({ post, likePost, savePost }) {
           <ImageSlider data={post.post.imageUrls} />
         </div>
       )}
+      <Modal
+        dialogClassName="modal-width"
+        show={showDeletePost}
+        centered
+        onHide={handleClose}
+        style={{ widows: "inherit" }}
+      >
+        <div className="d-flex border-bottom py-2 text-center flex-column">
+          <span className="mt-3" style={{ fontSize: "20px" }}>
+            Delete post?
+          </span>
+          <span
+            className="mx-auto mb-3"
+            style={{ fontSize: "12px", color: "#737373", width: "70%" }}
+          >
+            Are you sure you want to delete this post?
+          </span>
+        </div>
+        <div
+          role="button"
+          className="py-2 border-bottom text-center"
+          onClick={handleDeletePost}
+        >
+          <span
+            style={{ color: "#ED4956", fontWeight: "bold", fontSize: "14px" }}
+          >
+            Delete
+          </span>
+        </div>
+
+        <div role="button" className="py-2 text-center" onClick={handleClose}>
+          <span style={{ fontSize: "14px" }}>Cancel</span>
+        </div>
+      </Modal>
       <div
         className={
           post.post.imageUrls.length > 0
@@ -200,9 +226,13 @@ function PostModal({ post, likePost, savePost }) {
                   <Link
                     to={`/p/${post.post.id}`}
                     className="dropdown-item text-dark"
+                    style={{fontWeight:"bold"}}
                   >
                     Go to Post
                   </Link>
+                  <a role="button" className="dropdown-item text-danger" style={{fontWeight:"bold"}}>
+                  <i className="fa-solid fa-flag"></i> Repost
+                  </a>
                   {post.userId === auth.id && (
                     <>
                       {/* <a className="dropdown-item text-dark" role="button">
@@ -211,15 +241,14 @@ function PostModal({ post, likePost, savePost }) {
                       <a
                         className="dropdown-item text-danger"
                         role="button"
-                        onClick={() => handleDeletePost(post.post.id)}
+                        style={{fontWeight:"bold"}}
+                        onClick={() => setShowdeletePost(true)}
                       >
                         <i className="fa fa-trash me-1"></i>Delete
                       </a>
                     </>
                   )}
-                  <a role="button" className="dropdown-item text-danger">
-                    Repost
-                  </a>
+                
                 </ul>
               </div>
             </div>
@@ -310,7 +339,7 @@ function PostModal({ post, likePost, savePost }) {
                   {post.post.likeCount} likes
                 </span>
               )}
-              
+
               <span className="text-dark ms-auto">
                 {comments.length} comments
               </span>

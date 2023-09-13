@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
@@ -17,6 +17,103 @@ function AddPeople({ conversation, stompClient }) {
 
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchUser] = useLazySearchUserQuery();
+
+  const [key, setKey] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const loadMoreRef = useRef(null);
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && !isLast && !loading) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loadMoreRef, options]);
+
+  useEffect(() => {
+    if (currentPage > 0 && !isLast) {
+      setLoading(true);
+      searchUser({ term: key, page: currentPage, pageSize: 7 })
+        .unwrap()
+        .then((data) => {
+          const filterData = data.content.filter((x) => {
+            return !users.some((existingItem) => existingItem.id === x.id)
+             && !oldUserIds.some(oldId => oldId === x.id);
+          });
+          setUsers((pre) => [...pre, ...filterData]);
+          setIsLast(data.last);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error on page load.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    const fectData = async () => {
+      if (key) {
+        try {
+          let { data } = await searchUser({ term: key, page: 0, pageSize: 7 });
+          const filterData = data.content.filter((x) => {
+            return !oldUserIds.some(oldId => oldId === x.id);
+          });
+          setUsers(filterData);
+          setIsLast(data.last);
+          if(data.content?.length === 0 && data.last) {
+            setNoRes(true);
+          } else {
+            setNoRes(false);
+          }
+        } catch (error) {
+          console.log(error);
+          navigate("/search");
+          toast.error("Check your network.")
+        }
+      }
+    };
+    fectData();
+
+    return () => {
+      setCurrentPage(0);
+    };
+  }, [key]);
+
+  const handleSearch = async () => {
+    if (term === "") {
+      return;
+    } else {
+      setKey(term);
+    }
+  };
+  const handleSearchOther = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   const handleAddUsers = (u) => {
     if (selectedUsers.filter((x) => x.id === u.id).length === 0) {
@@ -52,30 +149,6 @@ function AddPeople({ conversation, stompClient }) {
     setUsers([]);
     setSelectedUsers([]);
     setLoadingButton(false);
-  };
-
-  const handleSearch = async () => {
-    if (term === "") {
-      return;
-    } else {
-      try {
-        let { data } = await searchUser(term);
-        const filterData = data.filter((x) => !oldUserIds.includes(x.id));
-        if (filterData.length > 0) {
-          setNoRes(false);
-        } else {
-          setNoRes(true);
-        }
-        setUsers(filterData);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  const handleSearchOther = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
   };
   return (
     <>
@@ -154,13 +227,23 @@ function AddPeople({ conversation, stompClient }) {
                       type="checkbox"
                       className="checked-add-user-chat"
                       checked={
-                        selectedUsers.filter((x) => x.id === u.id).length > 0
+                        selectedUsers.some((x) => x.id === u.id)
                       }
                       onChange={() => handleAddUsers(u)}
                     ></input>
                   </div>
                 </div>
               ))}
+               <span className="mb-2" ref={loadMoreRef}></span>
+               {loading && (
+            <div className="container">
+              <div className="text-center m-3">
+                <div className="spinner-border m-3" role="status">
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            </div>
+          )}
           </div>
           <div className="mt-3 mb-2 d-grid gap-2">
             <button

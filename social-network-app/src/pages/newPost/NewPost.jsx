@@ -87,6 +87,7 @@ function NewPost() {
       setSelectedImages([]);
       offCreatePost();
       setLoadingButton(false);
+      navigate("/");
     }).catch((err) => {
       toast.error("Something went wrong. Please try again.");
       console.log(err);
@@ -95,7 +96,7 @@ function NewPost() {
   }
   const renderPhotos = (source) => {
     return source.map((photo) => {
-      return <img src={photo} key={photo} />;
+      return <img src={photo} key={photo} /> 
     });
   };
 

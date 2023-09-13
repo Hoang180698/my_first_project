@@ -99,7 +99,7 @@ body {
 	max-width: 100%;
 	max-height: 750px;
 	height: 700px;
-	object-fit: cover;
+	object-fit: contain;
 }
 .post-block__content pre {
 	font-size: 15px;
@@ -175,7 +175,7 @@ body {
 	margin-bottom: 0;
 }
 .notification-ui_dd .notification-ui_dd-content {
-	max-height: 550px;
+	height: 450px;
 	overflow: auto;
 }
 
@@ -584,5 +584,9 @@ textarea {
 	-ms-transform: translate(-60%, -60%);
 	top: 50%;
 	left: 50%;
+}
+.successful-register {
+	word-wrap: break-word;
+	word-break: keep-all;
 }
 

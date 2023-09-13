@@ -1,39 +1,94 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  useGetAllNotificationQuery,
+  useLazyGetAllNotificationQuery,
   useSeenNotificationMutation,
 } from "../../../app/services/notification.service";
 import { formatDate, formatDateTime } from "../../../utils/functionUtils";
 
 function NotifyHeader() {
-  const { data, isLoading } = useGetAllNotificationQuery();
+  const [getNotifications] = useLazyGetAllNotificationQuery();
 
   const [seenNotifycation] = useSeenNotificationMutation();
+  const [notifications, setNotifications] = useState([]);
 
   const handleClick = () => {
-    if (data && !data[0].seen) {
-      seenNotifycation().unwrap().then().catch();
+    if (notifications.length > 0 && !notifications[0].seen) {
+      seenNotifycation().unwrap().then(() => {
+        const newNotify = notifications.map((n) => {
+          return { ...n, seen:true};
+        })
+        setNotifications(newNotify);
+      }).catch();
     }
   };
 
-  if (isLoading) {
-    return (
-      <>
-        <a
-          className="nav-link dropdown-toggle notification-ui_icon"
-          href=""
-          id="navbarDropdown"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <i className="fa fa-bell"></i>
-        </a>
-      </>
-    );
-  }
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const loadMoreRef = useRef(null);
+
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && !isLast && !loading) {
+      setCurrentPage(Math.floor(notifications.length / 10));
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loadMoreRef, options]);
+
+  useEffect(() => {
+    if (currentPage > 0 && !isLast) {
+      setLoading(true);
+      getNotifications({ page: currentPage, pageSize: 10 })
+        .unwrap()
+        .then((data) => {
+          const filterData = data.content.filter((x) => {
+            return !notifications.some((existingItem) => existingItem.id === x.id);
+          });
+          setNotifications((pre) => [...pre, ...filterData]);
+          setIsLast(data.last);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    const fectchData = async () => {
+      try {
+        const { data } = await getNotifications({page:0, pageSize:10});
+        setNotifications(data.content);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fectchData();
+    return () => {
+      setCurrentPage(0);
+    }
+  },[]);
 
   return (
     <>
@@ -48,7 +103,7 @@ function NotifyHeader() {
         onClick={handleClick}
       >
         <i className="fa fa-bell"></i>
-        {data.length > 0 && !data[0].seen && (
+        {notifications.length > 0 && !notifications[0].seen && (
           <span className="unread-notification"></span>
         )}
       </a>
@@ -60,7 +115,7 @@ function NotifyHeader() {
           <h3 className="text-center">Notification</h3>
         </div>
         <div className="notification-ui_dd-content">
-          {data.length === 0 && (
+          {(notifications.length === 0 && isLast) && (
             <>
               <p className="text-center mt-3 mx-4">
                 When someone likes or comments on one of your posts, you'll see
@@ -68,8 +123,8 @@ function NotifyHeader() {
               </p>
             </>
           )}
-          {data.length > 0 &&
-            data.map((n) => (
+          {notifications.length > 0 &&
+            notifications.map((n) => (
               <div className="header-notifications-list" key={n.id}>
                 <Link
                   to={`/u/${n.sender.id}`}
@@ -122,6 +177,16 @@ function NotifyHeader() {
                 </p>
               </div>
             ))}
+             <span className="ms-1" ref={loadMoreRef}></span>
+              {loading && (
+                <div className="container">
+                  <div className="text-center m-2">
+                    <div className="spinner-border m-2" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
         </div>
         <div className="notification-ui_dd-footer d-grid gap-2">
           <Link

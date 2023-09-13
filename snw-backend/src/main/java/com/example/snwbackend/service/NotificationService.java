@@ -8,6 +8,8 @@ import com.example.snwbackend.repository.NotificationRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.response.StatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +24,13 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    public List<Notification> getAllNotificationByUser() {
+    public Page<Notification> getAllNotificationByUser(Integer page, Integer pageSize) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
 
-        return notificationRepository.findAllByUserOrderByCreatedAtDesc(user);
+        return notificationRepository.findAllByUser_IdOrderByCreatedAtDesc(user.getId(), PageRequest.of(page,pageSize));
     }
 
     public void seenNotification() {

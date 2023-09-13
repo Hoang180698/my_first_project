@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAllByUser_IdOrderByCreatedAtDesc(Integer userId, Pageable pageable);
@@ -18,6 +19,12 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("select p from Post p left join Follow f on f.follower.id = ?1"
             + " where p.user.id = f.following.id order by p.createdAt DESC ")
     Page<Post> getPostFollowing(Integer userId, Pageable pageable);
+
+    @Query("select p from Post p left join Save s on s.user.id = ?1 " +
+            "where p.id = s.post.id order by s.createdAt DESC")
+    Page<Post> getSavedPosts(Integer userId, Pageable pageable);
+
+    Set<Post> findByIdIn(List<Integer> ids);
 
     @Query("select new com.example.snwbackend.dto.PostDto" +
             "(p, (exists(select 1 FROM Like l WHERE l.user.id = ?2 AND l.post.id = p.id))," +

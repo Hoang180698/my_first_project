@@ -16,6 +16,7 @@ import {
   receiveMessage,
   setConversationReceive,
 } from "../../app/slices/chat.slice";
+import { useLogOutMutation } from "../../app/services/auth.service";
 
 export var stompClient = null;
 
@@ -29,7 +30,8 @@ function Header() {
   );
   // const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
-  const { auth, token } = useSelector((state) => state.auth);
+  const { auth, token, refreshToken } = useSelector((state) => state.auth);
+  const [logOut] = useLogOutMutation();
   const effect = useRef(false);
   const { onCreatePost } = useCreatePost();
   const { unreadMessageCount, isOpenChatPage } = useSelector(
@@ -51,6 +53,7 @@ function Header() {
     };
   }, [isOpenChatPage, currentConversationId]);
   const handleLogout = () => {
+    logOut({refreshToken})
     dispatch(logout());
   };
 

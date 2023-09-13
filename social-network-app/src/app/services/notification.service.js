@@ -17,7 +17,7 @@ export const notificationApi = createApi({
     tagTypes: ["Post"],
     endpoints: (builder) => ({
         getAllNotification: builder.query({
-            query: () =>  `notification`,
+            query: ({page, pageSize}) =>  `notification?page=${page}&pageSize=${pageSize}`,
             providesTags: ["Post"],
         }),
         seenNotification: builder.mutation({
@@ -51,4 +51,5 @@ export const {
    useSeenNotificationMutation,
    useDeleteNotificationByIdMutation,
    useDeleteAllNotificationMutation,
+   useLazyGetAllNotificationQuery,
 } = notificationApi;

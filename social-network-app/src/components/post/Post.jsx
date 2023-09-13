@@ -6,34 +6,83 @@ import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import PostModal from "../PostModal/PostModal";
 import Liker from "../liker/Liker";
+import { post } from "jquery";
+import { useSelector } from "react-redux";
 
-function Post({ p, likePost, savePost }) {
+function Post({ p, likePost, savePost, deletePost }) {
+  const { auth } = useSelector((state) => state.auth);
   const likerRef = useRef(null);
   const [showMore, setShowMore] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
-
+  const [showDeletePost, setShowdeletePost] = useState(false);
+  const handleClose = () => {
+    setShowdeletePost(false);
+  };
   const handleOfLikerModal = () => {
     likerRef.current.removeChild(likerRef.current.children[0]);
     setShowLikerModal(false);
-  }
+  };
   const handleLikePost = (postId, liked) => {
     likePost(postId, liked);
   };
   const handeleSavePost = (saved, postId) => {
     savePost(saved, postId);
   };
+  const handleDeletePost = (id) => {
+    deletePost(id);
+    setShowPostModal(false);
+    setShowdeletePost(false);
+  };
 
   return (
     <>
+     <Modal
+        dialogClassName="modal-width"
+        show={showDeletePost}
+        centered
+        onHide={handleClose}
+        style={{ widows: "inherit" }}
+      >
+        <div className="d-flex border-bottom py-2 text-center flex-column">
+          <span className="mt-3" style={{ fontSize: "20px" }}>
+            Delete post?
+          </span>
+          <span
+            className="mx-auto mb-3"
+            style={{ fontSize: "12px", color: "#737373", width: "70%" }}
+          >
+            Are you sure you want to delete this post?
+          </span>
+        </div>
+        <div
+          role="button"
+          className="py-2 border-bottom text-center"
+          onClick={() => handleDeletePost(p.post.id)}
+        >
+          <span
+            style={{ color: "#ED4956", fontWeight: "bold", fontSize: "14px" }}
+          >
+            Delete
+          </span>
+        </div>
+
+        <div role="button" className="py-2 text-center" onClick={handleClose}>
+          <span style={{ fontSize: "14px" }}>Cancel</span>
+        </div>
+      </Modal>
       {showLikerModal && (
         <Modal centered show={true} dialogClassName="modal-width">
           <div className="modal-content px-2" ref={likerRef}>
             <div className="d-flex border-bottom py-2">
               <h6 className="modal-title mx-auto">Likes</h6>
-              <button type="button" className="btn-close" onClick={handleOfLikerModal}></button>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={handleOfLikerModal}
+              ></button>
             </div>
-            <Liker postId={p.post.id}/>
+            <Liker postId={p.post.id} />
           </div>
         </Modal>
       )}
@@ -49,7 +98,7 @@ function Post({ p, likePost, savePost }) {
               className="btn-close btn-close-white btn-close-pmd"
               onClick={() => setShowPostModal(false)}
             ></a>
-            <PostModal post={p} likePost={likePost} savePost={savePost}/>
+            <PostModal post={p} likePost={likePost} savePost={savePost} deletePost={deletePost}/>
           </div>
         </Modal>
       )}
@@ -111,7 +160,13 @@ function Post({ p, likePost, savePost }) {
                     {p.userName}
                   </a>
                 </h5>
-                <p role="button" className="mb-0 text-muted time-post" data-bs-toggle="tooltip" data-placement="bottom" title={formatDateTime(p.post.createdAt)}>
+                <p
+                  role="button"
+                  className="mb-0 text-muted time-post"
+                  data-bs-toggle="tooltip"
+                  data-placement="bottom"
+                  title={formatDateTime(p.post.createdAt)}
+                >
                   {formatDate(p.post.createdAt)}
                 </p>
               </div>
@@ -134,17 +189,29 @@ function Post({ p, likePost, savePost }) {
                 aria-labelledby="dropdownMenu2"
               >
                 <Link
-                  className="dropdown-item text-dark text-center"
+                  className="dropdown-item text-dark"
                   to={`/p/${p.post.id}`}
+                  style={{fontWeight:"bold"}}
                 >
                   Go to post
                 </Link>
                 <a
                   role="button"
-                  className="dropdown-item text-danger text-center"
+                  className="dropdown-item text-danger"
+                  style={{fontWeight:"bold"}}
                 >
-                  Repost
+                  <i className="fa-solid fa-flag"></i> Repost
                 </a>
+                {p.userId === auth.id && (
+                  <a
+                    role="button"
+                    className="dropdown-item text-danger"
+                    style={{fontWeight:"bold"}}
+                    onClick={() => setShowdeletePost(true)}
+                  >
+                    <i className="fa fa-trash me-1"></i>Delete
+                  </a>
+                )}
               </ul>
             </div>
           </div>
@@ -152,10 +219,17 @@ function Post({ p, likePost, savePost }) {
           {/* content */}
           <div className="post-block__content mb-2">
             {p.post.content.length > 250 && (
-              <pre> {showMore ? p.post.content : `${p.post.content.substring(0, 240)}...`}
-              <b role="button" onClick={() => setShowMore(!showMore)}>{showMore ? "\nShow less" : "Show more"}</b></pre>
+              <pre>
+                {" "}
+                {showMore
+                  ? p.post.content
+                  : `${p.post.content.substring(0, 240)}...`}
+                <b role="button" onClick={() => setShowMore(!showMore)}>
+                  {showMore ? "\nShow less" : "Show more"}
+                </b>
+              </pre>
             )}
-            {p.post.content.length <= 250 && <pre>{p.post.content}</pre>}  
+            {p.post.content.length <= 250 && <pre>{p.post.content}</pre>}
             <ImageSlider data={p.post.imageUrls} />
           </div>
           <div className="mb-3 border-top">
@@ -192,22 +266,38 @@ function Post({ p, likePost, savePost }) {
                   </span>
                 </a> */}
               </div>
-              <a role="button" onClick={() => handeleSavePost(p.saved ,p.post.id)} className="text-dark interact">
+              <a
+                role="button"
+                onClick={() => handeleSavePost(p.saved, p.post.id)}
+                className="text-dark interact"
+              >
                 <span>
-                  <i className={p.saved ? "fa-solid fa-bookmark text-warning" : "fa-regular fa-bookmark"}></i>
+                  <i
+                    className={
+                      p.saved
+                        ? "fa-solid fa-bookmark text-warning"
+                        : "fa-regular fa-bookmark"
+                    }
+                  ></i>
                 </span>
               </a>
             </div>
             <div className="mb-0 d-flex count-interact">
               {p.post.likeCount > 0 && (
-                 <span role="button" className="text-dark" onClick={() => setShowLikerModal(true)}>{p.post.likeCount} likes</span>
+                <span
+                  role="button"
+                  className="text-dark"
+                  onClick={() => setShowLikerModal(true)}
+                >
+                  {p.post.likeCount} likes
+                </span>
               )}
-             
-             {p.post.commentCount > 0 && (
-               <span className="text-dark ms-auto">
-               {p.post.commentCount} comments
-             </span>
-             )}             
+
+              {p.post.commentCount > 0 && (
+                <span className="text-dark ms-auto">
+                  {p.post.commentCount} comments
+                </span>
+              )}
             </div>
           </div>
           {/* <hr /> */}

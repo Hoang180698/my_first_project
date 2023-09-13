@@ -5,11 +5,11 @@ import ImageSlider from "../../components/imageSlider/ImageSlider";
 import Modal from "react-bootstrap/Modal";
 import {
   useDeletePostMutation,
-  useDislikePostMutation,
   useGetPostByIdQuery,
   useLikePostMutation,
   useSavePostMutation,
   useUnSavePostMutation,
+  useUnlikePostMutation,
 } from "../../app/services/posts.service";
 import {
   useAddCommentMutation,
@@ -43,7 +43,7 @@ function PostDetail() {
 
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
-  const [dislikePost] = useDislikePostMutation();
+  const [unlikePost] = useUnlikePostMutation();
   const [addComment] = useAddCommentMutation();
   const [savePost] = useSavePostMutation();
   const [unSavePost] = useUnSavePostMutation();
@@ -93,7 +93,7 @@ function PostDetail() {
   
   const handleLikePost = (liked, postId) => {
     if (liked) {
-      dislikePost(postId)
+      unlikePost(postId)
         .unwrap()
         .then(() => {
           //   alert("dislike");

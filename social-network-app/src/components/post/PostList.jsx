@@ -3,8 +3,12 @@ import React, { useState } from "react";
 import PostModal from "../PostModal/PostModal";
 var baseUrl = "http://localhost:8080";
 
-function PostList({ post, likePost, savePost }) {
+function PostList({ post, likePost, savePost, deletePost }) {
     const [showPostModal, setShowPostModal] = useState(false);
+    const handleDeletePost = (id) => {
+      deletePost(id);
+      setShowPostModal(false);
+    }
   return (
     <>
          {showPostModal && (
@@ -19,7 +23,7 @@ function PostList({ post, likePost, savePost }) {
               className="btn-close btn-close-white btn-close-pmd"
               onClick={() => setShowPostModal(false)}
             ></a>
-            <PostModal post={post} likePost={likePost} savePost={savePost}/>
+            <PostModal post={post} likePost={likePost} savePost={savePost} deletePost={handleDeletePost}/>
           </div>
         </Modal>
       )}

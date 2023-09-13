@@ -1,14 +1,14 @@
 package com.example.snwbackend.controller;
 
 import com.example.snwbackend.request.CreatePostRequest;
-import com.example.snwbackend.request.UpsertPostRequest;
 import com.example.snwbackend.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/post")
@@ -70,13 +70,6 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPost(page, pageSize));
     }
 
-    // Lấy danh sách post của mình
-    @GetMapping("user-post")
-    public ResponseEntity<?> getAllMyPost( @RequestParam(required = false, defaultValue = "0") Integer page,
-                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return ResponseEntity.ok(postService.getAllMyPost(page, pageSize));
-    }
-
     // Like post
     @PostMapping("{id}/like")
     public ResponseEntity<?> likePost(@PathVariable Integer id) {
@@ -106,5 +99,11 @@ public class PostController {
     public ResponseEntity<?> getAllSavedPost( @RequestParam(required = false, defaultValue = "0") Integer page,
                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         return ResponseEntity.ok(postService.getAllSavedPost(page, pageSize));
+    }
+
+    // Lấy danh sách post vừa tạo theo list id
+    @GetMapping("get-new-post")
+    public ResponseEntity<?> getPostsByIds(@RequestParam List<Integer> ids) {
+        return ResponseEntity.ok(postService.getPostsByIds(ids));
     }
 }

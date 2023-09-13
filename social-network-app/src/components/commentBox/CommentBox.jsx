@@ -94,16 +94,13 @@ function CommentBox({ comments }) {
                   {c.userId === auth.id && (
                     <>
                       <a
-                        role="button"
-                        className="dropdown-item text-danger"
+                        role="button" className="dropdown-item text-danger" style={{fontWeight:"bold"}}
                         onClick={() => handleDeleteComment(c.id)}
                       >
-                        Delete
+                        <i className="fa-solid fa-flag"></i> Delete
                       </a>
                     </>
-                  )}
-
-                  <a className="dropdown-item text-danger">Repost</a>
+                  ) ||  <a className="dropdown-item text-danger" style={{fontWeight:"bold"}}><i className="fa-solid fa-flag"></i> Repost</a>}
                 </ul>
               </div>
             </div>

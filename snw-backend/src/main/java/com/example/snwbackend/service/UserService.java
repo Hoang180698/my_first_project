@@ -83,7 +83,7 @@ public class UserService {
         if(gender.equals("male") && gender.equals("female") && gender.equals("gay") && gender.equals("les") && gender.equals("")) {
             throw new BadRequestException("invalid request in field gender");
         }
-        if(request.getPhone().length() != 0 && (request.getPhone().length() < 9 || request.getPhone().length() > 12)) {
+        if(request.getPhone() != null && (request.getPhone().length() < 9 && request.getPhone().length() > 1)) {
             throw new BadRequestException("invalid request in field phone");
         }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

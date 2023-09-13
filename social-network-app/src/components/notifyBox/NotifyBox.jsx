@@ -5,15 +5,18 @@ import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import { useDeleteNotificationByIdMutation } from "../../app/services/notification.service";
 import { toast } from "react-toastify";
 
-function NotifyBox({ n }) {
+function NotifyBox({ n, deleteNotify }) {
 
   const [showModal, setShowModal] = useState(false);
 
   const [deleteNotification] = useDeleteNotificationByIdMutation();
 
   const handleDeleteNotification = (id) => {
+    deleteNotify(id);
     deleteNotification(id)
-        .unwrap().then().catch((err) => {
+        .unwrap().then(() => {
+          toast.success("Removed")
+        }).catch((err) => {
           toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
@@ -23,7 +26,7 @@ function NotifyBox({ n }) {
     <>
       <Modal show={showModal} centered size="sm">
         <div className="modal-content">
-          <div className="border-top">
+          <div className="">
             <a
               type="button"
               className="d-block btn avatar-modal text-danger"
@@ -46,7 +49,7 @@ function NotifyBox({ n }) {
 
       <div className="notification-list text-dark position-relative">
         <a className="text-dark notify-activiti" role="button" onClick={() => setShowModal(true)}>
-          <i class="fa-solid fa-ellipsis"></i>
+          <i className="fa-solid fa-ellipsis"></i>
         </a>
         <div className="notification-list_content">
           <Link to={`/u/${n.sender.id}`} className="notification-list_img">
@@ -59,7 +62,7 @@ function NotifyBox({ n }) {
             />
           </Link>
           <div className="notification-list_detail">
-            <p>
+            <div>
               <b>{n.sender.name}</b>
               {n.type === "follow" && (
                 <p className="mt-2">Started following you</p>
@@ -74,7 +77,7 @@ function NotifyBox({ n }) {
                   <span className="text-muted">Commented your post</span>
                 </Link>
               )}
-            </p>
+            </div>
             {n.type !== "follow" && (
                <Link to={`/p/${n.post.id}`}>
                  <p
