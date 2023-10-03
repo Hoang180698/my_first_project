@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .header {
+            width: 480px;
+            background-color: rgb(7, 7, 7);
+            font-size: 32px;
+            padding-left: 30px;
+            padding: 15px;
+            font-family: 'Brush Script MT', cursive;
+        }
+        .cotent{
+            padding-left: 20px;
+            padding-right: 20px;
+            text-align: center;
+        }
+        p{
+            word-wrap: break-word;
+            max-width: 450px;
+            text-align: left;
+        }
+        .link{
+            padding: 25px 0px;
+            border-top: solid 0.1mm;
+            border-bottom: solid 0.1px;
+            text-align: center;
+        }
+        a{
+            display: block;
+            background-color: #ffab00;
+            text-decoration: none;
+            padding: 20px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .footer{
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+<div style="width: 100%; display: flex; justify-content: center;align-items: center">
+    <div style="border: solid 0.1px #737373; margin: auto; margin-top: 20px; border-bottom: none;">
+        <div class="header">
+            <span style="color: white;">Hoagram</span>
+        </div>
+        <div class="cotent" style="color: black; margin-top: 40px">
+            <h2>Please verify your email address</h2>
+            <p>Hello,</p>
+            <p>Thank you for signing up. Please click the link below to verify this email address.</p>
+        </div>
+        <div class="link">
+            <a th:href="${link}"><span style="color: white">VERIFY YOUR EMAIL ADDRESS
+</span></a>
+        </div>
+        <div class="footer">
+            <span style="color: black">Have fun on Hoagram</span>
+        </div>
+        <div style="background-color: #c4c7c5; height: 40px; margin-top: 20px"></div>
+        <div></div>
+    </div>
+</div>
+</body>
+</html>

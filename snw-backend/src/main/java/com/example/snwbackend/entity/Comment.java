@@ -25,26 +25,32 @@ public class Comment {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "like_count")
+    private Integer likeCount;
+
+    @Column(name = "reply_count")
+    private Integer replyCount;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        likeCount = 0;
+        replyCount = 0;
+        post.setCommentCount(post.getCommentCount() + 1);
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    @PreRemove
+    public void preRemove() {
+        post.setCommentCount(post.getCommentCount() - 1);
     }
 }

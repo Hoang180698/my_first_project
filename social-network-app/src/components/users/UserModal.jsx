@@ -103,7 +103,7 @@ function UserModal({ u, follow, unfollow }) {
                   Unfollow {u.name}?
                 </p>
               </div>
-              <div className="border-top">
+              <div className="">
                 <a
                   type="button"
                   className="d-block btn avatar-modal text-danger"

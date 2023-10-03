@@ -18,7 +18,7 @@ function InboxHeader({ conversation, stompClient }) {
         }${users[4] ? ",..." : ""}`;
     return (
       <>
-        <div className="avatars-inbox ms-4 d-flex" onClick={() => setShow(true)}>
+        <div className="avatars-inbox ms-4 d-flex">
           <span className="avatar-inbox">
             <img
               src={

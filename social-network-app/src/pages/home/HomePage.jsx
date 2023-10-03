@@ -19,7 +19,7 @@ function HomePage() {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const pageRef = useRef(null);
   const [deletePost] = useDeletePostMutation();
-
+  const [conect, setConect] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isLast, setIsLast] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -41,16 +41,15 @@ function HomePage() {
   const handleIntersection = (entries) => {
     const [entry] = entries;
     if (entry.isIntersecting && !isLast && !loading) {
-      setCurrentPage(Math.floor(posts.length / 5));
+      setCurrentPage(currentPage + 1);
     }
   };
 
   useEffect(() => {
-    if(postIds.length > 0) {
+    if(postIds.length > 0 && conect) {
       let ids = postIds.join();
       getNewPosts(ids).unwrap()
       .then((data) => {
-        console.log(data)
         const filterData = data.filter((x) => {
           return !posts.some(
             (existingItem) => existingItem.post.id === x.post.id
@@ -61,7 +60,7 @@ function HomePage() {
         console.log(err);
       });
     }
-  },[postIds])
+  },[postIds, conect])
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleIntersection, options);
@@ -108,14 +107,21 @@ function HomePage() {
           page: 0,
           pageSize: 5,
         });
-        setPosts((pre) => [ ...pre, ...data.content]);
+        const filterData = data.content.filter((x) => {
+          return !posts.some(
+            (existingItem) => existingItem.post.id === x.post.id
+          );
+        });
+        setPosts([ ...posts, ...filterData ]);
       } catch (error) {
         console.log(error);
         toast.error("Error on page load.");
       } finally {
         setLoading(false);
+        setConect(true);
       }
     };
+    
     fectchData();
 
     return () => {

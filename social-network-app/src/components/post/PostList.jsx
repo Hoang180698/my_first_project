@@ -9,6 +9,10 @@ function PostList({ post, likePost, savePost, deletePost }) {
       deletePost(id);
       setShowPostModal(false);
     }
+    const [commentCount, setCommentCount] = useState(post.post.commentCount);
+    const handeleSetCommentCount = (count) => {
+      setCommentCount(commentCount + count);
+    }
   return (
     <>
          {showPostModal && (
@@ -23,7 +27,9 @@ function PostList({ post, likePost, savePost, deletePost }) {
               className="btn-close btn-close-white btn-close-pmd"
               onClick={() => setShowPostModal(false)}
             ></a>
-            <PostModal post={post} likePost={likePost} savePost={savePost} deletePost={handleDeletePost}/>
+            <PostModal post={post} likePost={likePost} savePost={savePost} deletePost={handleDeletePost} commentCount={commentCount}
+            setCommentCount={handeleSetCommentCount}
+            />
           </div>
         </Modal>
       )}
@@ -40,7 +46,7 @@ function PostList({ post, likePost, savePost, deletePost }) {
               <i className="fa-solid fa-heart"></i> {post?.post.likeCount}
             </span>
             <span className="ms-4" style={{ fontWeight: "bold" }}>
-              <i className="fa-solid fa-comment"></i> {post?.post.commentCount}
+              <i className="fa-solid fa-comment"></i> {commentCount}
             </span>
           </div>
         </div>

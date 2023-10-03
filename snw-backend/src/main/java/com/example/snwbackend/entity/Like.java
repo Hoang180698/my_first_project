@@ -35,5 +35,11 @@ public class Like {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        post.setLikeCount(post.getLikeCount() + 1);
+    }
+
+    @PreRemove
+    public void preRemove() {
+        post.setLikeCount(post.getLikeCount() - 1);
     }
 }

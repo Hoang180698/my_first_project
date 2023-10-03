@@ -160,7 +160,7 @@ function Inbox() {
       setIsLast(false);
       setLoading(false);
     };
-  }, [conversationId]);
+  }, [conversationId, token]);
 
   const connect = () => {
     let Sock = new SockJS("http://localhost:8080/ws");

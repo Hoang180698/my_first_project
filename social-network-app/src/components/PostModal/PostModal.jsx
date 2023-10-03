@@ -3,28 +3,27 @@ import TextareaAutosize from "react-textarea-autosize";
 import ImageSlider from "../../components/imageSlider/ImageSlider";
 import "./PostModal.css";
 import { useSelector } from "react-redux";
-import {
-  useAddCommentMutation,
-  useGetCommentByPostIdQuery,
-} from "../../app/services/comment.service";
+import { useAddCommentMutation } from "../../app/services/comment.service";
 import { useState } from "react";
 import { useRef } from "react";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
-import CommentBox from "../commentBox/CommentBox";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import Comments from "../comment/Comments";
 
-function PostModal({ post, likePost, savePost, deletePost }) {
+function PostModal({
+  post,
+  likePost,
+  savePost,
+  deletePost,
+  commentCount,
+  setCommentCount,
+}) {
   const { auth } = useSelector((state) => state.auth);
-
-  // const { data: post, isLoading: isLoadingPost } = useGetPostByIdQuery(postId);
-  const { data: comments, isLoading: isLoadingComments } =
-    useGetCommentByPostIdQuery(post.post.id);
-
   const [showMore, setShowMore] = useState(false);
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
@@ -32,6 +31,11 @@ function PostModal({ post, likePost, savePost, deletePost }) {
   const emojiButtonRef = useRef(null);
   const textareaRef = useRef(null);
   const [showLikerModal, setShowLikerModal] = useState(false);
+  const [newComment, setNewComment] = useState(null);
+
+  const commentRef = useRef(null);
+  const contentRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const [showDeletePost, setShowdeletePost] = useState(false);
 
@@ -40,6 +44,29 @@ function PostModal({ post, likePost, savePost, deletePost }) {
   };
 
   const [addComment] = useAddCommentMutation();
+  const [addCommentLoading, setAddCommentLoading] = useState(false);
+
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const handleIntersection = (entries) => {
+    const [entry] = entries;
+    setIsVisible(entry.isIntersecting);
+  };
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (commentRef.current) {
+      observer.observe(commentRef.current);
+    }
+    return () => {
+      if (commentRef.current) {
+        observer.unobserve(commentRef.current);
+      }
+    };
+  }, [commentRef, options]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -78,18 +105,27 @@ function PostModal({ post, likePost, savePost, deletePost }) {
   const handleLikePost = (liked, postId) => {
     likePost(postId, liked);
   };
-
   const handleAddComment = () => {
     if (text.length > 0) {
+      setAddCommentLoading(true);
       const newData = { content: text };
       addComment({ postId: post.post.id, data: newData })
         .unwrap()
-        .then(() => {
+        .then((data) => {
           setText("");
+          setCommentCount(1);
+          setNewComment(data);
+          // commentRef.current.scrollIntoView({ block: 'center', inline: 'start' });  
+          if(!isVisible) {
+            contentRef.current.scrollTo({ top: (commentRef.current.offsetTop - 120), behavior: 'smooth'});
+          }
         })
         .catch((err) => {
           toast.error("Couldn't post comment.");
           console.log(err);
+        })
+        .finally(() => {
+          setAddCommentLoading(false);
         });
     }
   };
@@ -100,18 +136,6 @@ function PostModal({ post, likePost, savePost, deletePost }) {
       handleAddComment();
     }
   };
-
-  if (isLoadingComments) {
-    return (
-      <div className="container">
-        <div className="text-center m-5">
-          <div className="spinner-border m-5" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -172,11 +196,11 @@ function PostModal({ post, likePost, savePost, deletePost }) {
       <div
         className={
           post.post.imageUrls.length > 0
-            ? "pmd-content d-flex flex-column"
-            : "d-flex flex-column pmd-content-noimg"
+            ? "pmd-content d-flex flex-column position-relative"
+            : "d-flex flex-column pmd-content-noimg position-relative"
         }
       >
-        <div className="header-pmd-content border-bottom mt-2">
+        <div className="header-pmd-content border-bottom mt-2" ref={contentRef}>
           <div className="mt-3 ms-3 border-bottom ">
             <div className="d-flex">
               <div className="me-2">
@@ -226,14 +250,12 @@ function PostModal({ post, likePost, savePost, deletePost }) {
                   <Link
                     to={`/p/${post.post.id}`}
                     className="dropdown-item text-dark"
-                    style={{fontWeight:"bold"}}
+                    style={{ fontWeight: "bold" }}
                   >
                     Go to Post
                   </Link>
-                  <a role="button" className="dropdown-item text-danger" style={{fontWeight:"bold"}}>
-                  <i className="fa-solid fa-flag"></i> Repost
-                  </a>
-                  {post.userId === auth.id && (
+
+                  {(post.userId === auth.id && (
                     <>
                       {/* <a className="dropdown-item text-dark" role="button">
                         <i className="fa fa-pencil me-1"></i>Edit
@@ -241,21 +263,27 @@ function PostModal({ post, likePost, savePost, deletePost }) {
                       <a
                         className="dropdown-item text-danger"
                         role="button"
-                        style={{fontWeight:"bold"}}
+                        style={{ fontWeight: "bold" }}
                         onClick={() => setShowdeletePost(true)}
                       >
                         <i className="fa fa-trash me-1"></i>Delete
                       </a>
                     </>
+                  )) || (
+                    <a
+                      role="button"
+                      className="dropdown-item text-danger"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      <i className="fa-solid fa-flag"></i> Repost
+                    </a>
                   )}
-                
                 </ul>
               </div>
             </div>
             <div className="ms-1 pe-2 content-post-modal">
               {post.post.content.length > 250 && (
                 <pre>
-                  {" "}
                   {showMore
                     ? post.post.content
                     : `${post.post.content.substring(0, 240)}...`}
@@ -269,15 +297,13 @@ function PostModal({ post, likePost, savePost, deletePost }) {
               )}
             </div>
           </div>
-
           <div className="comment-pmd ms-3 mt-2 me-3">
-            {comments.length === 0 && (
-              <>
-                <h4 className="text-center mt-5">No comments yet.</h4>
-                <p className="text-center ">Start the conversation.</p>
-              </>
-            )}
-            <CommentBox comments={comments} />
+            <div ref={commentRef}></div>
+            <Comments
+              postId={post?.post?.id}
+              setCommentCount={setCommentCount}
+              newComment={newComment}
+            />
           </div>
         </div>
         <div className="footer-pmd-content d-flex flex-column">
@@ -339,14 +365,18 @@ function PostModal({ post, likePost, savePost, deletePost }) {
                   {post.post.likeCount} likes
                 </span>
               )}
-
-              <span className="text-dark ms-auto">
-                {comments.length} comments
-              </span>
+              {commentCount > 0 && (
+                <span className="text-dark ms-auto">
+                  {commentCount} comments
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="input-group form-comment form-control">
+          <div
+            className="input-group form-comment form-control"
+            disabled={addCommentLoading}
+          >
             <a
               role="button"
               className="emoji-icon"
@@ -374,6 +404,8 @@ function PostModal({ post, likePost, savePost, deletePost }) {
                   height={400}
                   width={300}
                   onEmojiClick={onEmojiClick}
+                  skinTonesDisabled={true}
+                  emojiStyle="native"
                   autoFocusSearch={true}
                 />
               </div>

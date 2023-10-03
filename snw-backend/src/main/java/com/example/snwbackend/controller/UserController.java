@@ -64,7 +64,21 @@ public class UserController {
     public ResponseEntity<?> getAllUserLikePost(@PathVariable Integer postId,
                                                 @RequestParam(required = false, defaultValue = "0") Integer page,
                                                 @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return ResponseEntity.ok(userService. getAllUserLikePost(postId, page, pageSize));
+        return ResponseEntity.ok(userService.getAllUserLikePost(postId, page, pageSize));
+    }
+
+    @GetMapping("likes/comment/{commentId}")
+    public ResponseEntity<?> getAllUserLikeComment(@PathVariable Integer commentId,
+                                                @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService.getAllUserLikeComment(commentId, page, pageSize));
+    }
+
+    @GetMapping("likes/reply-comment/{replyCommentId}")
+    public ResponseEntity<?> getAllUserLikeReplyComment(@PathVariable Integer replyCommentId,
+                                                   @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(userService.getAllUserLikeReplyComment(replyCommentId, page, pageSize));
     }
 
     // Xóa User
@@ -91,19 +105,16 @@ public class UserController {
     public ResponseEntity<?> followUser(@PathVariable Integer id) {
         return new ResponseEntity<>(userService.followUser(id), HttpStatus.CREATED);
     }
-
     // Unfollow
     @DeleteMapping("unfollow/{id}")
     public ResponseEntity<?> unfollowUser(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.unfollowUser(id));
     }
-
    // Remove your follower
     @DeleteMapping("remove-follower/{id}")
     public ResponseEntity<?> removeFollower(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.removeFollower(id));
     }
-
 
     // Thay doi pass
     @PutMapping("change-password")

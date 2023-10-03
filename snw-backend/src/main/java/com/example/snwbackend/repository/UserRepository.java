@@ -62,4 +62,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u left join Like l on l.post.id = ?1 where u.id = l.user.id")
     Page<User> findUserDetailDtoLikePostOther(Integer postId, Pageable pageable);
 
+    @Query("select u from User u left join LikeComment lc on lc.comment.id = ?1 where u.id = lc.user.id")
+    Page<User> findUserLikedComment(Integer commentId, Pageable pageable);
+
+    @Query("select u from User  u left join LikeReplyComment l on l.replyComment.id = ?1 where u.id = l.user.id")
+    Page<User> findUserLikedReplyComment(Integer replyCommentId, Pageable pageable);
 }

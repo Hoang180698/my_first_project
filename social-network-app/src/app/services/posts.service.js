@@ -89,7 +89,7 @@ export const postApi = createApi({
 export const {
   useCreatePostMutation,
   useDeletePostMutation,
-  useGetPostByIdQuery,
+  useGetPostByIdQuery, useLazyGetPostByIdQuery,
   useGetPostsQuery,
   useGetPostByUserIdQuery,
   useLikePostMutation,

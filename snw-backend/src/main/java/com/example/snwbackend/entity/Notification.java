@@ -25,6 +25,9 @@ public class Notification {
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Column(name = "content")
+    private String content;
+
     @Column(name = "seen")
     private Boolean seen;
 
@@ -47,6 +50,10 @@ public class Notification {
     @ManyToOne()
     @JoinColumn(name = "sender_id")
     private User sender;
+
+    @ManyToOne()
+    @JoinColumn(name = "reply_comment_id")
+    private ReplyComment replyComment;
 
     @PrePersist
     public void prePersist() {

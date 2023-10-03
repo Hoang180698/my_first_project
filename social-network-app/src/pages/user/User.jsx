@@ -320,7 +320,7 @@ function User() {
                 Unfollow {user.name}?
               </p>
             </div>
-            <div className="border-top">
+            <div className="">
               <a
                 type="button"
                 className="d-block btn avatar-modal text-danger"
@@ -446,7 +446,7 @@ function User() {
           <div className="d-flex justify-content-center">
             <br />
 
-            <div className="row" style={{maxWidth:"1050px"}}>
+            <div className="row" style={{width:"1050px"}}>
               {(posts.length === 0 && isLast) && (
                 <div className="d-grid text-center">
                   <span style={{ fontSize: "30px" }}>
@@ -458,7 +458,7 @@ function User() {
                 </div>
               )}
               {post.length > 0 &&
-                posts.map((p) => <PostList key={p.id} post={p} likePost={handleLikePost} savePost={handeleSavePost}/>)}
+              posts.map((p) => <PostList key={p.post.id} post={p} likePost={handleLikePost} savePost={handeleSavePost}/>)}
               <span ref={loadMoreRef}></span>
               {loading && (
                 <div className="container">

@@ -49,6 +49,12 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private ReplyCommentRepository replyCommentRepository;
+
     // Tìm user theo id
     public UserDtoOther getUserById(Integer id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -159,6 +165,36 @@ public class UserService {
         return userDetailDtos;
     }
 
+    // Danh sách user like comment
+    public Page<UserDetailDto> getAllUserLikeComment(Integer commentId, Integer page, Integer pageSize) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> {
+            throw new NotFoundException("Not found comment with id = " + commentId);
+        });
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Page<User> userPage = userRepository.findUserLikedComment(commentId, PageRequest.of(page, pageSize));
+        Page<UserDetailDto> userDetailDtoPage = userPage.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(user.getId(), u.getId())));
+        return userDetailDtoPage;
+    }
+
+    // Danh sách user like reply comment
+    public Page<UserDetailDto> getAllUserLikeReplyComment(Integer replyCommentId, Integer page, Integer pageSize) {
+        ReplyComment replyComment = replyCommentRepository.findById(replyCommentId).orElseThrow(() -> {
+            throw new NotFoundException("Not found comment with id = " + replyCommentId);
+        });
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Page<User> userPage = userRepository.findUserLikedReplyComment(replyCommentId, PageRequest.of(page, pageSize));
+        Page<UserDetailDto> userDetailDtoPage = userPage.map((u) -> new UserDetailDto(u,
+                followRepository.existsByFollower_IdAndFollowing_Id(user.getId(), u.getId())));
+        return userDetailDtoPage;
+    }
+
     public void deleteUserById(Integer id) {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Not found user with id = " + id);
@@ -246,14 +282,15 @@ public class UserService {
         followRepository.save(follow);
 
 //       Tạo thông báo
-        Notification notification = Notification.builder()
-                .user(userFl)
-                .sender(user)
-                .type("follow")
-                .build();
-
-        notificationRepository.save(notification);
-
+        if(userFl.getPushNotificationsStatus().isOnNewFollower()) {
+            Notification notification = Notification.builder()
+                    .user(userFl)
+                    .sender(user)
+                    .content("started following you")
+                    .type("follow")
+                    .build();
+            notificationRepository.save(notification);
+        }
         return new StatusResponse("Successfully follow");
     }
 
@@ -320,4 +357,5 @@ public class UserService {
             throw new BadRequestException("old password is incorrect");
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.example.snwbackend.service;
 
+import com.example.snwbackend.config.MailConfig;
 import com.example.snwbackend.dto.UserDto;
 import com.example.snwbackend.entity.PasswordResetToken;
 import com.example.snwbackend.entity.RefreshToken;
@@ -25,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,10 +37,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -76,6 +77,9 @@ public class AuthService {
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     public LoginResponse login(LoginRequest request) {
         log.info("Request : {}", request);
@@ -158,33 +162,36 @@ public class AuthService {
     }
 
     @Transactional
-    public String activeUser(Integer userId, String token) {
+    public String activeUser(Integer userId, String token, Model model) {
         VerificationToken verificationToken = verificationTokenService.findByUser_idAndToken(userId, token);
         if(verificationToken == null) {
-            return "Your verification token is invalid!";
+            model.addAttribute("messages","Your verification token is invalid!");
         }
         User user = verificationToken.getUser();
         if (user.isEnabled()) {
-            return "Your account is already activated!";
+            model.addAttribute("messages","Your account is already activated!");
         } else {
             if(verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-                return "Your verification token has expired!";
+                model.addAttribute("messages","Your verification token has expired!");
             } else {
                 user.setEnabled(true);
                 userRepository.save(user);
-                return "Your account successfully activated!";
+                model.addAttribute("messages","Your account successfully activated!");
             }
         }
+        return "verification-web";
     }
 
     @Transactional
-    public String resetPassword(Integer userId, String token) {
+    public String resetPassword(Integer userId, String token, Model model) {
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByUser_IdAndToken(userId, token);
         if(passwordResetToken == null) {
-            return "Your verification token is invalid!";
+            model.addAttribute("messages","Your verification token is invalid!");
+            return "reset-password";
         }
         if(passwordResetToken.isUsed()) {
-            return "Your verification token has used!";
+            model.addAttribute("messages","Your verification token has used!");
+            return "reset-password";
         }
         User user = passwordResetToken.getUser();
         String newPassword = RandomString.make(6);
@@ -196,16 +203,16 @@ public class AuthService {
             helper.setFrom(new InternetAddress("Hoagram <nhoang1806@gmail.com>"));
             helper.setTo(user.getEmail());
             helper.setSubject("New Password");
-            String htmlTag = "<h2>New Password<h2/>" +
-                    "<div style=\"display:flex\"><p>Your new password: <p/>" +
-                    "<p> " + newPassword + "<p/>" +
-                    "<div/>";
-            message.setContent(htmlTag, "text/html");
+            Context context = new Context();
+            context.setVariable("password", newPassword);
+            String htmlTag = MailConfig.getTemplateEngine().process("mail-newpassword.html", context);
+            helper.setText(htmlTag, true);
             javaMailSender.send(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "new password sent your email";
+        model.addAttribute("messages","Successfully! New password sent to your email!");
+        return "reset-password";
     }
 
     @Transactional
@@ -284,12 +291,10 @@ public class AuthService {
             helper.setFrom(new InternetAddress("Hoagram <nhoang1806@gmail.com>"));
             helper.setTo(user.getEmail());
             helper.setSubject("Verify your email address");
-            String htmlTag = "<h2>Please verify your email address<h2/>" +
-                    "<div style=\"display:flex\"><p>Thank you for signing up. Please kick <p/>" +
-                    "<a href='http://localhost:8080/api/auth/activation/" + user.getId() + "?token=" +token +
-                    "'>here<a/><p> to verify your email address.<p/>" +
-                    "<div/>";
-            message.setContent(htmlTag, "text/html");
+            Context context = new Context();
+            context.setVariable("link", "http://localhost:8080/api/auth/activation/" + user.getId() + "?token=" +token);
+            final String htmlContent = MailConfig.getTemplateEngine().process("mail-active.html", context);
+            helper.setText(htmlContent, true);
             javaMailSender.send(message);
         } catch (Exception e) {
             e.printStackTrace();
@@ -303,12 +308,11 @@ public class AuthService {
             helper.setFrom(new InternetAddress("Hoagram <nhoang1806@gmail.com>"));
             helper.setTo(user.getEmail());
             helper.setSubject("Reset Password");
-            String htmlTag = "<h2>Reset Password<h2/>" +
-                    "<div style=\"display:flex\"><p>Please kick <p/>" +
-                    "<a href='http://localhost:8080/api/auth/reset-password/" + user.getId() + "?token=" +token +
-                    "'>here<a/><p> to reset your password<p/>" +
-                    "<div/>";
-            message.setContent(htmlTag, "text/html");
+            Context context = new Context();
+            context.setVariable("link", "http://localhost:8080/api/auth/reset-password/" + user.getId() + "?token=" +token);
+            final String htmlContent = MailConfig.getTemplateEngine().process("mail-password.html", context);
+            helper.setText(htmlContent, true);
+//            message.setContent(htmlContent, "text/html");
             javaMailSender.send(message);
         } catch (Exception e) {
             e.printStackTrace();

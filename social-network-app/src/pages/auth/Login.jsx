@@ -148,7 +148,7 @@ function Login() {
                 </div>
               </div>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-dark" type="submit">
+                <button className="btn btn-dark" type="submit" disabled={loading}>
                 {(loading && (
                     <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
                   )) ||

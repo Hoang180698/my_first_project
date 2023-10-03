@@ -11,8 +11,6 @@ public class CommentMapper {
                  .id(comment.getId())
                  .content(comment.getContent())
                  .createdAt(comment.getCreatedAt())
-                 .updatedAt(comment.getUpdatedAt())
-                 .postId(comment.getPost().getId())
                  .userId(comment.getUser().getId())
                  .userName(comment.getUser().getName())
                  .userAvatar(comment.getUser().getAvatar())

@@ -136,6 +136,7 @@ function NewPost() {
                   height={350}
                   width={350}
                   onEmojiClick={onEmojiClick}
+                  emojiStyle="native"
                   autoFocusSearch={false}
                 />
               </div>

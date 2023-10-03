@@ -48,7 +48,7 @@ function OwnFollower({ u, rmFollower }) {
                   We won't tell {u.name} they were removed from your followers.
                 </p>
               </div>
-              <div className="border-top">
+              <div className="">
                 <a
                   type="button"
                   className="d-block btn avatar-modal text-danger"

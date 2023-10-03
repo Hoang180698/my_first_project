@@ -62,7 +62,6 @@ body {
 
 /* home page */
 
-
 .post-image{
 	height: 100%;
 	width: 100%;
@@ -179,6 +178,11 @@ body {
 	overflow: auto;
 }
 
+.notifications-header-container{
+	max-height: 470px;
+	overflow-y: auto;
+}
+
 .header-notifications-list {
 	display: flex;
 	justify-content: space-between;
@@ -197,14 +201,21 @@ body {
 	height: calc(100% + 1px);
 	border-left: 2px solid #080808;
 }
-.header-notifications-list .header-notifications-list_img img {
-	height: 42px;
-	width: 42px;
+.header-notifications-list_img img {
+	height: 48px;
+	width: 48px;
 	border-radius: 50px;
-	margin-right: 20px;
+}
+.header-notifications-box span{
+	font-size: 14px;
+}
+.header-notifications-box:hover {
+	background-color: #e5e5e5;
+}
+.header-notifications-box:hover * {
+	background-color: #e5e5e5;
 }
 .header-notifications-list .header-notifications-list_detail {
-	margin-right: auto;
 	max-width: 200px;
 }
 .header-notifications-list .header-notifications-list_detail p {
@@ -440,10 +451,33 @@ body {
 	transform: translateY(-3px);
 }
 /* comment  */
+.reply-activiti{
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: -5px;
+}
+.reply-box{
+	position: relative;
+}
+.reply-box:hover .reply-activiti{
+	display: block;
+}
+.form-reply-comment{
+	border-radius: 10px;
+	padding: 3px 10px;
+	border: 1px solid #ced4da;
+}
+.form-reply-comment[disabled] {
+	pointer-events: none;
+	opacity: 0.7;
+}
 
 .comment-box {
 	/* background-color: #DADDE1; */
 	border-radius: 10px;
+	position: relative;
+	width: 100%;
 	/* padding: 10px 10px; */
 }
 
@@ -469,15 +503,26 @@ body {
 }
 textarea:focus{
 	height: auto;
-	font-size: 14px;
 }
 
 .comment-activiti{
 	display: none;
+	position: absolute;
+	right: 15px;
+	top: -5px;
 }
-
+.like-comment {
+	position: absolute;
+	top: 20px;
+	right: 10px;
+}
 .comment-box:hover .comment-activiti {
 	display: block;
+}
+
+.form-comment[disabled] {
+	pointer-events: none;
+	opacity: 0.7;
 }
 
 .form-comment {
@@ -493,6 +538,11 @@ textarea:focus{
 	top: 10px;
 	left: 2px;
   }
+.emoji-picker-reply {
+	position:absolute;
+	bottom: 40px;
+	left: 30px;
+}
 .emoji-picker {
 	position: absolute;
 	bottom: 50px;
@@ -588,5 +638,22 @@ textarea {
 .successful-register {
 	word-wrap: break-word;
 	word-break: keep-all;
+}
+.em-dash{
+    border-bottom: 1px solid rgb(var(--ig-secondary-text));
+    display: inline-block;
+    flex-direction: column;
+    flex-shrink: 0;
+    font: inherit;
+    font-size: 100%;
+    height: 1px;
+    margin: 0;
+    margin-right: 16px;
+    padding: 0;
+    position: relative;
+    vertical-align: middle;
+    width: 24px;
+	text-align: center;
+	/* background-color: #080808; */
 }
 

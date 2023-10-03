@@ -74,7 +74,7 @@ function ConversationBox({ data, toggleArchiveChat }) {
                 <span className="last-message mt-0">
                   {lastMessage?.sender.id === auth.id
                     ? `You: ${lastMessage?.content}`
-                    : lastMessage?.content}
+                    : `${lastMessage?.sender.name}: ${lastMessage?.content}`}
                 </span>
               )}
               {lastMessage.type !== "MESSAGE" && (

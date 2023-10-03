@@ -89,6 +89,7 @@ function InputChat({ conversationId, stompClient }) {
             height={400}
             width={300}
             onEmojiClick={onEmojiClick}
+            emojiStyle="native"
             autoFocusSearch={false}
           />
         </div>

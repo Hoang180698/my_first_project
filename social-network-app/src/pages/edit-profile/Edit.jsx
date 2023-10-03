@@ -10,6 +10,7 @@ import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import { Suspense } from "react";
 import Loading3dot from "../../components/loading/Loading3dot";
+import PushNotifications from "./PushNotifications";
 const EditPassword = React.lazy(() => import("./EditPassword"));
 const EditAccount = React.lazy(() => import("./EditAccount"));
 
@@ -166,12 +167,25 @@ function Edit() {
                   <i className="fa fa-key text-center me-2"></i>
                   Password
                 </a>
+                <a
+                  className={tabIdx === 3 ? "nav-link active" : "nav-link"}
+                  id="password-tab"
+                  data-toggle="pill"
+                  role="tab"
+                  aria-controls="password"
+                  aria-selected="false"
+                  onClick={() => setTabIdx(3)}
+                >
+                 <i className="fa-solid fa-bell text-center me-2"></i>
+                  Push Notifications
+                </a>
               </div>
             </div>
             <div className="tab-content p-4 p-md-5" id="v-pills-tabContent">
               <Suspense fallback={<Loading3dot/>}>
                 {tabIdx === 0 && <EditAccount />}
                 {tabIdx === 1 && <EditPassword />}
+                {tabIdx === 3 && <PushNotifications />}
               </Suspense>
             </div>
           </div>

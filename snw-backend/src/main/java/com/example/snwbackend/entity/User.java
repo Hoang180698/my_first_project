@@ -32,6 +32,7 @@ public class User implements UserDetails, Serializable {
     @Column(name = "gender")
     private String gender;
 
+    @JsonIgnore
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -54,6 +55,7 @@ public class User implements UserDetails, Serializable {
     @Column(name = "password")
     private String password;
 
+    @JsonIgnore
     @Column(name = "role")
     private String role;
 
@@ -61,6 +63,12 @@ public class User implements UserDetails, Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @JsonIgnore
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @JoinColumn(name = "push_notifications_status_id", nullable = false)
+    private PushNotificationsStatus pushNotificationsStatus;
+
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> roles = new ArrayList<>();
@@ -68,33 +76,44 @@ public class User implements UserDetails, Serializable {
         return roles;
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return this.password;
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return this.email;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.pushNotificationsStatus = new PushNotificationsStatus();
     }
 }

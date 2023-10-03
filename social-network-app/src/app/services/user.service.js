@@ -74,6 +74,14 @@ export const userApi = createApi({
         getUserLikePost: builder.query({
             query: ({postId, page, pageSize}) => `users/likes/post/${postId}?page=${page}&pageSize=${pageSize}`,
         }),
+           // get users like 1 comment
+        getUserLikeComment: builder.query({
+            query: ({commentId, page, pageSize}) => `users/likes/comment/${commentId}?page=${page}&pageSize=${pageSize}`,
+        }),
+        // get users like 1 comment
+        getUserLikeReplyComment: builder.query({
+            query: ({replyId, page, pageSize}) => `users/likes/reply-comment/${replyId}?page=${page}&pageSize=${pageSize}`,
+        }),
         getFollower: builder.query({
             query: ({userId, page, pageSize}) => `users/${userId}/follower?page=${page}&pageSize=${pageSize}`,
         }),
@@ -108,4 +116,6 @@ export const {
     useLazyGetFollowerQuery,
     useChangePassWordMutation,
     useLazyGetUserLikePostQuery,
+    useLazyGetUserLikeCommentQuery,
+    useLazyGetUserLikeReplyCommentQuery,
 } = userApi;

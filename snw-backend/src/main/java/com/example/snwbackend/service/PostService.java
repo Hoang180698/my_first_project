@@ -47,25 +47,15 @@ public class PostService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private ReplyCommentRepository replyCommentRepository;
 
-//    // Tạo post
-//    @Transactional
-//    public Post createPost(UpsertPostRequest request) {
-//        if(request.getContent().isEmpty()) {
-//            throw new BadRequestException("Content or images cannot be empty");
-//        }
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-//            throw new NotFoundException("Not found user with email = " + email);
-//        });
-//
-//        // Tạo post
-//        Post post = Post.builder()
-//                .content(request.getContent())
-//                .user(user)
-//                .build();
-//        return postRepository.save(post);
-//    }
+    @Autowired
+    private LikeReplyCommentRepository likeReplyCommentRepository;
+
+    @Autowired
+    private LikeCommentRepository likeCommentRepository;
+
 
     // Lấy post theo id
     public PostDto getPostById(Integer id) {
@@ -77,27 +67,6 @@ public class PostService {
             throw new NotFoundException("Not found post with id = " + id);
         });
     }
-
-//    // update post
-//    @Transactional
-//    public Post updatePost(Integer id, UpsertPostRequest request) {
-//        Post post = postRepository.findById(id).orElseThrow(() -> {
-//            throw new NotFoundException("Not found post with id = " + id);
-//        });
-//
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-//            throw new NotFoundException("Not found user with email = " + email);
-//        });
-//
-//        if (user.getId() != post.getUser().getId()) {
-//            throw new BadRequestException("You do not have permission to update this post");
-//        }
-//
-//        post.setContent(request.getContent());
-//
-//        return postRepository.save(post);
-//    }
 
     // Xóa post
     @Transactional
@@ -118,10 +87,14 @@ public class PostService {
             Integer imgId = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1));
             imageRepository.deleteById(imgId);
         }
-        likeRepository.deleteByPost(post);
-        commentRepository.deleteAllByPost(post);
+        likeCommentRepository.deleteAllByComment_Post(post);
+        likeReplyCommentRepository.deleteAllByReplyComment_Comment_Post(post);
+        likeRepository.deleteAllByPost(post);
         notificationRepository.deleteAllByPost(post);
+        replyCommentRepository.deleteAllByComment_Post(post);
+        commentRepository.deleteAllByPost(post);
         saveRepository.deleteAllByPost(post);
+
         postRepository.delete(post);
 
         return new StatusResponse("ok");
@@ -221,15 +194,14 @@ public class PostService {
                 .post(post)
                 .user(user)
                 .build();
-        post.setLikeCount(post.getLikeCount() + 1);
-
         likeRepository.save(like);
 
         // Tao thong bao
-        if (user.getId() != post.getUser().getId()) {
+        if (user.getId() != post.getUser().getId() && post.getUser().getPushNotificationsStatus().isOnLikes()) {
             Notification notification = Notification.builder()
                     .user(post.getUser())
                     .post(post)
+                    .content("liked your post")
                     .sender(user)
                     .type("like")
                     .build();
@@ -251,13 +223,9 @@ public class PostService {
         Like like = likeRepository.findByPostAndUser(post, user).orElseThrow(() -> {
             throw new BadRequestException("You have not liked this post");
         });
-        post.setLikeCount(post.getLikeCount() - 1);
-
         likeRepository.delete(like);
-
         // xoa thong bao
-       notificationRepository.deleteByPostAndSenderAndType(post, user, "like");
-
+        notificationRepository.deleteByPostAndSenderAndType(post, user, "like");
         return post;
     }
 

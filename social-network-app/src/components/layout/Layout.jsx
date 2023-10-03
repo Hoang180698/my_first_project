@@ -17,16 +17,17 @@ function Layout() {
     const handleRefreshToken = () => {
       refreshJWTToken({refreshToken: refreshToken}).unwrap()
       .then().catch((err) => {
+        dispatch(logout());
+        navigate("/login");
         console.log(err)
         if(err.status != 400) {
           toast.error("error networking!");
           return;
         }
-        toast.error("Your session has timed out or network error, you have been logged out.");
-        dispatch(logout());
-        navigate("/login", {
+        toast.error("Your session has timed out or network error, you have been logged out.",  {
           position: "top-center",
         });
+       
       })
     }
     handleRefreshToken();

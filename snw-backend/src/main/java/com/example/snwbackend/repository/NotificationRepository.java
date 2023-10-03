@@ -1,10 +1,7 @@
 package com.example.snwbackend.repository;
 
 import com.example.snwbackend.dto.NotificationDto;
-import com.example.snwbackend.entity.Comment;
-import com.example.snwbackend.entity.Notification;
-import com.example.snwbackend.entity.Post;
-import com.example.snwbackend.entity.User;
+import com.example.snwbackend.entity.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +25,15 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     List<Notification> findAllByUser(User user);
     void deleteAllByCreatedAtBefore(LocalDateTime localDateTime);
-
     void deleteByPostAndSenderAndType(Post post, User sender, String type);
-
     void deleteByUserAndSenderAndType(User user, User sender, String type);
-
     void deleteAllByPost(Post post);
     void deleteAllByComment(Comment comment);
     void deleteByUser(User user);
+    void deleteBySenderAndReplyCommentAndType(User sender, ReplyComment replyComment, String type);
+    void deleteBySenderAndCommentAndType(User sender, Comment comment, String type);
+    void deleteAllByReplyComment(ReplyComment replyComment);
+    void deleteAllByPost_Id(Integer postId);
 
     @Modifying
     @Transactional

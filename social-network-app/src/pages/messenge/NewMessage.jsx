@@ -107,13 +107,13 @@ function NewMessage() {
 
     return () => {
       setCurrentPage(0);
+      setTerm("");
+      setKey("");
     };
   }, [key]);
 
   const handleSearch = async () => {
-    if (term === "") {
-      return;
-    } else {
+    if (term) {
       setKey(term);
     }
   };

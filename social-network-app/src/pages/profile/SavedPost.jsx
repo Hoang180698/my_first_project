@@ -199,9 +199,9 @@ function SavedPost() {
         <div className="d-flex justify-content-center">
          
           <br />
-          <div className="row" style={{maxWidth:"1050px"}}>
+          <div className="row" style={{width:"1050px"}}>
           {posts.length > 0 &&
-               posts.map((p) => <PostList key={p.id} post={p} likePost={handleLikePost} savePost={handeleSavePost} deletePost={handleDeletePost}/>)}
+               posts.map((p) => <PostList key={p.post.id} post={p} likePost={handleLikePost} savePost={handeleSavePost} deletePost={handleDeletePost}/>)}
             <span ref={loadMoreRef}></span>
               {loading && (
                 <div className="container">

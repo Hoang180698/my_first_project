@@ -5,7 +5,7 @@ import ImageSlider from "../../components/imageSlider/ImageSlider";
 import Modal from "react-bootstrap/Modal";
 import {
   useDeletePostMutation,
-  useGetPostByIdQuery,
+  useLazyGetPostByIdQuery,
   useLikePostMutation,
   useSavePostMutation,
   useUnSavePostMutation,
@@ -13,25 +13,25 @@ import {
 } from "../../app/services/posts.service";
 import {
   useAddCommentMutation,
-  useGetCommentByPostIdQuery,
 } from "../../app/services/comment.service";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import { useSelector } from "react-redux";
-import CommentBox from "../../components/commentBox/CommentBox";
 import EmojiPicker from "emoji-picker-react";
 import Liker from "../../components/liker/Liker";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
+import Comments from "../../components/comment/Comments";
 
 function PostDetail() {
   const { postId } = useParams();
   const { auth } = useSelector((state) => state.auth);
 
+  const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
-
-  const { data: post, isLoading: isLoadingPost, isError } = useGetPostByIdQuery(postId);
-  const { data: comments, isLoading: isLoadingComments } =
-    useGetCommentByPostIdQuery(postId);
+  const [post, setPost] = useState(null);
+  const [getPost] = useLazyGetPostByIdQuery();
+  const [loading, setLoading] = useState(false);
+  const [addCommentLoading, setAddCommentLoading] = useState(false);
 
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
@@ -39,14 +39,40 @@ function PostDetail() {
   const emojiButtonRef = useRef(null);
   const [showLikerModal, setShowLikerModal] = useState(false);
   const textareaRef = useRef(null);
+  const [newComment, setNewComment] = useState(null);
+  const [showDeletePost, setShowdeletePost] = useState(false);
   
-
   const [deletePost] = useDeletePostMutation();
   const [likePost] = useLikePostMutation();
   const [unlikePost] = useUnlikePostMutation();
   const [addComment] = useAddCommentMutation();
   const [savePost] = useSavePostMutation();
   const [unSavePost] = useUnSavePostMutation();
+
+  const handeleSetCommentCount = (count) => {
+    let newCount = post.post?.commentCount + count;
+    let nPost = { ...post.post, commentCount: newCount}
+    setPost({ ...post, post:nPost});
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    getPost(postId).unwrap()
+    .then((data) => {
+      setPost(data);
+    }).catch(() => {
+      console.log(err)
+      toast.error();
+    })
+    .finally(() => {
+      setLoading(false);
+    })
+
+    return(() => {
+      setPost(null);
+    });
+    
+  },[postId])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -70,12 +96,8 @@ function PostDetail() {
     textareaRef.current.focus();
   }
 
-  const handleDeletePost = (id) => {
-    let isConfirm = window.confirm(
-      "Are you sure you want to delete this post?"
-    );
-    if (isConfirm) {
-      deletePost(id)
+  const handleDeletePost = () => {
+      deletePost(postId)
         .unwrap()
         .then(() => {
           toast.success("You delete the post!");
@@ -88,15 +110,17 @@ function PostDetail() {
           toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
-    }
+    
   };
   
   const handleLikePost = (liked, postId) => {
     if (liked) {
       unlikePost(postId)
         .unwrap()
-        .then(() => {
-          //   alert("dislike");
+        .then((res) => {
+          let nPost = { ...post.post, likeCount: res.likeCount};
+          let newPost = { ...post, liked:false, post: nPost };
+          setPost(newPost);
         })
         .catch((err) => {
           toast.error("Something went wrong. Please try again.");
@@ -105,8 +129,10 @@ function PostDetail() {
     } else {
       likePost(postId)
         .unwrap()
-        .then(() => {
-          //   alert("liked");
+        .then((res) => {
+          let nPost = { ...post.post, likeCount: res.likeCount};
+          let newPost = { ...post, liked:true, post: nPost };
+          setPost(newPost);
         })
         .catch((err) => {
           toast.error("Something went wrong. Please try again.");
@@ -118,14 +144,20 @@ function PostDetail() {
   const handeleSavePost = (saved, postId) => {
     if(saved) {
       unSavePost(postId).unwrap()
-        .then()
+        .then(() => {
+          let newPost = { ...post, saved:false };
+          setPost(newPost);
+        })
         .catch((err) =>{
           toast.error("Something went wrong. Please try again.");
           console.log(err);
         });
     } else {
       savePost(postId).unwrap()
-        .then()
+        .then(() => {
+          let newPost = { ...post, saved:true};
+          setPost(newPost);
+        })
         .catch((err) => {
           toast.error("Something went wrong. Please try again.");
           console.log(err);
@@ -135,15 +167,21 @@ function PostDetail() {
 
   const handleAddComment = () => {
     if (text.length > 0) {
+      setAddCommentLoading(true);
       const newData = {content: text}
       addComment({ postId, data: newData })
         .unwrap()
-        .then(() => {
+        .then((data) => {
           setText("");
+          setNewComment(data);
+          handeleSetCommentCount(1);
         })
         .catch((err) => {
           toast.error("Couldn't post comment!");
           console.log(err);
+        })
+        .finally(() => {
+          setAddCommentLoading(false);
         });
     }
   };
@@ -155,7 +193,7 @@ function PostDetail() {
     }
   };
 
-  if (isLoadingPost || isLoadingComments) {
+  if (loading) {
     return (
       <div className="container">
         <div className="text-center m-5">
@@ -167,7 +205,7 @@ function PostDetail() {
     );
   }
 
-  if (isError) {
+  if (!post) {
     return(
       <div className='container'>
       <h3 className='text-center mt-5'>Sorry, this page isn't available.</h3>
@@ -181,6 +219,40 @@ function PostDetail() {
     <Helmet>
       <title>Post of {post.userName} | Hoagram</title>
     </Helmet>
+    <Modal
+        dialogClassName="modal-width"
+        show={showDeletePost}
+        centered
+        onHide={() => setShowdeletePost(false)}
+        style={{ widows: "inherit" }}
+      >
+        <div className="d-flex border-bottom py-2 text-center flex-column">
+          <span className="mt-3" style={{ fontSize: "20px" }}>
+            Delete post?
+          </span>
+          <span
+            className="mx-auto mb-3"
+            style={{ fontSize: "12px", color: "#737373", width: "70%" }}
+          >
+            Are you sure you want to delete this post?
+          </span>
+        </div>
+        <div
+          role="button"
+          className="py-2 border-bottom text-center"
+          onClick={handleDeletePost}
+        >
+          <span
+            style={{ color: "#ED4956", fontWeight: "bold", fontSize: "14px" }}
+          >
+            Delete
+          </span>
+        </div>
+
+        <div role="button" className="py-2 text-center" onClick={() => setShowdeletePost(false)}>
+          <span style={{ fontSize: "14px" }}>Cancel</span>
+        </div>
+      </Modal>
      {showLikerModal && (
         <Modal centered show={true}>
           <div className="modal-content px-2">
@@ -192,7 +264,7 @@ function PostDetail() {
           </div>
         </Modal>
       )}
-      <section className="">
+      <div className="">
         <div className="container">
           <div className="col-sm-8 offset-sm-2 mb-2">
             <div className="post-block mt-3">
@@ -242,28 +314,37 @@ function PostDetail() {
                   >
                     {post.userId === auth.id && (
                       <>
-                        <a className="dropdown-item text-dark" role="button">
+                        {/* <a className="dropdown-item text-dark" role="button">
                           <i className="fa fa-pencil me-1"></i>Edit
-                        </a>
+                        </a> */}
                         <a
                           className="dropdown-item text-danger"
                           role="button"
-                          onClick={() => handleDeletePost(post.post.id)}
+                          onClick={() => setShowdeletePost(true)}
                         >
                           <i className="fa fa-trash me-1"></i>Delete
                         </a>
                       </>
-                    )}
-                    <a role="button" className="dropdown-item text-danger">
-                      Repost
-                    </a>
+                    ) ||   <a role="button" className="dropdown-item text-danger">
+                    Repost
+                  </a>}
+                  
                   </ul>
                 </div>
               </div>
 
               {/* content */}
               <div className="post-block__content mb-2">
-                <pre>{post.post.content}</pre>
+              {post.post.content.length > 300 && (
+                <pre>
+                  {showMore
+                    ? post.post.content
+                    : `${post.post.content.substring(0, 290)}...`}
+                  <b role="button" onClick={() => setShowMore(!showMore)}>
+                    {showMore ? "\nShow less" : " Show more"}
+                  </b>
+                </pre>
+              ) ||<pre>{post.post.content}</pre>}
                 <ImageSlider data={post.post.imageUrls} />
               </div>
               <div className="mb-3">
@@ -308,17 +389,17 @@ function PostDetail() {
                  <span role="button" className="text-dark" onClick={() => setShowLikerModal(true)}>{post.post.likeCount} likes</span>
               )}
              
-             {comments.length > 0 && (
+             {post.post.commentCount > 0 && (
                <span className="text-dark ms-auto">
-               {comments.length} comments
+               {post.post.commentCount} comments
              </span>
              )}             
                 </div>
               </div>
               <hr />
-              <div className="post-block__comments">
+              <div className="post-block__comments position-relative">
                 {/* <!-- Comment Input --> */}
-                <div className="input-group mb-3 form-comment form-control">
+                <div className="input-group mb-3 form-comment form-control" disabled={addCommentLoading}>
                     <a role="button" className="emoji-icon" onClick={() => setShowPicker(true)} ref={emojiButtonRef}>
                       <i className="fa-sharp fa-regular fa-face-smile"></i>
                     </a>
@@ -361,20 +442,20 @@ function PostDetail() {
                 </div>
 
                 {/* <!-- Comment content --> */}
-                <CommentBox comments={comments} />
+                <Comments postId={post.post.id} newComment={newComment} setCommentCount={handeleSetCommentCount}/>
                 {/* <!-- More Comments --> */}
-                <hr />
+                {/* <hr />
                 <a href="#!" className="text-dark view-more-coment">
                   View More comments{" "}
                   <span className="font-weight-bold">(12)</span>
-                </a>
+                </a> */}
+                <div className="mt-5"></div>
               </div>
             </div>
           </div>
-
           {/*  */}
         </div>
-      </section>
+      </div>
     </>
   );
 }

@@ -9,13 +9,17 @@ import Liker from "../liker/Liker";
 import { post } from "jquery";
 import { useSelector } from "react-redux";
 
-function Post({ p, likePost, savePost, deletePost }) {
+function Post({ p, likePost, savePost, deletePost, }) {
   const { auth } = useSelector((state) => state.auth);
   const likerRef = useRef(null);
   const [showMore, setShowMore] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showLikerModal, setShowLikerModal] = useState(false);
   const [showDeletePost, setShowdeletePost] = useState(false);
+  const [commentCount, setCommentCount] = useState(p.post.commentCount);
+  const handeleSetCommentCount = (count) => {
+    setCommentCount(commentCount + count);
+  }
   const handleClose = () => {
     setShowdeletePost(false);
   };
@@ -30,14 +34,14 @@ function Post({ p, likePost, savePost, deletePost }) {
     savePost(saved, postId);
   };
   const handleDeletePost = (id) => {
-    deletePost(id);
     setShowPostModal(false);
     setShowdeletePost(false);
+    deletePost(id);
   };
 
   return (
     <>
-     <Modal
+      <Modal
         dialogClassName="modal-width"
         show={showDeletePost}
         centered
@@ -98,7 +102,14 @@ function Post({ p, likePost, savePost, deletePost }) {
               className="btn-close btn-close-white btn-close-pmd"
               onClick={() => setShowPostModal(false)}
             ></a>
-            <PostModal post={p} likePost={likePost} savePost={savePost} deletePost={deletePost}/>
+            <PostModal
+              post={p}
+              likePost={likePost}
+              savePost={savePost}
+              deletePost={handleDeletePost}
+              commentCount={commentCount}
+              setCommentCount={handeleSetCommentCount}
+            />
           </div>
         </Modal>
       )}
@@ -191,25 +202,27 @@ function Post({ p, likePost, savePost, deletePost }) {
                 <Link
                   className="dropdown-item text-dark"
                   to={`/p/${p.post.id}`}
-                  style={{fontWeight:"bold"}}
+                  style={{ fontWeight: "bold" }}
                 >
                   Go to post
                 </Link>
-                <a
-                  role="button"
-                  className="dropdown-item text-danger"
-                  style={{fontWeight:"bold"}}
-                >
-                  <i className="fa-solid fa-flag"></i> Repost
-                </a>
-                {p.userId === auth.id && (
+
+                {(p.userId === auth.id && (
                   <a
                     role="button"
                     className="dropdown-item text-danger"
-                    style={{fontWeight:"bold"}}
+                    style={{ fontWeight: "bold" }}
                     onClick={() => setShowdeletePost(true)}
                   >
                     <i className="fa fa-trash me-1"></i>Delete
+                  </a>
+                )) || (
+                  <a
+                    role="button"
+                    className="dropdown-item text-danger"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    <i className="fa-solid fa-flag"></i> Repost
                   </a>
                 )}
               </ul>
@@ -283,7 +296,7 @@ function Post({ p, likePost, savePost, deletePost }) {
               </a>
             </div>
             <div className="mb-0 d-flex count-interact">
-              {p.post.likeCount > 0 && (
+              {p.post?.likeCount > 0 && (
                 <span
                   role="button"
                   className="text-dark"
@@ -293,9 +306,9 @@ function Post({ p, likePost, savePost, deletePost }) {
                 </span>
               )}
 
-              {p.post.commentCount > 0 && (
+              {commentCount > 0 && (
                 <span className="text-dark ms-auto">
-                  {p.post.commentCount} comments
+                  {commentCount} comments
                 </span>
               )}
             </div>

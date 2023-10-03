@@ -41,7 +41,11 @@ function App() {
             </Route>
             <Route path="/edit-profile" element={<Edit />}></Route>
             <Route path="/u/:userId" element={<User />}></Route>
-            <Route path="/p/:postId" element={<PostDetailPage />}></Route>
+            <Route path="/p/:postId" element={<PostDetailPage />}>
+              <Route path=":commentId" element={<PostDetailPage />}>
+                 <Route path=":replyId" element={<PostDetailPage />}></Route>
+              </Route>
+            </Route>
             <Route path="*" element={<NotFound />}></Route>
           </Route>
         </Route>

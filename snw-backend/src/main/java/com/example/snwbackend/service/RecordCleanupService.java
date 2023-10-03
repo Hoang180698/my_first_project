@@ -8,8 +8,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.example.snwbackend.entity.Notification;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 @Service
 public class RecordCleanupService {
@@ -25,6 +27,7 @@ public class RecordCleanupService {
         // Đặt điều kiện để xóa các bản ghi cũ hơn 1 giờ
         LocalDateTime oneMonthAgo = LocalDateTime.now().minus(1, ChronoUnit.MONTHS);
         notificationRepository.deleteAllByCreatedAtBefore(oneMonthAgo);
+        LocalDate date = LocalDate.now();
     }
 
     @Scheduled(cron = "0 0 * * * *")

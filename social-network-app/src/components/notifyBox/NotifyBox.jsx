@@ -61,37 +61,31 @@ function NotifyBox({ n, deleteNotify }) {
               }
             />
           </Link>
-          <div className="notification-list_detail">
+          <div className="notification-list_detail d-grid">
             <div>
-              <b>{n.sender.name}</b>
+              <Link className="text-dark fw-bold" to={`/u/${n.sender.id}`}>{n.sender.name}</Link>
               {n.type === "follow" && (
                 <p className="mt-2">Started following you</p>
               )}
-              {n.type === "like" && (
-                <Link to={`/p/${n.post.id}`} className="ms-2">
-                  <span className="text-muted">Liked your post</span>
+              {n.type !== "follow" && (
+                <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`} className="ms-2">
+                  <span className="text-muted">{n.content}</span>
                 </Link>
               )}
-              {n.type === "comment" && (
-                <Link to={`/p/${n.post.id}`} className="ms-2">
-                  <span className="text-muted">Commented your post</span>
-                </Link>
-              )}
-            </div>
-            {n.type !== "follow" && (
-               <Link to={`/p/${n.post.id}`}>
+                {n.type !== "follow" && (
+               <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
                  <p
                 className="text-muted notfy-content text-truncate"
                 style={{ width: "750px" }}
-              >
-               
-                {n.type === "like"
-                  ? `${n.post.content}`
-                  : `${n.comment.content} || ${n.post.content}`}
+              >   
+                         {(n.comment && !n.replyComment)? `${n.comment.content}`: ""}
+                         {n.replyComment? `${n.replyComment.content}`: ""}
+                    
               </p>
-               </Link>
-             
+               </Link>           
             )}
+            </div>
+      
             <p className="text-muted">
               <small
                 role="button"
@@ -106,10 +100,11 @@ function NotifyBox({ n, deleteNotify }) {
         </div>
         <div className="notification-list_feature-img my-auto">
           {n.type !== "follow" && n.post.imageUrls.length > 0 && (
-            <img
+            <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
+             <img
               src={`http://localhost:8080${n.post.imageUrls[0]}`}
               alt="post img"
-            />
+            /></Link>      
           )}
         </div>
       </div>

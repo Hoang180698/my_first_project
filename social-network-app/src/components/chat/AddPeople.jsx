@@ -3,6 +3,7 @@ import { Modal } from "react-bootstrap";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
 
+var pageSize = 7;
 function AddPeople({ conversation, stompClient }) {
   const { token } = useSelector((state) => state.auth);
   const oldUserIds = conversation.users.map((u) => {
@@ -51,9 +52,9 @@ function AddPeople({ conversation, stompClient }) {
   }, [loadMoreRef, options]);
 
   useEffect(() => {
-    if (currentPage > 0 && !isLast) {
+    if (currentPage > 0 && !isLast && key) {
       setLoading(true);
-      searchUser({ term: key, page: currentPage, pageSize: 7 })
+      searchUser({ term: key, page: currentPage, pageSize: pageSize })
         .unwrap()
         .then((data) => {
           const filterData = data.content.filter((x) => {
@@ -77,7 +78,7 @@ function AddPeople({ conversation, stompClient }) {
     const fectData = async () => {
       if (key) {
         try {
-          let { data } = await searchUser({ term: key, page: 0, pageSize: 7 });
+          let { data } = await searchUser({ term: key, page: 0, pageSize: pageSize });
           const filterData = data.content.filter((x) => {
             return !oldUserIds.some(oldId => oldId === x.id);
           });
@@ -99,13 +100,13 @@ function AddPeople({ conversation, stompClient }) {
 
     return () => {
       setCurrentPage(0);
+      setTerm("");
+      setKey("");
     };
   }, [key]);
 
   const handleSearch = async () => {
-    if (term === "") {
-      return;
-    } else {
+    if (term) {
       setKey(term);
     }
   };

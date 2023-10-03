@@ -51,7 +51,7 @@ function Header() {
       onDisconnect();
       effect.current = true;
     };
-  }, [isOpenChatPage, currentConversationId]);
+  }, [isOpenChatPage, currentConversationId, token]);
   const handleLogout = () => {
     logOut({refreshToken})
     dispatch(logout());

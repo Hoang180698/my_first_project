@@ -47,10 +47,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.checkEmailExist(request));
     }
 
-    @GetMapping("activation/{userId}")
-    public ResponseEntity<?> activeUser(@PathVariable Integer userId, @RequestParam String token) {
-        return ResponseEntity.ok(authService.activeUser(userId, token));
-    }
+//    @GetMapping("activation/{userId}")
+//    public ResponseEntity<?> activeUser(@PathVariable Integer userId, @RequestParam String token) {
+//        return ResponseEntity.ok(authService.activeUser(userId, token));
+//    }
 
     @PutMapping("resend-email")
     public ResponseEntity<?> resendEmail(@RequestBody EmailRequest request) {
@@ -62,8 +62,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.fogotPasword(request));
     }
 
-    @GetMapping("reset-password/{userId}")
-    public ResponseEntity<?> resetPassword(@PathVariable Integer userId, @RequestParam String token) {
-        return ResponseEntity.ok(authService.resetPassword(userId, token));
-    }
+//    @GetMapping("reset-password/{userId}")
+//    public ResponseEntity<?> resetPassword(@PathVariable Integer userId, @RequestParam String token) {
+//        return ResponseEntity.ok(authService.resetPassword(userId, token));
+//    }
 }
