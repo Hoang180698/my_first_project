@@ -61,6 +61,33 @@ function InputChat({ conversationId, stompClient }) {
     }
   };
 
+  const handleSendImage = (file) => {
+    var reader = new FileReader();
+    let rawData = new ArrayBuffer();
+    reader.onload = (e) => {
+        rawData = e.target.result;
+        stompClient.send("/app/message/send-image/" + conversationId,  { Authorization: `Bearer ${token}` }, 
+        JSON.stringify({ data: e.target.result }))
+    };
+    reader.readAsArrayBuffer(file.target.files[0]);
+
+    // reader.readAsArrayBuffer(file);
+    // const reader = new FileReader();
+    // let rawData = new ArrayBuffer();
+    // rawData = e.target.files[0];
+    // const bufferData = Buffer.from(rawData);
+    // const bsonData = serialize({  // whatever js Object you need
+    //   file: bufferData,
+    //   route: 'TRANSFER',
+    //   action: 'FILE_UPLOAD',
+    // });
+    // stompClient.send(
+    //   "/app/message/send-image/" + conversationId,
+    //   { Authorization: `Bearer ${token}` },
+    //   bsonData
+    // );
+  }
+
 
   return (
     <div className="input-message mx-auto mt-auto mb-3 d-flex border position-relative">
@@ -72,6 +99,7 @@ function InputChat({ conversationId, stompClient }) {
       >
         <i className="fa-sharp fa-regular fa-face-smile"></i>
       </a>
+      <input onChange={(e) => handleSendImage(e)} type="file"></input>
       <TextareaAutosize
         rows="1"
         type="text"

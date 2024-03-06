@@ -165,7 +165,7 @@ function Inbox() {
   const connect = () => {
     let Sock = new SockJS("http://localhost:8080/ws");
     stompClient = over(Sock);
-    stompClient.debug = () => {};
+    // stompClient.debug = () => {};
     stompClient.connect(
       { Authorization: `Bearer ${token}` },
       onConnected,

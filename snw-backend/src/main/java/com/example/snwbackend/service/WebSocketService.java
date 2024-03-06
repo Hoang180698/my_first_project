@@ -4,29 +4,36 @@ import com.example.snwbackend.entity.*;
 import com.example.snwbackend.exception.BadRequestException;
 import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.repository.*;
+import com.example.snwbackend.request.MessageFile;
 import com.example.snwbackend.request.MessageRequest;
 import com.example.snwbackend.request.NamedGroupChatRequest;
 import com.example.snwbackend.request.UpsertConversationRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.security.JwtTokenUtil;
+import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class WebSocketService {
 
-    @Autowired
-    private ContactRepository contactRepository;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -45,6 +52,12 @@ public class WebSocketService {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private ImageUtils imageUtils;
 
     @Transactional
     public Message sendMessage(MessageRequest request, Integer conversationId, SimpMessageHeaderAccessor accessor) {
@@ -246,5 +259,28 @@ public class WebSocketService {
                 simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
             }
         }
+    }
+
+    @Transactional
+    public void sendImage(Integer conversationId,MessageFile messageFile, SimpMessageHeaderAccessor accessor){
+        String token = accessor.getFirstNativeHeader("Authorization");
+        if(token == null || !token.startsWith("Bearer")) {
+            return;
+        }
+        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        try {
+            Image image = Image
+                    .builder()
+                    .data(messageFile.getData().array())
+                    .user(user)
+                    .build();
+            imageRepository.save(image);
+        } catch (Exception e) {
+            throw new RuntimeException("Error on upload file");
+        }
+
     }
 }

@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/images/read/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/test/**").permitAll()
+                .requestMatchers("/test/**", "/v3/**","/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                     .exceptionHandling()
