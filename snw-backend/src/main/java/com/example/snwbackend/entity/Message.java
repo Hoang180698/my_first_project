@@ -22,6 +22,8 @@ public class Message {
     @Column(name = "content", nullable = false)
     private String content;
 
+    private String imageUrl;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

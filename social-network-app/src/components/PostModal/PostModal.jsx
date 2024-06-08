@@ -14,6 +14,7 @@ import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import Comments from "../comment/Comments";
+import { baseUrl, userImage } from "../../App";
 
 function PostModal({
   post,
@@ -208,8 +209,8 @@ function PostModal({
                   <img
                     src={
                       post.userAvatar
-                        ? `http://localhost:8080${post.userAvatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${post.userAvatar}`
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img-pmd"

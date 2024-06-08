@@ -21,6 +21,7 @@ import Liker from "../../components/liker/Liker";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import Comments from "../../components/comment/Comments";
+import { baseUrl, userImage } from "../../App";
 
 function PostDetail() {
   const { postId } = useParams();
@@ -275,8 +276,8 @@ function PostDetail() {
                       <img
                         src={
                           post.userAvatar
-                            ? `http://localhost:8080${post.userAvatar}`
-                            : "../../../public/user.jpg"
+                            ? `${baseUrl}${post.userAvatar}`
+                            : `${userImage}`
                         }
                         alt="User"
                         className="author-img"
@@ -372,11 +373,12 @@ function PostDetail() {
                         <i className="fa-regular fa-comment"></i>
                       </span>
                     </a>
-                    <a href="#!" className="text-dark ms-3 interact">
+                    {/* share */}
+                    {/* <a href="#!" className="text-dark ms-3 interact">
                       <span>
                         <i className="fa-regular fa-paper-plane"></i>
                       </span>
-                    </a>
+                    </a> */}
                   </div>
                   <a role="button" onClick={() => handeleSavePost(post.saved ,post.post.id)} className="text-dark interact">
                 <span>

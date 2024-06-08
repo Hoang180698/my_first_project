@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
+
 export const chatApi = createApi({
     reducerPath: "chatApi",
     baseQuery: fetchBaseQuery({
@@ -68,6 +69,12 @@ export const chatApi = createApi({
             }),
             invalidatesTags: ["Unread"],
         }),
+        toggleSetNoticeSound: builder.mutation({
+            query: (conversationId) => ({
+                url: `chat/notice-sound/${conversationId}`,
+                method: "PUT",
+            }),
+        }),
     }),
 });
 
@@ -85,4 +92,5 @@ export const {
     useCreateGroupChatMutation,
     useLazyGetArchiveConversationsQuery,
     useToggleArchiveChatMutation,
+    useToggleSetNoticeSoundMutation,
 } = chatApi;

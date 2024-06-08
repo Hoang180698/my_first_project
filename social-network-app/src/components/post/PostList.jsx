@@ -1,7 +1,8 @@
 import Modal from "react-bootstrap/Modal";
 import React, { useState } from "react";
 import PostModal from "../PostModal/PostModal";
-var baseUrl = "http://localhost:8080";
+import { baseUrl } from "../../App";
+import noImg from "../../../public/no-image.png"
 
 function PostList({ post, likePost, savePost, deletePost }) {
     const [showPostModal, setShowPostModal] = useState(false);
@@ -35,11 +36,12 @@ function PostList({ post, likePost, savePost, deletePost }) {
       )}
       <div className="mt-2 ms-2 post-list-box" role="button" onClick={() => setShowPostModal(true)}>
         {(post.post.imageUrls?.length > 0 && (
-          <img
-            className="list-post-img"
-            src={`${baseUrl}${post.post.imageUrls[0]}`}
-          ></img>
-        )) || <img className="list-post-img" src="../../../public/no-image.png"></img>}
+          <>
+             {post.post.imageUrls[0].includes("api/images") && <img className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></img>} 
+             {post.post.imageUrls[0].includes("api/videos") && <video className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></video>}     
+          </>
+         
+        )) || <img className="list-post-img" src={noImg}></img>}
         <div className="post-list-middle">
           <div className="d-flex ms-2" style={{ color: "white" }}>
             <span style={{ fontWeight: "bold" }}>

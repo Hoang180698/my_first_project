@@ -8,27 +8,16 @@ import com.example.snwbackend.request.MessageFile;
 import com.example.snwbackend.request.MessageRequest;
 import com.example.snwbackend.request.NamedGroupChatRequest;
 import com.example.snwbackend.request.UpsertConversationRequest;
-import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.security.JwtTokenUtil;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Base64;
 import java.util.Set;
 
 @Service
@@ -54,10 +43,10 @@ public class WebSocketService {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private ImageRepository imageRepository;
+    private ChatImageRepository chatImageRepository;
 
     @Autowired
-    private ImageUtils imageUtils;
+    private ChatImgRepository chatImgRepository;
 
     @Transactional
     public Message sendMessage(MessageRequest request, Integer conversationId, SimpMessageHeaderAccessor accessor) {
@@ -262,7 +251,11 @@ public class WebSocketService {
     }
 
     @Transactional
-    public void sendImage(Integer conversationId,MessageFile messageFile, SimpMessageHeaderAccessor accessor){
+    public void sendImage(Integer conversationId,MessageRequest request, SimpMessageHeaderAccessor accessor){
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
+        });
+
         String token = accessor.getFirstNativeHeader("Authorization");
         if(token == null || !token.startsWith("Bearer")) {
             return;
@@ -271,16 +264,53 @@ public class WebSocketService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
-        try {
-            Image image = Image
-                    .builder()
-                    .data(messageFile.getData().array())
-                    .user(user)
-                    .build();
-            imageRepository.save(image);
-        } catch (Exception e) {
-            throw new RuntimeException("Error on upload file");
+
+        if(!conversation.getUsers().contains(user)) {
+            throw new BadRequestException("You not in this conversation");
         }
 
+//        String[] parts = request.getContent().split(",");
+//        String header = parts[0]; // data:image/jpeg;base64
+//        String content = parts[1];
+            Integer imgId = saveImage(request.getContent(), user);
+
+            Message message = Message.builder()
+                    .content("sent a photo")
+                    .sender(user).type("IMAGE")
+                    .imageUrl("/api/images/chat/" + imgId)
+                    .conversation(conversation)
+                    .build();
+
+            messageRepository.save(message);
+
+            simpMessagingTemplate.convertAndSend("/topic/conversation/" + conversation.getId(), message);
+            for (User u: conversation.getUsers()) {
+                UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+                if (u.getId() == user.getId()) {
+                    simpMessagingTemplate.convertAndSendToUser(u.getEmail() ,"/topic/chat", userConversation);
+                    continue;
+                }
+                userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
+                simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
+            }
+    }
+
+    public Integer saveImage(String base64, User user) {
+        String[] parts = base64.split(",");
+        String header = parts[0]; // data:image/jpeg;base64
+        String content = parts[1];
+        try {
+            byte[] data = Base64.getDecoder().decode(content);
+            ChatImage image = ChatImage
+                    .builder()
+                    .data(data)
+                    .user(user)
+                    .type(header.substring(5, header.indexOf(";")))
+                    .build();
+            chatImgRepository.saveImage(image);
+            return image.getId();
+        } catch (Exception e) {
+            throw new RuntimeException("Error on upload file: " +e.getMessage());
+        }
     }
 }

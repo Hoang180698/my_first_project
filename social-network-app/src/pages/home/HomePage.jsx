@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet";
 import { useState } from "react";
 import { useRef } from "react";
 import { toast } from "react-toastify";
+import { baseUrl, userImage } from "../../App";
 
 function HomePage() {
   const { auth } = useSelector((state) => state.auth);
@@ -56,6 +57,7 @@ function HomePage() {
           );
         });
         setPosts([ ...filterData, ...posts ]);
+        scrollTo();
       }).catch((err) => {
         console.log(err);
       });
@@ -127,6 +129,7 @@ function HomePage() {
     return () => {
       setCurrentPage(0);
       setIsLast(false);
+      setConect(false);
     };
   }, []);
 
@@ -256,9 +259,9 @@ function HomePage() {
                   {" "}
                   <img
                     src={
-                      auth.avatar === null
-                        ? "../../../public/user.jpg"
-                        : `http://localhost:8080${auth.avatar}`
+                      auth.avatar
+                        ? `${baseUrl}${auth.avatar}`
+                        : `${userImage}`
                     }
                     alt=""
                   />

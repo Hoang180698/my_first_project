@@ -19,6 +19,11 @@ import Inbox from "./pages/messenge/Inbox";
 import { ToastContainer } from "react-toastify";
 import PostDetailPage from "./pages/post-detail/PostDetailPage";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import userImg from "../public/user.jpg";
+
+// export var baseUrl = "https://hoagramspring-production-8c94.up.railway.app";
+export var baseUrl = "http://localhost:8080";
+export var userImage = userImg;
 
 function App() {
   return (

@@ -5,6 +5,7 @@ import ChangeGroupName from "./ChangeGroupName";
 import AddPeople from "./AddPeople";
 import LeaveGroup from "./LeaveGroup";
 import MemberGroup from "./MemberGroup";
+import { baseUrl, userImage } from "../../App";
 
 function InboxHeader({ conversation, stompClient }) {
   const { auth } = useSelector((state) => state.auth);
@@ -23,8 +24,8 @@ function InboxHeader({ conversation, stompClient }) {
             <img
               src={
                 users[0]?.avatar
-                  ? `http://localhost:8080${users[0].avatar}`
-                  : "../../../public/user.jpg"
+                  ? `${baseUrl}${users[0].avatar}`
+                  : `${userImage}`
               }
             />
           </span>
@@ -33,8 +34,8 @@ function InboxHeader({ conversation, stompClient }) {
               <img
                 src={
                   users[1]?.avatar
-                    ? `http://localhost:8080${users[1].avatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${users[1].avatar}`
+                    : `${userImage}`
                 }
               />
             </span>
@@ -45,8 +46,8 @@ function InboxHeader({ conversation, stompClient }) {
               <img
                 src={
                   users[2]?.avatar
-                    ? `http://localhost:8080${users[2].avatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${users[2].avatar}`
+                    : `${userImage}`
                 }
               />
             </span>
@@ -57,8 +58,8 @@ function InboxHeader({ conversation, stompClient }) {
               <img
                 src={
                   users[3]?.avatar
-                    ? `http://localhost:8080${users[3].avatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${users[3].avatar}`
+                    : `${userImage}`
                 }
               />
             </span>
@@ -123,8 +124,8 @@ function InboxHeader({ conversation, stompClient }) {
           <img
             src={
               user.avatar
-                ? `http://localhost:8080${user.avatar}`
-                : "../../../public/user.jpg"
+                ? `${baseUrl}${user.avatar}`
+                : `${userImage}`
             }
             className="avatar-inbox ms-4"
           />

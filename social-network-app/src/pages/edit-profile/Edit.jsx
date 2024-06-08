@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { Suspense } from "react";
 import Loading3dot from "../../components/loading/Loading3dot";
 import PushNotifications from "./PushNotifications";
+import { baseUrl, userImage } from "../../App";
 const EditPassword = React.lazy(() => import("./EditPassword"));
 const EditAccount = React.lazy(() => import("./EditAccount"));
 
@@ -69,8 +70,8 @@ function Edit() {
                   <img
                     src={
                       auth.avatar
-                        ? `http://localhost:8080${auth.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${auth.avatar}`
+                        : `${userImage}`
                     }
                     alt="Image"
                     className="shadow"

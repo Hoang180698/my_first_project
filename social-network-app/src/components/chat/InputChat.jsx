@@ -5,9 +5,9 @@ import "./init";
 import EmojiPicker from "emoji-picker-react";
 import { useRef } from "react";
 import { useEffect } from "react";
+import { stompClient } from "../header/Header";
 
-
-function InputChat({ conversationId, stompClient }) {
+function InputChat({ conversationId }) {
   const { token } = useSelector((state) => state.auth);
 
   const [content, setContent] = useState("");
@@ -17,7 +17,7 @@ function InputChat({ conversationId, stompClient }) {
 
   useEffect(() => {
     setContent("");
-  },[conversationId])
+  }, [conversationId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -61,45 +61,49 @@ function InputChat({ conversationId, stompClient }) {
     }
   };
 
-  const handleSendImage = (file) => {
-    var reader = new FileReader();
-    let rawData = new ArrayBuffer();
-    reader.onload = (e) => {
-        rawData = e.target.result;
-        stompClient.send("/app/message/send-image/" + conversationId,  { Authorization: `Bearer ${token}` }, 
-        JSON.stringify({ data: e.target.result }))
-    };
-    reader.readAsArrayBuffer(file.target.files[0]);
-
-    // reader.readAsArrayBuffer(file);
-    // const reader = new FileReader();
-    // let rawData = new ArrayBuffer();
-    // rawData = e.target.files[0];
-    // const bufferData = Buffer.from(rawData);
-    // const bsonData = serialize({  // whatever js Object you need
-    //   file: bufferData,
-    //   route: 'TRANSFER',
-    //   action: 'FILE_UPLOAD',
-    // });
-    // stompClient.send(
-    //   "/app/message/send-image/" + conversationId,
-    //   { Authorization: `Bearer ${token}` },
-    //   bsonData
-    // );
-  }
-
+  const handleSendImage = (e) => {
+    const files = Array.from(e.target.files);
+    if(files) {
+      files.map((file) => {
+        var reader = new FileReader();
+        reader.onload = () => {
+          const rawData = reader.result.toString();
+          const newMessage = { content: rawData };
+          stompClient.send(
+            "/app/message/send-image/" + conversationId,
+            { Authorization: `Bearer ${token}` },
+            JSON.stringify(newMessage)
+          );
+        };
+        reader.readAsDataURL(file);
+      })
+    }
+  };
 
   return (
     <div className="input-message mx-auto mt-auto mb-3 d-flex border position-relative">
+      <label
+        htmlFor="chat-image"
+        className="photo-video text-center my-auto ms-2"
+      >
+        <i className="fa-regular fa-image"></i>
+      </label>
       <a
         role="button"
-        className="ms-3 my-auto"
+        className="ms-2 my-auto"
         onClick={() => setShowPicker(true)}
         ref={emojiButtonRef}
       >
         <i className="fa-sharp fa-regular fa-face-smile"></i>
       </a>
-      <input onChange={(e) => handleSendImage(e)} type="file"></input>
+      <input
+        className="d-none"
+        id="chat-image"
+        onChange={(e) => handleSendImage(e)}
+        type="file"
+        multiple
+        accept="image/png, image/gif, image/jpeg, image/jpg"
+      ></input>
       <TextareaAutosize
         rows="1"
         type="text"

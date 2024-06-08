@@ -65,6 +65,7 @@ public class ChatService {
             UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation1).get();
             userConversation.setUnreadCount(0);
             userConversation.setIsArchive(false);
+            userConversation.setIsOnSound(true);
         }
 
         return conversation1;
@@ -97,10 +98,12 @@ public class ChatService {
                 UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
                 userConversation.setUnreadCount(0);
                 userConversation.setIsArchive(false);
+                userConversation.setIsOnSound(true);
             } else {
                 UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
                 userConversation.setUnreadCount(1);
                 userConversation.setIsArchive(false);
+                userConversation.setIsOnSound(true);
             }
         }
         return conversation;
@@ -193,6 +196,19 @@ public class ChatService {
             throw new NotFoundException("You aren't in conversation have id: " + conversationId);
         });
         userConversation.setIsArchive(!userConversation.getIsArchive());
+        userConversationRepository.save(userConversation);
+        return new StatusResponse("ok");
+    }
+
+    public StatusResponse toggleSetNoticeSoundMessage(Integer conversationId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        UserConversation userConversation = userConversationRepository.findById_UserIdAndId_ConversationId(user.getId(), conversationId).orElseThrow(() -> {
+            throw new NotFoundException("You aren't in conversation have id: " + conversationId);
+        });
+        userConversation.setIsOnSound(!userConversation.getIsOnSound());
         userConversationRepository.save(userConversation);
         return new StatusResponse("ok");
     }

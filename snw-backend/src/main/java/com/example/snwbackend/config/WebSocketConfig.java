@@ -11,6 +11,7 @@ import com.example.snwbackend.security.JwtTokenUtil;
 import com.example.snwbackend.service.WebSocketService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwt;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +20,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -33,9 +35,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.reactive.result.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 import java.util.List;
 
@@ -43,6 +47,7 @@ import java.util.List;
 @Configuration
 @EnableWebSocketMessageBroker
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
+@Component
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Qualifier("userDetailsService")
@@ -68,6 +73,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/topic");
         registry.setUserDestinationPrefix("/users");
+
     }
 
     private String extractTokenFromHeader(String header) {
@@ -75,6 +81,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             return header.substring(7);
         }
         return null;
+    }
+
+    @Transactional
+    private void setIsOnlineUser(String email, boolean status) {
+        User user = userRepository.findByEmail(email).get();
+        if(user != null) {
+            user.setIsOnline(status);
+            userRepository.save(user);
+        }
     }
 
     private void checkPort(String token, String destination) {
@@ -91,6 +106,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         }
     }
+
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
@@ -109,6 +125,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         Authentication authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
                         accessor.setUser(authentication);
+                        setIsOnlineUser(email, true);
                     } else {
                         throw new  BadRequestException("");
                     }
@@ -121,8 +138,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     }
                     checkPort(jwtToken, destination);
                 }
+                if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+                    String email = accessor.getUser().getName();
+                    setIsOnlineUser(email, false);
+                }
                 return message;
             }
         });
     }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(1024*1024*3);
+    }
+
    }

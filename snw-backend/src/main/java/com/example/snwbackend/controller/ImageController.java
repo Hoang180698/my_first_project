@@ -1,5 +1,6 @@
 package com.example.snwbackend.controller;
 
+import com.example.snwbackend.entity.ChatImage;
 import com.example.snwbackend.entity.Image;
 import com.example.snwbackend.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,22 +36,29 @@ public class ImageController {
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.getType())).body(image.getData());
     }
 
-    // Upload ảnh
-    @PostMapping("")
-    public ResponseEntity<?> uploadImage(@ModelAttribute("file") MultipartFile file) {
-        return new ResponseEntity<>(imageService.uploadImage(file), HttpStatus.CREATED);
-    }
+//    // Upload ảnh
+//    @PostMapping("")
+//    public ResponseEntity<?> uploadImage(@ModelAttribute("file") MultipartFile file) {
+//        return new ResponseEntity<>(imageService.uploadImage(file), HttpStatus.CREATED);
+//    }
+//
+//    // Xóa ảnh
+//    @DeleteMapping("{id}")
+//    public ResponseEntity<?> deleteImage(@PathVariable Integer id) {
+//        imageService.deleteImage(id);
+//        return ResponseEntity.noContent().build(); // 204
+//    }
+//
+//    // upload multi images
+//    @PostMapping("multi-upload")
+//    public ResponseEntity<?> uploadMultiImages(@ModelAttribute("files") MultipartFile[] files) {
+//        return new ResponseEntity<>(imageService.uploadMultiImages(files), HttpStatus.CREATED);
+//    }
 
-    // Xóa ảnh
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteImage(@PathVariable Integer id) {
-        imageService.deleteImage(id);
-        return ResponseEntity.noContent().build(); // 204
-    }
-
-    // upload multi images
-    @PostMapping("multi-upload")
-    public ResponseEntity<?> uploadMultiImages(@ModelAttribute("files") MultipartFile[] files) {
-        return new ResponseEntity<>(imageService.uploadMultiImages(files), HttpStatus.CREATED);
+    //xem ảnh tin nhắn
+    @GetMapping("chat/{id}")
+    public ResponseEntity<?> readChatImage(@PathVariable Integer id) {
+        ChatImage image = imageService.getChatImage(id);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.getType())).body(image.getData());
     }
 }

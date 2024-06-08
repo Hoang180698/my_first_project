@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,9 +23,6 @@ import java.nio.ByteBuffer;
 @Tag(name = "Websocket", description = "for real time chat")
 @RestController
 public class WebSocketController {
-
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     private WebSocketService webSocketService;
@@ -53,7 +51,7 @@ public class WebSocketController {
         webSocketService.leaveGroup(conversationId, accessor);
     }
     @MessageMapping("/message/send-image/{conversationId}")
-    public void sendImage(@DestinationVariable Integer conversationId,MessageFile messageFile, SimpMessageHeaderAccessor accessor) throws IOException {
-        webSocketService.sendImage(conversationId, messageFile, accessor);
+    public void sendImage(@DestinationVariable Integer conversationId, MessageRequest file, SimpMessageHeaderAccessor accessor) throws IOException {
+        webSocketService.sendImage(conversationId, file, accessor);
     }
 }

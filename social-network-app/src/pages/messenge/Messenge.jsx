@@ -6,6 +6,7 @@ import {
   useLazyGetArchiveConversationsQuery,
   useLazyGetConversationsQuery,
   useToggleArchiveChatMutation,
+  useToggleSetNoticeSoundMutation,
 } from "../../app/services/chat.service";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
@@ -34,6 +35,7 @@ function Messenge() {
   const [getConversations] = useLazyGetConversationsQuery();
   const [getArchiveConversations] = useLazyGetArchiveConversationsQuery();
   const [toggleArchiveChat] = useToggleArchiveChatMutation();
+  const [setSoundNotice] = useToggleSetNoticeSoundMutation();
   const [loading, setLoading] = useState(false);
   // const [currentPage, setCurrentPage] = useState(0);
 
@@ -113,6 +115,26 @@ function Messenge() {
       })
       .catch((err) => {
         toast.error("Something went wrong. Please try again.");
+        console.log(err);
+      });
+  };
+
+  const handleToggSetSoundNotice = (conversationId) => {
+    setSoundNotice(conversationId)
+      .unwrap()
+      .then(() => {
+        const newConversations = conversations.map((c) => {
+          if (c.id.conversationId == conversationId) {
+            console.log(c.isOnSound)
+            return { ...c, isOnSound: !c.isOnSound };
+          } else {
+            return c;
+          }
+        });
+        setConversations(newConversations);
+      })
+      .catch((err) => {
+        toast.error("Something went wrong. Please try again!");
         console.log(err);
       });
   };
@@ -229,6 +251,7 @@ function Messenge() {
                       data={c}
                       key={c.conversation.id}
                       toggleArchiveChat={handleToggleArchiveChat}
+                      toggleSetSoundNotice={handleToggSetSoundNotice}
                     />
                   ))) || (
                   <div className="container">

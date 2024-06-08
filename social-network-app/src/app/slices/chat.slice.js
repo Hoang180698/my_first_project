@@ -5,6 +5,7 @@ const initialState = {
   unreadMessageCount: 0,
   conversationReceive: null,
   isOpenChatPage: false,
+  messageRecieve: null,
 };
 
 const chatSlice = createSlice({
@@ -21,8 +22,11 @@ const chatSlice = createSlice({
       state.isOpenChatPage = false;
     },
     setConversationReceive: (state, action) => {
-        state.conversationReceive = action.payload;
-    }
+      state.conversationReceive = action.payload;
+    },
+    setMessageRecieve: (state, action) => {
+      state.messageRecieve = action.payload;
+  },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -34,6 +38,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { receiveMessage, openChatPage, closeChatPage, setConversationReceive } = chatSlice.actions;
+export const { receiveMessage, openChatPage, closeChatPage, setConversationReceive, setMessageRecieve } = chatSlice.actions;
 
 export default chatSlice.reducer;

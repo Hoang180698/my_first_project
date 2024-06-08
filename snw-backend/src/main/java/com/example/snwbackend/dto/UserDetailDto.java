@@ -20,6 +20,7 @@ public class UserDetailDto {
     private String gender;
     private String birthday;
     private boolean followed;
+    private boolean isOnline;
 
     public UserDetailDto(User user, boolean followed) {
         this.id = user.getId();
@@ -32,5 +33,6 @@ public class UserDetailDto {
         this.birthday = user.getBirthday();
         this.email = user.getEmail();
         this.followed = followed;
+        this.isOnline = user.getIsOnline();
     }
 }

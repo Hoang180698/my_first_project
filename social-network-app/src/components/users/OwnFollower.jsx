@@ -5,6 +5,7 @@ import {
 } from "../../app/services/user.service";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { baseUrl, userImage } from "../../App";
 
 function OwnFollower({ u, rmFollower }) {
 
@@ -36,8 +37,8 @@ function OwnFollower({ u, rmFollower }) {
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img-modal"
@@ -73,8 +74,8 @@ function OwnFollower({ u, rmFollower }) {
             <img
               src={
                 u.avatar
-                  ? `http://localhost:8080${u.avatar}`
-                  : "../../../public/user.jpg"
+                  ? `${baseUrl}${u.avatar}`
+                  : `${userImage}`
               }
               alt="User"
               className="author-img-search"

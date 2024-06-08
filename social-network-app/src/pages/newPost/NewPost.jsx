@@ -47,6 +47,7 @@ function NewPost() {
 
   const imageHandleChange = (e) => {
     // console.log(e.target.files);
+    // console.log(e.target.files[0])
     const newFiles = Array.from(e.target.files);
     if (selectedFiles.length + newFiles.length > 15) {
       toast.warning("Can't post more than 15 photos");
@@ -56,12 +57,11 @@ function NewPost() {
       ...prevSelectedFiles,
       ...newFiles,
     ]);
-    const fileArray = Array.from(e.target.files).map((file) =>
-      URL.createObjectURL(file)
+    const fileArray = Array.from(e.target.files).map((file) => {
+      return ({ url: URL.createObjectURL(file), type: file.type})
+    }   
     );
-
     setSelectedImages((prevImages) => prevImages.concat(fileArray));
-    Array.from(e.target.files).map((file) => URL.revokeObjectURL(file));
   };
 
   const handleRemoveImage = () => {
@@ -96,7 +96,16 @@ function NewPost() {
   }
   const renderPhotos = (source) => {
     return source.map((photo) => {
-      return <img src={photo} key={photo} /> 
+      if(photo.type.includes("image")) {
+        return <span key={photo.url}><img src={photo.url} key={photo.url} /> </span> 
+      }
+      if(photo.type.includes("video")) {
+        return <span key={photo.url} className="position-relative">
+          <video className="" src={photo.url} >  
+          </video> 
+          <i className="fa-regular fa-circle-play icon-video"></i>
+        </span> 
+      }   
     });
   };
 
@@ -149,12 +158,12 @@ function NewPost() {
                   <button
                     onClick={handleRemoveImage}
                     type="button"
-                    className="btn ms-auto py-0"
+                    className="btn ms-auto py-0 np-close-button"
                   >
                     <i className="fa-sharp fa-regular fa-circle-xmark"></i>
                   </button>
                 </div>
-                <div className="pre-images mb-1">
+                <div className="row mb-1">
                   {renderPhotos(selectedImages)}
                 </div>
               </div>
@@ -170,7 +179,7 @@ function NewPost() {
               type="file"
               multiple
               id="photo-video"
-              accept="image/png, image/gif, image/jpeg, image/jpg"
+              accept="image/png, image/gif, image/jpeg, image/jpg, video/mp4 ,video/x-m4v ,video/*"
               onChange={imageHandleChange}
             />
 

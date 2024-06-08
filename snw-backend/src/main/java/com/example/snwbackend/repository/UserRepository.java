@@ -18,30 +18,30 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Set<User> findByIdIn(List<Integer> ids);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday, " +
-            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)))"
+            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)), u.isOnline)"
             + "from User u where u.phone = ?1 or upper(u.name) like upper(concat('%', ?1, '%'))"
     )
     List<UserDetailDto> findByKeyword(String key, Integer userSendRqId);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday, " +
-            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)))"
+            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)), u.isOnline)"
             + "from User u left join Follow fl on fl.follower.id = ?1 where u.id = fl.following.id"
     )
     List<UserDetailDto> getUsersFollowing(Integer id, Integer userSendRqId);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday, " +
-            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)))"
+            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)), u.isOnline)"
             + "from User u left join Follow fl on fl.following.id = ?1 where u.id = fl.follower.id"
     )
     List<UserDetailDto> getUsersFollower(Integer id, Integer userSendRqId);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday," +
-            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = ?1)))" +
+            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = ?1)), u.isOnline)" +
             "from User u where  u.id = ?1")
     Optional<UserDetailDto> findUserDetailDtoById(Integer id, Integer userSendRqId);
 
     @Query("select new com.example.snwbackend.dto.UserDetailDto(u.id, u.name, u.email, u.phone, u.address, u.biography, u.avatar, u.gender, u.birthday," +
-            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)))" +
+            "(exists(select 1 from Follow f where f.follower.id = ?2 and f.following.id = u.id)), u.isOnline)" +
             "from User u left join Like l on l.post.id = ?1 where u.id = l.user.id")
     List<UserDetailDto> findUserDetailDtoLikePost(Integer postId, Integer userSendRqId);
 

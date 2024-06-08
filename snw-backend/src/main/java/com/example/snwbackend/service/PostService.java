@@ -9,6 +9,7 @@ import com.example.snwbackend.request.CreatePostRequest;
 import com.example.snwbackend.response.StatusResponse;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,11 +17,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
+@Slf4j
 public class PostService {
 
     @Autowired
@@ -56,6 +62,9 @@ public class PostService {
     @Autowired
     private LikeCommentRepository likeCommentRepository;
 
+    @Autowired
+    private VideoService videoService;
+
 
     // Lấy post theo id
     public PostDto getPostById(Integer id) {
@@ -84,8 +93,14 @@ public class PostService {
             throw new BadRequestException("You do not have permission to delete this post");
         }
         for (String url: post.getImageUrls()) {
-            Integer imgId = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1));
-            imageRepository.deleteById(imgId);
+            if (url.contains("api/images")) {
+                Integer imgId = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1));
+                imageRepository.deleteById(imgId);
+            }
+           if (url.contains("api/videos")) {
+               String videoId = url.substring(url.lastIndexOf("/") + 1);
+               videoService.deleteVideo(user.getId().toString(), videoId);
+           }
         }
         likeCommentRepository.deleteAllByComment_Post(post);
         likeReplyCommentRepository.deleteAllByReplyComment_Comment_Post(post);
@@ -97,7 +112,7 @@ public class PostService {
 
         postRepository.delete(post);
 
-        return new StatusResponse("ok");
+        return new StatusResponse("removed");
     }
 
     // Lấy danh sách post của 1 user
@@ -292,6 +307,12 @@ public class PostService {
             List<String> urls = new ArrayList<>();
             if (files.length > 0) {
                 for (MultipartFile file: files) {
+                    if(file.getContentType().startsWith("video")) {
+                        String url = videoService.uploadVideo(user, file);
+                        urls.add(url);
+                        log.info(url);
+                        continue;
+                    }
                     imageUtils.validateFile(file);
                     Image image = Image.builder()
                             .data(file.getBytes())
@@ -313,6 +334,7 @@ public class PostService {
                     .build();
             return postRepository.save(post);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException("Upload post error");
         }
     }

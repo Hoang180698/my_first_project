@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import ImageSlider from "../imageSlider/ImageSlider";
@@ -6,8 +6,8 @@ import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import PostModal from "../PostModal/PostModal";
 import Liker from "../liker/Liker";
-import { post } from "jquery";
 import { useSelector } from "react-redux";
+import { baseUrl, userImage } from "../../App";
 
 function Post({ p, likePost, savePost, deletePost, }) {
   const { auth } = useSelector((state) => state.auth);
@@ -38,6 +38,9 @@ function Post({ p, likePost, savePost, deletePost, }) {
     setShowdeletePost(false);
     deletePost(id);
   };
+  useEffect(() => {
+    setCommentCount(p.post?.commentCount)
+  },[p])
 
   return (
     <>
@@ -157,8 +160,8 @@ function Post({ p, likePost, savePost, deletePost, }) {
                   <img
                     src={
                       p.userAvatar
-                        ? `http://localhost:8080${p.userAvatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${p.userAvatar}`
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img"

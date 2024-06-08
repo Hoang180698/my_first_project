@@ -5,6 +5,7 @@ import { logout } from "../../app/slices/auth.slice";
 import useCreatePost from "../../pages/newPost/useCreatePost";
 import styles from "./Header.module.css";
 import NotifyHeader from "./notify/NotifyHeader";
+import messageSound from "../../assets/sound/message-sound.mp3";
 import {
   useGetAllUnreadMessageCountQuery,
   useResetUnreadCountByConversationIdMutation,
@@ -15,8 +16,10 @@ import { over } from "stompjs";
 import {
   receiveMessage,
   setConversationReceive,
+  setMessageRecieve,
 } from "../../app/slices/chat.slice";
 import { useLogOutMutation } from "../../app/services/auth.service";
+import { baseUrl, userImage } from "../../App";
 
 export var stompClient = null;
 
@@ -24,6 +27,7 @@ function Header() {
   function refreshPage() {
     window.location.reload(false);
   }
+  const sound = new Audio(messageSound);
   const [isConnected, setIsConnected] = useState(false);
   const { currentConversationId } = useSelector(
     (state) => state.currentConversationId
@@ -44,7 +48,6 @@ function Header() {
     onDisconnect();
     if (effect.current === true) {
       connect();
-      effect.current = true;
     }
 
     return () => {
@@ -53,19 +56,23 @@ function Header() {
     };
   }, [isOpenChatPage, currentConversationId, token]);
   const handleLogout = () => {
-    logOut({refreshToken})
+    logOut({ refreshToken });
     dispatch(logout());
   };
 
   const connect = () => {
-    let Sock = new SockJS("http://localhost:8080/ws");
+    let Sock = new SockJS(`${baseUrl}/ws`);
     stompClient = over(Sock);
     stompClient.debug = () => {};
-    stompClient.connect({ Authorization: `Bearer ${token}` }, onConnected, onError);
+    stompClient.connect(
+      { Authorization: `Bearer ${token}` },
+      onConnected,
+      onError
+    );
   };
 
   const onDisconnect = () => {
-    if (isConnected) {
+    if (stompClient?.connected === true) {
       stompClient?.disconnect();
       setIsConnected(false);
     }
@@ -77,19 +84,49 @@ function Header() {
 
   const onConnected = () => {
     setIsConnected(true);
-    stompClient.subscribe("/users/topic/chat", (payload) => {
-      const payloadData = JSON.parse(payload.body);
-      if (payloadData.id.conversationId !== currentConversationId) {
-        if (payloadData.conversation.lastMessage.sender.id !== auth.id && !payloadData.isArchive) {
-          dispatch(receiveMessage());
+    stompClient.subscribe(
+      "/users/topic/chat",
+      (payload) => {
+        const payloadData = JSON.parse(payload.body);
+        if (payloadData.id.conversationId !== currentConversationId) {
+          if (
+            payloadData.conversation.lastMessage.sender.id !== auth.id &&
+            !payloadData.isArchive
+          ) {
+            dispatch(receiveMessage());
+          }
+          if (isOpenChatPage) {
+            dispatch(setConversationReceive(payloadData));
+          }
+        } else {
+          dispatch(setConversationReceive({ ...payloadData, unreadCount: 0 }));
         }
-        if (isOpenChatPage) {
-          dispatch(setConversationReceive(payloadData));
+        if (
+          payloadData.conversation.lastMessage.sender.id !== auth.id &&
+          !payloadData.isArchive &&
+          payloadData.isOnSound
+        ) {
+          sound.play();
         }
-      } else {
-        dispatch(setConversationReceive({ ...payloadData, unreadCount: 0 }));
-      }
-    }, { Authorization: `Bearer ${token}` });
+      },
+      { Authorization: `Bearer ${token}` }
+    );
+
+    if (currentConversationId > 0) {
+      stompClient.subscribe(
+        "/topic/conversation/" + currentConversationId,
+        onMessageReceived,
+        { Authorization: `Bearer ${token}` }
+      );
+    }
+  };
+  const onMessageReceived = (payload) => {
+    const payloadData = JSON.parse(payload.body);
+    // setMessages((oldMess) => [payloadData, ...oldMess]);
+    dispatch(setMessageRecieve(payloadData));
+    // if (["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
+    //   resetUnreadMessageCount(conversationId).unwrap().then().catch();
+    // }
   };
 
   return (
@@ -178,9 +215,9 @@ function Header() {
                   <img
                     className={styles.avatar}
                     src={
-                      auth.avatar === null
-                        ? "../../public/user.jpg"
-                        : `http://localhost:8080${auth.avatar}`
+                      auth.avatar
+                        ? `${baseUrl}${auth.avatar}`
+                        : `${userImage}`
                     }
                   />
                 </a>

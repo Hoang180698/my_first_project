@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { formatDate, formatDateTime } from "../../utils/functionUtils";
 import { useDeleteNotificationByIdMutation } from "../../app/services/notification.service";
 import { toast } from "react-toastify";
+import { baseUrl, userImage } from "../../App";
 
 function NotifyBox({ n, deleteNotify }) {
-
+  
   const [showModal, setShowModal] = useState(false);
 
   const [deleteNotification] = useDeleteNotificationByIdMutation();
@@ -56,8 +57,8 @@ function NotifyBox({ n, deleteNotify }) {
             <img
               src={
                 n.sender.avatar
-                  ? `http://localhost:8080${n.sender.avatar}`
-                  : "../../../public/user.jpg"
+                  ? `${baseUrl}${n.sender.avatar}`
+                  : `${userImage}`
               }
             />
           </Link>
@@ -102,7 +103,7 @@ function NotifyBox({ n, deleteNotify }) {
           {n.type !== "follow" && n.post.imageUrls.length > 0 && (
             <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
              <img
-              src={`http://localhost:8080${n.post.imageUrls[0]}`}
+              src={`${baseUrl}${n.post.imageUrls[0]}`}
               alt="post img"
             /></Link>      
           )}

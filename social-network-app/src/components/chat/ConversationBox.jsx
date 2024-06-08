@@ -2,8 +2,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { formatDate } from "../../utils/functionUtils";
+import { baseUrl, userImage } from "../../App";
 
-function ConversationBox({ data, toggleArchiveChat }) {
+function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
   const { auth } = useSelector((state) => state.auth);
 
   if (data.conversation.groupChat) {
@@ -14,6 +15,7 @@ function ConversationBox({ data, toggleArchiveChat }) {
       : `${users[0]?.name}${users[1] ? ", " + users[1].name : ""}${
           users[2] ? ", " + users[2].name : ""
         }${users[4] ? ",..." : ""}`;
+    const isOnline = users.some((user) => (user.id !== auth.id && user.isOnline === true)); 
 
     return (
       <>
@@ -33,8 +35,8 @@ function ConversationBox({ data, toggleArchiveChat }) {
                   <img
                     src={
                       users[0].avatar
-                        ? `http://localhost:8080${users[0].avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${users[0].avatar}`
+                        : `${userImage}`
                     }
                   />
                 </div>
@@ -43,23 +45,26 @@ function ConversationBox({ data, toggleArchiveChat }) {
                   <img
                     src={
                       users[1].avatar
-                        ? `http://localhost:8080${users[1].avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${users[1].avatar}`
+                        : `${userImage}`
                     }
                     className="mt-4 me-2"
                   />
                 </div>
+                {isOnline && <span className="conversation-active"></span>}    
               </div>
             )) || (
-              <div>
+              <div className="position-relative">
                 <img
                   src={
                     users[0].avatar
-                      ? `http://localhost:8080${users[0].avatar}`
-                      : "../../../public/user.jpg"
+                      ? `${baseUrl}${users[0].avatar}`
+                      : `${userImage}`
                   }
                   className="avatar-chat"
                 />
+                <span className="conversation-active"></span>
+                {isOnline && <span className="conversation-active"></span>}   
               </div>
             )}
 
@@ -105,6 +110,13 @@ function ConversationBox({ data, toggleArchiveChat }) {
             aria-labelledby="dropdownMenu2"
           >
             <a
+              onClick={() => toggleSetSoundNotice(data.conversation.id)}
+              className="dropdown-item"
+              style={{ fontWeight: "500", fontSize: "14px" }}
+            >
+              {data.isOnSound ? "Mute" : "Unmute"}
+            </a>
+            <a
               onClick={() => toggleArchiveChat(data.conversation.id)}
               className="dropdown-item"
               style={{ fontWeight: "500", fontSize: "14px" }}
@@ -134,14 +146,18 @@ function ConversationBox({ data, toggleArchiveChat }) {
           to={`/messenge/inbox/${data.id.conversationId}`}
         >
           {data.unreadCount > 0 && <span className="message-badge"></span>}
+          <div className="position-relative">
           <img
             src={
               user.avatar
-                ? `http://localhost:8080${user.avatar}`
-                : "../../../public/user.jpg"
+                ? `${baseUrl}${user.avatar}`
+                : `${userImage}`
             }
             className="avatar-chat"
           />
+           {user.isOnline && <span className="conversation-active"></span>}   
+          </div>
+       
           <div className="px-2 d-flex flex-column" style={{ maxWidth: "75%" }}>
             <span className="mt-1 chat-user-name">{user.name}</span>
 
@@ -169,6 +185,13 @@ function ConversationBox({ data, toggleArchiveChat }) {
           className="dropdown-menu dropdown-menu-lg-end"
           aria-labelledby="dropdownMenu2"
         >
+          <a
+            onClick={() => toggleSetSoundNotice(data.conversation.id)}
+            className="dropdown-item"
+            style={{ fontWeight: "500", fontSize: "14px" }}
+          >
+            {data.isOnSound ? "Mute" : "Unmute"}
+          </a>
           <a
             onClick={() => toggleArchiveChat(data.conversation.id)}
             className="dropdown-item"

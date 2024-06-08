@@ -8,21 +8,23 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useState } from "react";
-import { over } from "stompjs";
-import SockJS from "sockjs-client";
+// import { over } from "stompjs";
+// import SockJS from "sockjs-client";
 import {
   calDistanceTimeMinute,
   formatDateTime,
 } from "../../utils/functionUtils";
 import { setCurrentConversationId } from "../../app/slices/currentConversationId.slice";
+import { setMessageRecieve } from "../../app/slices/chat.slice"
 const InputChat = React.lazy(() => import("../../components/chat/InputChat"));
 import { Suspense } from "react";
 import Loading3dot from "../../components/loading/Loading3dot";
 import { toast } from "react-toastify";
+import ImageBox from "../../components/chat/ImageBox";
+import { baseUrl, userImage } from "../../App";
 const InboxHeader = React.lazy(() =>
   import("../../components/chat/InboxHeader")
 );
-
 var stompClient = null;
 function Inbox() {
   const [isConnected, setIsConnected] = useState(false);
@@ -42,14 +44,16 @@ function Inbox() {
     isError,
   } = useGetConversationByIdQuery(conversationId);
   const navigate = useNavigate();
-  const [resetUnreadMessageCount] = useResetUnreadCountByConversationIdMutation();
-  const effect = useRef(false);
+  const [resetUnreadMessageCount] =
+    useResetUnreadCountByConversationIdMutation();
+  // const effect = useRef(false);
   const loadMoreRef = useRef(null);
   const options = {
     root: null,
     rootMargin: "0px",
     threshold: 1.0,
   };
+  const { messageRecieve } = useSelector((state) => state.chat);
 
   const handleIntersection = (entries) => {
     const [entry] = entries;
@@ -113,7 +117,7 @@ function Inbox() {
             setIsLast(data.last);
           })
           .catch((err) => {
-            console.log(err)
+            console.log(err);
             toast.error("Error on page load.");
           })
           .finally(() => {
@@ -126,10 +130,10 @@ function Inbox() {
 
   const dipatch = useDispatch();
   useEffect(() => {
-    onDisconnect();
+    // onDisconnect();
     dipatch(setCurrentConversationId({ id: Number(conversationId) }));
     const fectchData = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         let { data } = await getMessage({
           conversationId,
@@ -146,13 +150,14 @@ function Inbox() {
     };
     fectchData();
     resetUnreadMessageCount(conversationId).unwrap().then().catch();
-    if (effect.current === true) {
-      connect();
-    }
+    // if (effect.current === true) {
+    //   connect();
+    // }
 
     return () => {
-      effect.current = true;
-      onDisconnect();
+      // effect.current = true;
+      // onDisconnect();
+      dipatch(setMessageRecieve(null))
       dipatch(setCurrentConversationId({ id: 0 }));
       resetUnreadMessageCount(conversationId).unwrap().then().catch();
       setMessages([]);
@@ -162,44 +167,53 @@ function Inbox() {
     };
   }, [conversationId, token]);
 
-  const connect = () => {
-    let Sock = new SockJS("http://localhost:8080/ws");
-    stompClient = over(Sock);
-    // stompClient.debug = () => {};
-    stompClient.connect(
-      { Authorization: `Bearer ${token}` },
-      onConnected,
-      onError
-    );
-  };
-
-  const onDisconnect = () => {
-    if (isConnected) {
-      stompClient?.disconnect();
-      setIsConnected(false);
+  useEffect(() => {
+    if(messageRecieve !== null) {
+      setMessages((oldMess) => [messageRecieve, ...oldMess]);
+      if (["ADDED", "LEAVE", "NAMED"].includes(messageRecieve.type)) {
+        resetUnreadMessageCount(conversationId).unwrap().then().catch();
+      }
     }
-  };
+  },[messageRecieve])
 
-  const onError = (err) => {
-    console.log(err);
-  };
+  // const connect = () => {
+  //   let Sock = new SockJS(`${baseUrl}/ws`);
+  //   stompClient = over(Sock);
+  //   stompClient.debug = () => {};
+  //   stompClient.connect(
+  //     { Authorization: `Bearer ${token}` },
+  //     onConnected,
+  //     onError
+  //   );
+  // };
 
-  const onConnected = () => {
-    setIsConnected(true);
-    stompClient.subscribe(
-      "/topic/conversation/" + conversationId,
-      onMessageReceived,
-      { Authorization: `Bearer ${token}` }
-    );
-  };
+  // const onDisconnect = () => {
+  //   if (isConnected) {
+  //     stompClient?.disconnect();
+  //     setIsConnected(false);
+  //   }
+  // };
 
-  const onMessageReceived = (payload) => {
-    const payloadData = JSON.parse(payload.body);
-    setMessages((oldMess) => [payloadData, ...oldMess]);
-    if (["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
-      resetUnreadMessageCount(conversationId).unwrap().then().catch();
-    }
-  };
+  // const onError = (err) => {
+  //   console.log(err);
+  // };
+
+  // const onConnected = () => {
+  //   setIsConnected(true);
+  //   stompClient.subscribe(
+  //     "/topic/conversation/" + conversationId,
+  //     onMessageReceived,
+  //     { Authorization: `Bearer ${token}` }
+  //   );
+  // };
+
+  // const onMessageReceived = (payload) => {
+  //   const payloadData = JSON.parse(payload.body);
+  //   setMessages((oldMess) => [payloadData, ...oldMess]);
+  //   if (["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
+  //     resetUnreadMessageCount(conversationId).unwrap().then().catch();
+  //   }
+  // };
 
   if (isLoadingconversation) {
     return (
@@ -242,7 +256,8 @@ function Inbox() {
             }
             key={index}
           >
-            {((m.type === "MESSAGE" &&
+            {/* Thoi gian cua message */}
+            {((["MESSAGE", "IMAGE"].includes(m.type) &&
               (calDistanceTimeMinute(
                 m.createdAt,
                 messages[index + 1]?.createdAt
@@ -264,13 +279,13 @@ function Inbox() {
 
             {m.sender.id !== auth.id &&
               conversation.groupChat &&
-              m.type === "MESSAGE" &&
+              ["MESSAGE", "IMAGE"].includes(m.type) &&
               (m.sender.id !== messages[index + 1]?.sender.id ||
                 calDistanceTimeMinute(
                   m.createdAt,
                   messages[index + 1]?.createdAt
                 ) > 20 ||
-                messages[index + 1]?.type !== "MESSAGE") && (
+                !["MESSAGE", "IMAGE"].includes(messages[index + 1]?.type)) && (
                 <>
                   <span
                     className="ms-5 mt-3"
@@ -280,7 +295,8 @@ function Inbox() {
                   </span>
                 </>
               )}
-            {m.type === "MESSAGE" && (
+
+            {["MESSAGE", "IMAGE"].includes(m.type) && (
               <div
                 className={
                   m.sender.id === auth.id
@@ -295,14 +311,16 @@ function Inbox() {
                         m.createdAt,
                         messages[index - 1]?.createdAt
                       ) > 20 ||
-                      messages[index - 1]?.type !== "MESSAGE") && (
+                      !["MESSAGE", "IMAGE"].includes(
+                        messages[index - 1]?.type
+                      )) && (
                       <>
                         <span className="avatar-inbox">
                           <img
                             src={
                               m.sender.avatar
-                                ? `http://localhost:8080${m.sender.avatar}`
-                                : "../../../public/user.jpg"
+                                ? `${baseUrl + m.sender.avatar}`
+                                : `${userImage}`
                             }
                           />
                         </span>
@@ -310,15 +328,19 @@ function Inbox() {
                     )}
                   </div>
                 )}
-
-                <p
-                  className={m.sender.id === auth.id ? "mb-1" : " border mb-1"}
-                  data-bs-toggle="tooltip"
-                  data-placement="bottom"
-                  title={formatDateTime(m.createdAt)}
-                >
-                  {m.content}
-                </p>
+                {m.type === "MESSAGE" && (
+                  <p
+                    className={
+                      m.sender.id === auth.id ? "mb-1" : " border mb-1"
+                    }
+                    data-bs-toggle="tooltip"
+                    data-placement="bottom"
+                    title={formatDateTime(m.createdAt)}
+                  >
+                    {m.content}
+                  </p>
+                )}
+                {m.type === "IMAGE" && <ImageBox imageUrl={m.imageUrl} createAt={m.createdAt} />}
               </div>
             )}
             {m.type === "START" && (
@@ -367,7 +389,7 @@ function Inbox() {
         <div ref={loadMoreRef}></div>
       </div>
       <Suspense>
-        <InputChat stompClient={stompClient} conversationId={conversationId} />
+        <InputChat conversationId={conversationId} />
       </Suspense>
     </div>
   );

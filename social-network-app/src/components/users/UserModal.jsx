@@ -7,6 +7,7 @@ import {
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { baseUrl, userImage } from "../../App";
 
 function UserModal({ u, follow, unfollow }) {
   const { auth } = useSelector((state) => state.auth);
@@ -35,7 +36,7 @@ function UserModal({ u, follow, unfollow }) {
         console.log(err);
       });
   };
-
+  
   const handleUnfollow = (id) => {
     setLoadingButton(true);
     unfollowUser(id)
@@ -65,8 +66,8 @@ function UserModal({ u, follow, unfollow }) {
               <img
                 src={
                   u.avatar
-                    ? `http://localhost:8080${u.avatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${u.avatar}`
+                    : `${userImage}`
                 }
                 alt="User"
                 className="author-img-search"
@@ -92,8 +93,8 @@ function UserModal({ u, follow, unfollow }) {
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img-modal"
@@ -130,8 +131,8 @@ function UserModal({ u, follow, unfollow }) {
             <img
               src={
                 u.avatar
-                  ? `http://localhost:8080${u.avatar}`
-                  : "../../../public/user.jpg"
+                  ? `${baseUrl}${u.avatar}`
+                  : `${userImage}`
               }
               alt="User"
               className="author-img-search"

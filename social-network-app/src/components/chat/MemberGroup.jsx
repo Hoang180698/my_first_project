@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { baseUrl, userImage } from "../../App";
 
 function MemberGroup({ users }) {
   const [show, setShow] = useState(false);
@@ -44,8 +45,8 @@ function MemberGroup({ users }) {
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     className="author-img-search ms-3"
                   />

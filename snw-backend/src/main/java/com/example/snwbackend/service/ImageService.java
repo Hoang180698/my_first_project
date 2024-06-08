@@ -1,8 +1,10 @@
 package com.example.snwbackend.service;
 
+import com.example.snwbackend.entity.ChatImage;
 import com.example.snwbackend.entity.Image;
 import com.example.snwbackend.entity.User;
 import com.example.snwbackend.exception.NotFoundException;
+import com.example.snwbackend.repository.ChatImageRepository;
 import com.example.snwbackend.repository.ImageRepository;
 import com.example.snwbackend.repository.UserRepository;
 import com.example.snwbackend.response.ImageResponse;
@@ -26,6 +28,9 @@ public class ImageService {
     private UserRepository userRepository;
 
     @Autowired
+    private ChatImageRepository chatImageRepository;
+
+    @Autowired
     private ImageUtils imageUtils;
 
     public List<String> getAllImage() {
@@ -46,47 +51,64 @@ public class ImageService {
         });
     }
 
-    public ImageResponse uploadImage(MultipartFile file) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
+//    public ImageResponse uploadImage(MultipartFile file) {
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+//            throw new NotFoundException("Not found user with email = " + email);
+//        });
+//
+//        imageUtils.validateFile(file);
+//
+//        try {
+//            Image image = Image.builder()
+//                    .data(file.getBytes())
+//                    .type(file.getContentType())
+//                    .user(user)
+//                    .build();
+//
+//            imageRepository.save(image);
+//
+//            String url = "/api/images/read/" + image.getId();
+//            return new ImageResponse(url);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Upload image error");
+//        }
+//    }
 
-        imageUtils.validateFile(file);
+//    public void deleteImage(Integer id) {
+//        Image image = imageRepository.findById(id).orElseThrow(() -> {
+//            throw new NotFoundException("Not found image with id = " + id);
+//        });
+//
+//        imageRepository.delete(image);
+//    }
 
-        try {
-            Image image = Image.builder()
-                    .data(file.getBytes())
-                    .type(file.getContentType())
-                    .user(user)
-                    .build();
-
-            imageRepository.save(image);
-
-            String url = "/api/images/read/" + image.getId();
-            return new ImageResponse(url);
-        } catch (Exception e) {
-            throw new RuntimeException("Upload image error");
-        }
-    }
-
-    public void deleteImage(Integer id) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> {
-            throw new NotFoundException("Not found image with id = " + id);
-        });
-
-        imageRepository.delete(image);
-    }
-
-    @Transactional
-    public List<ImageResponse> uploadMultiImages(MultipartFile[] files) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
-        List<ImageResponse> imageResponses = new ArrayList<>();
-//        for (MultipartFile file: files) {
-//            try {
+//    @Transactional
+//    public List<ImageResponse> uploadMultiImages(MultipartFile[] files) {
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+//            throw new NotFoundException("Not found user with email = " + email);
+//        });
+//        List<ImageResponse> imageResponses = new ArrayList<>();
+////        for (MultipartFile file: files) {
+////            try {
+////                imageUtils.validateFile(file);
+////                Image image = Image.builder()
+////                        .data(file.getBytes())
+////                        .type(file.getContentType())
+////                        .user(user)
+////                        .build();
+////
+////                imageRepository.save(image);
+////
+////                String url = "/api/images/read/" + image.getId();
+////                imageResponses.add(new ImageResponse(url)) ;
+////            } catch (Exception e) {
+////                throw new RuntimeException("Upload image error");
+////            }
+////        }
+//        try {
+//            for (MultipartFile file: files) {
 //                imageUtils.validateFile(file);
 //                Image image = Image.builder()
 //                        .data(file.getBytes())
@@ -98,27 +120,16 @@ public class ImageService {
 //
 //                String url = "/api/images/read/" + image.getId();
 //                imageResponses.add(new ImageResponse(url)) ;
-//            } catch (Exception e) {
-//                throw new RuntimeException("Upload image error");
 //            }
+//        } catch (Exception e) {
+//            throw new RuntimeException("Upload image error");
 //        }
-        try {
-            for (MultipartFile file: files) {
-                imageUtils.validateFile(file);
-                Image image = Image.builder()
-                        .data(file.getBytes())
-                        .type(file.getContentType())
-                        .user(user)
-                        .build();
+//        return imageResponses;
+//    }
 
-                imageRepository.save(image);
-
-                String url = "/api/images/read/" + image.getId();
-                imageResponses.add(new ImageResponse(url)) ;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Upload image error");
-        }
-        return imageResponses;
+    public ChatImage getChatImage(Integer id) {
+        return chatImageRepository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Not found image with id = " + id);
+        });
     }
 }

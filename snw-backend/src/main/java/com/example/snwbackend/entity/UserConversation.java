@@ -33,5 +33,8 @@ public class UserConversation {
 
     @Column(name = "is_Archive")
     private Boolean isArchive;
+
+    @Column(name = "is_on_sound_notice")
+    private Boolean isOnSound;
 }
 

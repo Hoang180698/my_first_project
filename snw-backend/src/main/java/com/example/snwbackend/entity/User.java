@@ -51,6 +51,8 @@ public class User implements UserDetails, Serializable {
     @Column(name = "avatar")
     private String avatar;
 
+    private Boolean isOnline;
+
     @JsonIgnore
     @Column(name = "password")
     private String password;
@@ -115,5 +117,6 @@ public class User implements UserDetails, Serializable {
     @PrePersist
     public void prePersist() {
         this.pushNotificationsStatus = new PushNotificationsStatus();
+        this.isOnline = false;
     }
 }

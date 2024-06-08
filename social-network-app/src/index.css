@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
 
 body {
     background: #f3f3f3;
@@ -244,15 +246,32 @@ body {
 }
 
 /* New post */
-
+.icon-video{
+	position: absolute;
+	top: 30%;
+	left: 50%;
+	font-size: 40px;
+	color: #eee;
+}
+.np-result span {
+	width: 150px;
+	height: 100px;
+}
 .np-result img{
 	width: 150px;
 	height: 100px;
 	object-fit: cover;
 	padding: 0.2rem;
+	display: block;
 }
 .np-result {
 	background-color: rgb(193, 226, 221);
+}
+.np-result video {
+	width: 150px;
+	height: 100px;
+	object-fit: cover;
+	padding: 0.2rem;
 }
 
 .np-content{
@@ -386,7 +405,7 @@ body {
 }
 
 
-.np-comment-bottom i:hover{
+.np-close-button i:hover{
   background:#EF78;
   color:#f0f0f0;
 }

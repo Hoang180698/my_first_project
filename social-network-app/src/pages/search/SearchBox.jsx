@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Modal } from "react-bootstrap";
+import { baseUrl, userImage } from "../../App";
 
 function SearchBox({ u, follow, unfollow }) {
   const { auth } = useSelector((state) => state.auth);
@@ -66,8 +67,8 @@ function SearchBox({ u, follow, unfollow }) {
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img-modal"
@@ -109,8 +110,8 @@ function SearchBox({ u, follow, unfollow }) {
                 <img
                   src={
                     u.avatar
-                      ? `http://localhost:8080${u.avatar}`
-                      : "../../../public/user.jpg"
+                      ? `${baseUrl}${u.avatar}`
+                      : `${userImage}`
                   }
                   alt="User"
                   className="author-img-search"

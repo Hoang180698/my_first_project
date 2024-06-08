@@ -9,6 +9,7 @@ import ReplyBox from "./ReplyBox";
 import EmojiPicker from "emoji-picker-react";
 import Modal from "react-bootstrap/Modal";
 import CommentLiker from "../liker/CommentLiker";
+import { baseUrl, userImage } from "../../App";
 
 var pageSize = 3
 function CommentBox({ comment, setCommentCount, fillterComments, replyCommentFocus }) {
@@ -214,8 +215,8 @@ function CommentBox({ comment, setCommentCount, fillterComments, replyCommentFoc
               <img
                 src={
                   cmt.userAvatar
-                    ? `http://localhost:8080${cmt.userAvatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${cmt.userAvatar}`
+                    : `${userImage}`
                 }
                 alt="User img"
                 className="author-img author-img--small"

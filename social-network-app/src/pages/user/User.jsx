@@ -8,7 +8,6 @@ import {
 import {
   useLazyGetPostByUserIdQuery, useLikePostMutation, useSavePostMutation, useUnSavePostMutation, useUnlikePostMutation,
 } from "../../app/services/posts.service";
-import Post from "../../components/post/Post";
 import { useSelector } from "react-redux";
 import { post } from "jquery";
 import { Modal } from "react-bootstrap";
@@ -18,6 +17,7 @@ import { toast } from "react-toastify";
 import { useCreateConversationMutation } from "../../app/services/chat.service";
 import PostList from "../../components/post/PostList";
 import { useEffect } from "react";
+import { baseUrl, userImage } from "../../App";
 
 function User() {
   const { userId } = useParams();
@@ -42,7 +42,7 @@ function User() {
   const [loadingButton, setLoadingButton] = useState(false);
 
   const navigate = useNavigate();
-
+  
   if (auth.id === Number(userId)) {
     navigate("/profile/");
   }
@@ -309,8 +309,8 @@ function User() {
                 <img
                   src={
                     user.avatar
-                      ? `http://localhost:8080${user.avatar}`
-                      : "../../../public/user.jpg"
+                      ? `${baseUrl}${user.avatar}`
+                      : `${userImage}`
                   }
                   alt="User"
                   className="author-img-modal"
@@ -348,8 +348,8 @@ function User() {
               <img
                 src={
                   user.avatar
-                    ? `http://localhost:8080${user.avatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${user.avatar}`
+                    : `${userImage}`
                 }
               />
             </div>

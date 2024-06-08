@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { stompClient } from "../../components/header/Header";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { baseUrl, userImage } from "../../App";
 
 function NewMessage() {
   const { auth, token } = useSelector((state) => state.auth);
@@ -259,14 +260,18 @@ function NewMessage() {
             {users.length > 0 &&
               users.map((u) => (
                 <div className="d-flex mt-2" key={u.id}>
+                  <div className="position-relative">
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     className="author-img-search"
                   />
+                   {u.online && <span className="conversation-active" style={{right:"5%", bottom:"5%"}}></span>}   
+                  </div>
+               
                   <div className="px-2 d-flex flex-column">
                     <span className="name-user-modal mt-2">{u.name}</span>
                   </div>

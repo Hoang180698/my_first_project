@@ -92,4 +92,11 @@ public class ChatController {
     public ResponseEntity<?> toggleSetArchiveChat(@PathVariable Integer conversationId) {
         return ResponseEntity.ok(chatService.toggleSetArchiveChat(conversationId));
     }
+
+    @Operation(summary = "set sound notice chat",
+            description = "Toggle set sound notice a specific conversation.")
+    @PutMapping("notice-sound/{conversationId}")
+    public ResponseEntity<?> toggleSetNoticeSoundMessage(@PathVariable Integer conversationId) {
+        return ResponseEntity.ok(chatService.toggleSetNoticeSoundMessage(conversationId));
+    }
 }

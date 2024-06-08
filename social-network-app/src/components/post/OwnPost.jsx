@@ -13,6 +13,7 @@ import Modal from "react-bootstrap/Modal";
 import { Link } from "react-router-dom";
 import Liker from "../liker/Liker";
 import { toast } from "react-toastify";
+import { userImage } from "../../App";
 
 function OwnPost({ p }) {
   const [deletePost] = useDeletePostMutation();
@@ -114,7 +115,7 @@ function OwnPost({ p }) {
                     src={
                       p.userAvatar
                         ? `http://localhost:8080${p.userAvatar}`
-                        : "../../../public/user.jpg"
+                        : `${userImage}`
                     }
                     alt="User"
                     className="author-img"

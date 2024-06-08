@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ReplyCommentLiker from "../liker/ReplyCommentLiker";
+import { baseUrl, userImage } from "../../App";
 
 function ReplyBox({replyComment, likeReplyComment, deleteReplyComment}) {
     const { auth } = useSelector((state) => state.auth);
@@ -61,8 +62,8 @@ function ReplyBox({replyComment, likeReplyComment, deleteReplyComment}) {
               <img
                 src={
                   replyComment.userAvatar
-                    ? `http://localhost:8080${replyComment.userAvatar}`
-                    : "../../../public/user.jpg"
+                    ? `${baseUrl}${replyComment.userAvatar}`
+                    : `${userImage}`
                 }
                 alt="User img"
                 className="author-img author-img--small"

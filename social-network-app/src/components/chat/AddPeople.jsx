@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useLazySearchUserQuery } from "../../app/services/user.service";
 import { useSelector } from "react-redux";
+import { baseUrl, userImage } from "../../App";
 
 var pageSize = 7;
 function AddPeople({ conversation, stompClient }) {
@@ -212,14 +213,18 @@ function AddPeople({ conversation, stompClient }) {
             {users.length > 0 &&
               users.map((u) => (
                 <div className="d-flex mt-2" key={u.id}>
+                  <div className="position-relative">
                   <img
                     src={
                       u.avatar
-                        ? `http://localhost:8080${u.avatar}`
-                        : "../../../public/user.jpg"
+                        ? `${baseUrl}${u.avatar}`
+                        : `${userImage}`
                     }
                     className="author-img-search"
                   />
+                  {u.online && <span className="conversation-active" style={{right:"5%", bottom:"5%"}}></span>}   
+                  </div>
+                
                   <div className="px-2 d-flex flex-column">
                     <span className="name-user-modal mt-2">{u.name}</span>
                   </div>

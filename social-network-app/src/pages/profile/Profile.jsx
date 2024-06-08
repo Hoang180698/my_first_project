@@ -7,6 +7,7 @@ import Follower from "../../components/users/Follower";
 import Following from "../../components/users/Following";
 import { Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet";
+import { baseUrl, userImage } from "../../App";
 
 
 function Profile() {
@@ -60,7 +61,7 @@ function Profile() {
           <div className="profile d-flex mt-5">
             <div className="profile-image d-flex justify-content-center">
               <img
-                src={auth.avatar ? `http://localhost:8080${auth.avatar}` : "../../../public/user.jpg"}
+                src={auth.avatar ? `${baseUrl}${auth.avatar}` : `${userImage}`}
                 alt=""
               />
             </div>

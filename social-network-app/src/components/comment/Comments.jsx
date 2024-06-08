@@ -143,6 +143,7 @@ function Comments({postId, setCommentCount, newComment}) {
         setLoading(false);
        })
        .catch((error) => {
+        loadMoreRef.current = false;
         console.log(error);
         toast.error("Error on page load.");
         setLoading(false);

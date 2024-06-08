@@ -5,6 +5,7 @@ import {
   useSeenNotificationMutation,
 } from "../../../app/services/notification.service";
 import { formatDate, formatDateTime } from "../../../utils/functionUtils";
+import { baseUrl } from "../../../App";
 
 function NotifyHeader() {
   const [getNotifications] = useLazyGetAllNotificationQuery();
@@ -145,7 +146,7 @@ function NotifyHeader() {
                     <img
                       src={
                         n.sender.avatar
-                          ? `http://localhost:8080${n.sender.avatar}`
+                          ? `${baseUrl}${n.sender.avatar}`
                           : "../../../../public/user.jpg"
                       }
                       className="mb-2 mt-1"
@@ -273,7 +274,7 @@ function NotifyHeader() {
                     {n.post.imageUrls.length > 0 && (
                       <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
                         <img
-                          src={`http://localhost:8080${n.post.imageUrls[0]}`}
+                          src={`${baseUrl}${n.post.imageUrls[0]}`}
                           alt="post img"
                           style={{ width: "50px", height: "50px" }}
                         />
