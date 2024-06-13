@@ -3,9 +3,12 @@ import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { formatDate } from "../../utils/functionUtils";
 import { baseUrl, userImage } from "../../App";
+import { OverlayTrigger } from "react-bootstrap";
+import Tooltip from 'react-bootstrap/Tooltip';
 
 function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
   const { auth } = useSelector((state) => state.auth);
+  const usersCalling = data.conversation.usersInRoom;
 
   if (data.conversation.groupChat) {
     const users = data.conversation.users;
@@ -17,8 +20,51 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
         }${users[4] ? ",..." : ""}`;
     const isOnline = users.some((user) => (user.id !== auth.id && user.isOnline === true)); 
 
+    const renderTooltipGroup = (props) => (
+      <Tooltip id="button-tooltip" {...props} >
+        <div className="d-grid">
+          <div className="group-name-calling">
+               <span style={{fontWeight:"bold", color:"#eaeaea"}}>{groupName}</span>
+          </div>
+         
+          {usersCalling.length > 0 &&  <div className="d-flex mt-2">
+            <span><i className="fa-solid fa-volume-high me-2 pt-2"></i></span>
+            <div>
+              {usersCalling.map((u, index) => (   
+                <span className="avatar-inbox">  
+                {index < 5 && <img
+                    style={{width:"26px", height:"26px"}}
+                     src={
+                       u.avatar
+                      ? `${baseUrl}${u.avatar}`
+                      : `${userImage}`
+                  }
+                />}  
+
+                {index === 5 && usersCalling.length === 6 &&  <img
+                    style={{width:"26px", height:"26px"}}
+                     src={
+                       u.avatar
+                      ? `${baseUrl}${u.avatar}`
+                      : `${userImage}`
+                  }
+                />}           
+                {index === 5 && usersCalling.length > 6 &&  <i style={{fontWeight:"bolder"}}>
+                     +{usersCalling.length - 5}
+            </i>}   
+              </span>
+              ))}
+            </div>
+          </div>}
+         
+        </div>
+      </Tooltip>
+    );
+
     return (
-      <>
+      <OverlayTrigger placement="right"
+      delay={{ show: 100, hide: 200 }}
+      overlay={renderTooltipGroup}>
         <div className="user-chat-box">
           <NavLink
             className={
@@ -51,7 +97,10 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
                     className="mt-4 me-2"
                   />
                 </div>
-                {isOnline && <span className="conversation-active"></span>}    
+                {isOnline && <span className="conversation-active"></span>}  
+                {usersCalling.length > 0 && <span className="call-active">
+                  <i className="fa-solid fa-volume-high"></i>
+                  </span>}  
               </div>
             )) || (
               <div className="position-relative">
@@ -65,6 +114,9 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
                 />
                 <span className="conversation-active"></span>
                 {isOnline && <span className="conversation-active"></span>}   
+                {usersCalling.length > 0 && <span className="call-active">
+                  <i className="fa-solid fa-volume-high"></i>
+                  </span>}  
               </div>
             )}
 
@@ -125,17 +177,49 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
             </a>
           </ul>
         </div>
-      </>
+      </OverlayTrigger>
     );
   }
+
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      <div className="d-grid">
+        <div className="d-flex">
+             <span style={{fontWeight:"bold", color:"#eaeaea"}}>{user.name}</span>
+        </div>
+       
+        {usersCalling.length > 0 &&  <div className="d-flex mt-2">
+          <span><i className="fa-solid fa-volume-high me-2 pt-2"></i></span>
+          <div>
+            {usersCalling.map((u) => (   
+              <span className="avatar-inbox">               
+                 <img
+                  style={{width:"26px", height:"26px"}}
+                   src={
+                     u.avatar
+                    ? `${baseUrl}${u.avatar}`
+                    : `${userImage}`
+                }
+              />
+            </span>
+            ))}
+          </div>
+        </div>}
+       
+      </div>
+    </Tooltip>
+  );
   const user =
     data.conversation.users.length > 1
       ? data.conversation.users[0].id === auth.id
         ? data.conversation.users[1]
         : data.conversation.users[0]
       : data.conversation.users[0];
+
   return (
-    <>
+    <OverlayTrigger  placement="right"
+    delay={{ show: 100, hide: 120 }}
+    overlay={renderTooltip}>
       <div className="user-chat-box">
         <NavLink
           className={
@@ -156,6 +240,9 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
             className="avatar-chat"
           />
            {user.isOnline && <span className="conversation-active"></span>}   
+           {usersCalling.length > 0 && <span className="call-active">
+                  <i className="fa-solid fa-volume-high"></i>
+                  </span>}  
           </div>
        
           <div className="px-2 d-flex flex-column" style={{ maxWidth: "75%" }}>
@@ -201,7 +288,7 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
           </a>
         </ul>
       </div>
-    </>
+    </OverlayTrigger>
   );
 }
 

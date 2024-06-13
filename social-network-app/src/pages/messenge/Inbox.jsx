@@ -27,7 +27,6 @@ const InboxHeader = React.lazy(() =>
 );
 var stompClient = null;
 function Inbox() {
-  const [isConnected, setIsConnected] = useState(false);
   const { conversationId } = useParams();
   const { auth, token } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
@@ -175,45 +174,6 @@ function Inbox() {
       }
     }
   },[messageRecieve])
-
-  // const connect = () => {
-  //   let Sock = new SockJS(`${baseUrl}/ws`);
-  //   stompClient = over(Sock);
-  //   stompClient.debug = () => {};
-  //   stompClient.connect(
-  //     { Authorization: `Bearer ${token}` },
-  //     onConnected,
-  //     onError
-  //   );
-  // };
-
-  // const onDisconnect = () => {
-  //   if (isConnected) {
-  //     stompClient?.disconnect();
-  //     setIsConnected(false);
-  //   }
-  // };
-
-  // const onError = (err) => {
-  //   console.log(err);
-  // };
-
-  // const onConnected = () => {
-  //   setIsConnected(true);
-  //   stompClient.subscribe(
-  //     "/topic/conversation/" + conversationId,
-  //     onMessageReceived,
-  //     { Authorization: `Bearer ${token}` }
-  //   );
-  // };
-
-  // const onMessageReceived = (payload) => {
-  //   const payloadData = JSON.parse(payload.body);
-  //   setMessages((oldMess) => [payloadData, ...oldMess]);
-  //   if (["ADDED", "LEAVE", "NAMED"].includes(payloadData.type)) {
-  //     resetUnreadMessageCount(conversationId).unwrap().then().catch();
-  //   }
-  // };
 
   if (isLoadingconversation) {
     return (

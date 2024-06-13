@@ -17,6 +17,7 @@ import {
   receiveMessage,
   setConversationReceive,
   setMessageRecieve,
+  setGroupCallReceive
 } from "../../app/slices/chat.slice";
 import { useLogOutMutation } from "../../app/services/auth.service";
 import { baseUrl, userImage } from "../../App";
@@ -108,6 +109,18 @@ function Header() {
         ) {
           sound.play();
         }
+      },
+      { Authorization: `Bearer ${token}` }
+    );
+
+    stompClient.subscribe(
+      "/users/topic/call",
+      (payload) => {
+        const payloadData = JSON.parse(payload.body);
+        console.log(payloadData);
+        if (isOpenChatPage) {
+          dispatch(setGroupCallReceive(payloadData));
+        }   
       },
       { Authorization: `Bearer ${token}` }
     );

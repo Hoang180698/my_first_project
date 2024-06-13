@@ -3,9 +3,10 @@ import { chatApi } from "../services/chat.service";
 
 const initialState = {
   unreadMessageCount: 0,
-  conversationReceive: null,
+  conversationReceive: null, //user-conversation
   isOpenChatPage: false,
   messageRecieve: null,
+  groupCallReceive: null  // conversatioon
 };
 
 const chatSlice = createSlice({
@@ -27,6 +28,9 @@ const chatSlice = createSlice({
     setMessageRecieve: (state, action) => {
       state.messageRecieve = action.payload;
   },
+    setGroupCallReceive: (state, action) => {
+      state.groupCallReceive = action.payload;
+  },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -38,6 +42,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { receiveMessage, openChatPage, closeChatPage, setConversationReceive, setMessageRecieve } = chatSlice.actions;
+export const { receiveMessage, openChatPage, closeChatPage, setConversationReceive, setMessageRecieve, setGroupCallReceive } = chatSlice.actions;
 
 export default chatSlice.reducer;

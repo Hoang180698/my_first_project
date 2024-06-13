@@ -33,7 +33,7 @@ function Layout() {
     handleRefreshToken();
     const interval = setInterval(() => {
       handleRefreshToken();
-    }, 1000*60*19);
+    }, 1000*60*55);
     return () => clearInterval(interval);
   },[])
   return (

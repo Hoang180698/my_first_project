@@ -20,6 +20,7 @@ import { ToastContainer } from "react-toastify";
 import PostDetailPage from "./pages/post-detail/PostDetailPage";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import userImg from "../public/user.jpg";
+import Call from "./pages/call/Call";
 
 // export var baseUrl = "https://hoagramspring-production-8c94.up.railway.app";
 export var baseUrl = "http://localhost:8080";
@@ -30,6 +31,7 @@ function App() {
     <>
       <Routes>
         <Route element={<Private />}>
+          <Route path="/call/:conversationId" element={<Call />}></Route>
           <Route path="/" element={<Layout />}>
             <Route path="/" element={<HomePage />}></Route>
             <Route path="/search" element={<Search />}>

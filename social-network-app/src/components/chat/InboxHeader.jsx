@@ -71,41 +71,52 @@ function InboxHeader({ conversation, stompClient }) {
           )}
           <span className="inbox-user-name ms-2">{groupName}</span>
 
-          <div
-            className="ms-auto"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <i className="fa-solid fa-bars"></i>
+          <div className="ms-auto d-flex">
+            <Link to={`/call/${conversation.id}`} className="text-dark" target="blank">
+              <span className="me-3 d-flex" style={{ fontSize: "26px" }}>
+                <i className="fa-solid fa-video mb-auto"></i>
+              </span>
+            </Link>
+
+            <div
+              className="ms-auto"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i
+                style={{ fontSize: "26px" }}
+                className="fa-solid fa-circle-info"
+              ></i>
+            </div>
+            <ul
+              className="dropdown-menu"
+              aria-labelledby="dropdownMenu2"
+              style={{ fontWeight: "bold" }}
+            >
+              <li>
+                <ChangeGroupName
+                  conversation={conversation}
+                  stompClient={stompClient}
+                />
+              </li>
+              <li>
+                <AddPeople
+                  conversation={conversation}
+                  stompClient={stompClient}
+                />
+              </li>
+              <li>
+                <MemberGroup users={conversation.users} />
+              </li>
+              <li className="border-top">
+                <LeaveGroup
+                  stompClient={stompClient}
+                  conversationId={conversation.id}
+                />
+              </li>
+            </ul>
           </div>
-          <ul
-            className="dropdown-menu"
-            aria-labelledby="dropdownMenu2"
-            style={{ fontWeight: "bold" }}
-          >
-            <li>
-              <ChangeGroupName
-                conversation={conversation}
-                stompClient={stompClient}
-              />
-            </li>
-            <li>
-              <AddPeople
-                conversation={conversation}
-                stompClient={stompClient}
-              />
-            </li>
-            <li>
-              <MemberGroup users={conversation.users} />
-            </li>
-            <li className="border-top">
-              <LeaveGroup
-                stompClient={stompClient}
-                conversationId={conversation.id}
-              />
-            </li>
-          </ul>
         </div>
       </>
     );
@@ -122,30 +133,36 @@ function InboxHeader({ conversation, stompClient }) {
       <div className="d-flex">
         <Link to={`/u/${user.id}`} className="text-dark">
           <img
-            src={
-              user.avatar
-                ? `${baseUrl}${user.avatar}`
-                : `${userImage}`
-            }
+            src={user.avatar ? `${baseUrl}${user.avatar}` : `${userImage}`}
             className="avatar-inbox ms-4"
           />
           <span className="mt-2 inbox-user-name ms-2">{user.name}</span>
         </Link>
-        <div
-          className="ms-auto"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <i className="fa-solid fa-bars"></i>
+        <div className="ms-auto d-flex">
+          <Link to={`/call/${conversation.id}`} className="text-dark" target="blank">
+            <span className="me-3 d-flex" style={{ fontSize: "26px" }}>
+              <i className="fa-solid fa-video mb-auto"></i>
+            </span>
+          </Link>
+          <div
+            className="ms-auto"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i
+              style={{ fontSize: "26px" }}
+              className="fa-solid fa-circle-info"
+            ></i>
+          </div>
+          <ul className="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li>
+              <a className="dropdown-item" role="button">
+                {"Nothing :))"}
+              </a>
+            </li>
+          </ul>
         </div>
-        <ul className="dropdown-menu" aria-labelledby="dropdownMenu2">
-          <li>
-            <a className="dropdown-item" role="button">
-              {"Nothing :))"}
-            </a>
-          </li>
-        </ul>
       </div>
     </>
   );

@@ -16,6 +16,7 @@ import {
   closeChatPage,
   openChatPage,
   setConversationReceive,
+  setGroupCallReceive,
 } from "../../app/slices/chat.slice";
 import NewMessage from "./NewMessage";
 import { useRef } from "react";
@@ -30,7 +31,7 @@ function Messenge() {
   const dispatch = useDispatch();
   const [tabChat, setTabChat] = useState(0);
 
-  const { conversationReceive } = useSelector((state) => state.chat);
+  const { conversationReceive, groupCallReceive } = useSelector((state) => state.chat);
 
   const [getConversations] = useLazyGetConversationsQuery();
   const [getArchiveConversations] = useLazyGetArchiveConversationsQuery();
@@ -167,10 +168,25 @@ function Messenge() {
   }, [conversationReceive]);
 
   useEffect(() => {
+    if (groupCallReceive) {
+        console.log(groupCallReceive)
+        const newConversations = conversations.map((c) => {
+          if(c.id.conversationId === groupCallReceive.id) {
+            return { ...c, conversation : groupCallReceive }
+          } else {
+            return c;
+          }
+        })
+       setConversations(newConversations);
+    }
+  }, [groupCallReceive]);
+
+  useEffect(() => {
     dispatch(openChatPage());
     return () => {
       dispatch(closeChatPage());
       dispatch(setConversationReceive(null));
+      dispatch(setGroupCallReceive(null))
     };
   }, []);
 

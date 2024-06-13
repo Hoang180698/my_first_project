@@ -75,6 +75,9 @@ export const chatApi = createApi({
                 method: "PUT",
             }),
         }),
+        getCallTokken: builder.query({
+            query: (id) => `call/token/${id}`, 
+        }),
     }),
 });
 
@@ -93,4 +96,5 @@ export const {
     useLazyGetArchiveConversationsQuery,
     useToggleArchiveChatMutation,
     useToggleSetNoticeSoundMutation,
+    useLazyGetCallTokkenQuery,
 } = chatApi;
