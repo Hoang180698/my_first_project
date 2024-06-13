@@ -54,4 +54,16 @@ public class WebSocketController {
     public void sendImage(@DestinationVariable Integer conversationId, MessageRequest file, SimpMessageHeaderAccessor accessor) throws IOException {
         webSocketService.sendImage(conversationId, file, accessor);
     }
+
+    // JoinCall
+    @MessageMapping("/call/join/{conversationId}")
+    public void joinCall(@DestinationVariable Integer conversationId, SimpMessageHeaderAccessor accessor) {
+        webSocketService.joinCall(conversationId, accessor);
+    }
+
+    // LeaveCAll
+    @MessageMapping("/call/leave/{conversationId}")
+    public void leaveCall(@DestinationVariable Integer conversationId, SimpMessageHeaderAccessor accessor) {
+        webSocketService.leaveCall(conversationId, accessor);
+    }
 }

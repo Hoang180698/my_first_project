@@ -46,6 +46,12 @@ public class Conversation {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new LinkedHashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "Conversation_users",
+            joinColumns = @JoinColumn(name = "conversation_id"),
+            inverseJoinColumns = @JoinColumn(name = "users_id"))
+    private Set<User> usersInRoom = new LinkedHashSet<>();
+
     @PrePersist
     protected void onCreate() {
         if (user1 == null || user2 == null) {

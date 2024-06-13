@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class JwtTokenUtil {
     // Token có hạn trong vòng 20 phut kể từ thời điểm tạo, thời gian tính theo giây
-    private final Integer duration = 60 * 20;
+    private final Integer duration = 60 * 60;
 
     // Key này sẽ được sử dụng để mã hóa và giải mã
     // Độ dài key > 32 bytes

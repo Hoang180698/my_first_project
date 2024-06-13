@@ -11,6 +11,7 @@ import com.example.snwbackend.request.UpsertConversationRequest;
 import com.example.snwbackend.security.JwtTokenUtil;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -21,6 +22,7 @@ import java.util.Base64;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class WebSocketService {
 
 
@@ -57,11 +59,13 @@ public class WebSocketService {
             throw new NotFoundException("Not found contact with id = " + conversationId);
         });
 
-        String token = accessor.getFirstNativeHeader("Authorization");
-        if(token == null || !token.startsWith("Bearer")) {
-            return null;
-        }
-        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+////        String token = accessor.getFirstNativeHeader("Authorization");
+////        if(token == null || !token.startsWith("Bearer")) {
+////            return null;
+////        }
+//        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        String email = accessor.getUser().getName();
+
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
@@ -115,11 +119,12 @@ public class WebSocketService {
         if(!conversation.isGroupChat()) {
             return;
         }
-        String token = accessor.getFirstNativeHeader("Authorization");
-        if(token == null || !token.startsWith("Bearer")) {
-            return;
-        }
-        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+//        String token = accessor.getFirstNativeHeader("Authorization");
+//        if(token == null || !token.startsWith("Bearer")) {
+//            return;
+//        }
+//        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        String email = accessor.getUser().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
@@ -159,11 +164,12 @@ public class WebSocketService {
         if(!conversation.isGroupChat()) {
             return;
         }
-        String token = accessor.getFirstNativeHeader("Authorization");
-        if(token == null || !token.startsWith("Bearer")) {
-            return;
-        }
-        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+//        String token = accessor.getFirstNativeHeader("Authorization");
+//        if(token == null || !token.startsWith("Bearer")) {
+//            return;
+//        }
+//        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        String email = accessor.getUser().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
@@ -216,11 +222,12 @@ public class WebSocketService {
         if(!conversation.isGroupChat()) {
             return;
         }
-        String token = accessor.getFirstNativeHeader("Authorization");
-        if(token == null || !token.startsWith("Bearer")) {
-            return;
-        }
-        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+//        String token = accessor.getFirstNativeHeader("Authorization");
+//        if(token == null || !token.startsWith("Bearer")) {
+//            return;
+//        }
+//        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        String email = accessor.getUser().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
@@ -256,11 +263,12 @@ public class WebSocketService {
             throw new NotFoundException("Not found contact with id = " + conversationId);
         });
 
-        String token = accessor.getFirstNativeHeader("Authorization");
-        if(token == null || !token.startsWith("Bearer")) {
-            return;
-        }
-        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+//        String token = accessor.getFirstNativeHeader("Authorization");
+//        if(token == null || !token.startsWith("Bearer")) {
+//            return;
+//        }
+//        String email = jwtTokenUtil.getClaimsFromToken(token.substring(7)).getSubject();
+        String email = accessor.getUser().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new NotFoundException("Not found user with email = " + email);
         });
@@ -295,7 +303,7 @@ public class WebSocketService {
             }
     }
 
-    public Integer saveImage(String base64, User user) {
+    private Integer saveImage(String base64, User user) {
         String[] parts = base64.split(",");
         String header = parts[0]; // data:image/jpeg;base64
         String content = parts[1];
@@ -313,4 +321,54 @@ public class WebSocketService {
             throw new RuntimeException("Error on upload file: " +e.getMessage());
         }
     }
+
+    @Transactional
+    public void joinCall(Integer conversationId, SimpMessageHeaderAccessor accessor) {
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
+        });
+
+        log.info("sdsd", accessor.getUser().getName());
+        User user = userRepository.findByEmail(accessor.getUser().getName()).orElseThrow(() -> {
+            throw new NotFoundException("Not found user");
+        });
+
+
+
+        if(!conversation.getUsers().contains(user)) {
+            throw new BadRequestException("You not in this conversation");
+        }
+
+        Set<User> oldUsers = conversation.getUsersInRoom();
+        oldUsers.add(user);
+        conversation.setUsersInRoom(oldUsers);
+
+        for (User u: conversation.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/call", conversation);
+        }
+    }
+
+    @Transactional
+    public void leaveCall(Integer conversationId, SimpMessageHeaderAccessor accessor) {
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
+        });
+
+        User user = userRepository.findByEmail(accessor.getUser().getName()).orElseThrow(() -> {
+            throw new NotFoundException("Not found user");
+        });
+
+        if(!conversation.getUsers().contains(user)) {
+            throw new BadRequestException("You not in this conversation");
+        }
+
+        Set<User> oldUsers = conversation.getUsersInRoom();
+        oldUsers.remove(user);
+        conversation.setUsersInRoom(oldUsers);
+
+        for (User u: conversation.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/call", conversation);
+        }
+    }
+
 }
