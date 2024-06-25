@@ -4,7 +4,7 @@ import PostModal from "../PostModal/PostModal";
 import { baseUrl } from "../../App";
 import noImg from "../../../public/no-image.png"
 
-function PostList({ post, likePost, savePost, deletePost }) {
+function PostList({ post, likePost, savePost, deletePost, isBigSize }) {
     const [showPostModal, setShowPostModal] = useState(false);
     const handleDeletePost = (id) => {
       deletePost(id);
@@ -34,7 +34,7 @@ function PostList({ post, likePost, savePost, deletePost }) {
           </div>
         </Modal>
       )}
-      <div className="mt-2 ms-2 post-list-box" role="button" onClick={() => setShowPostModal(true)}>
+      <div style={{height: `${isBigSize? "606px" : ""}`}} className="mt-2 ms-2 post-list-box" role="button" onClick={() => setShowPostModal(true)}>
         {(post.post.imageUrls?.length > 0 && (
           <>
              {post.post.imageUrls[0].includes("api/images") && <img className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></img>} 
@@ -52,6 +52,13 @@ function PostList({ post, likePost, savePost, deletePost }) {
             </span>
           </div>
         </div>
+        { post.post.imageUrls[0]?.includes("api/videos") && 
+            <div className="post-list-video-icon">
+              <span style={{ fontWeight: "bold", color:"white", fontSize:"16px"}}>
+              <i className="fa-solid fa-video"></i>
+            </span>
+            </div>
+        }
       </div>
     </>
   );

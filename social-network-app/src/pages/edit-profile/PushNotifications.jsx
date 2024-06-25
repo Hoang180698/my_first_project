@@ -70,7 +70,7 @@ function PushNotifications() {
             <div className='d-grid px-3' style={{backgroundColor:"#f3f3f3"}}>
             <div className='mt-2 d-flex'>
                 <span>Likes</span>
-                <div class="form-check form-switch d-flex ms-auto">
+                <div className="form-check form-switch d-flex ms-auto">
                     {/* <label classname="form-check-label">Pause all</label> */}
                     <input className="form-check-input" type="checkbox" role="switch" onChange={handleUpdateLikeStatus}
                      checked={status?.onLikes}/>                  
@@ -88,7 +88,7 @@ function PushNotifications() {
             </div>
             <div className='mt-2 d-flex'>
                 <span>New followers</span>
-                <div class="form-check form-switch d-flex ms-auto">
+                <div className="form-check form-switch d-flex ms-auto">
                     {/* <label classname="form-check-label">Pause all</label> */}
                     <input className="form-check-input" type="checkbox" role="switch" onChange={handleUpdateFollowStatus}
                     checked={status?.onNewFollower}/>                  

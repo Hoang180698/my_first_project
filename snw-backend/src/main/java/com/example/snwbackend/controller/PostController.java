@@ -145,4 +145,10 @@ public class PostController{
     public ResponseEntity<?> getPostsByIds(@RequestParam List<Integer> ids) {
         return ResponseEntity.ok(postService.getPostsByIds(ids));
     }
+
+    @GetMapping("explore")
+    public ResponseEntity<?> getPostsExplore(@RequestParam(required = false, defaultValue = "0") Integer page,
+                                             @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ResponseEntity.ok(postService.getPostsExplore(page, pageSize));
+    }
 }

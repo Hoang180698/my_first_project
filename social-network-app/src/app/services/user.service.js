@@ -94,7 +94,17 @@ export const userApi = createApi({
                 method: "PUT",
                 body: data
             })
-        })
+        }),
+        createPassWord: builder.mutation({
+            query: (data) => ({
+                url: `users/create-password`,
+                method: "PUT",
+                body: data
+            })
+        }),
+        checkHavePassword: builder.query({
+            query: () => "users/check-have-password",
+        }),
     }),
 });
 
@@ -118,4 +128,6 @@ export const {
     useLazyGetUserLikePostQuery,
     useLazyGetUserLikeCommentQuery,
     useLazyGetUserLikeReplyCommentQuery,
+    useLazyCheckHavePasswordQuery,
+    useCreatePassWordMutation,
 } = userApi;

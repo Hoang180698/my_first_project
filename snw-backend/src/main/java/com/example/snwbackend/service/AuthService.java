@@ -11,22 +11,20 @@ import com.example.snwbackend.exception.NotFoundException;
 import com.example.snwbackend.mapper.UserMapper;
 import com.example.snwbackend.repository.PasswordResetTokenRepository;
 import com.example.snwbackend.repository.UserRepository;
-import com.example.snwbackend.request.EmailRequest;
-import com.example.snwbackend.request.LoginRequest;
-import com.example.snwbackend.request.RegisterRequest;
-import com.example.snwbackend.request.TokenRefreshRequest;
+import com.example.snwbackend.repository.httpclient.OutboundIdentityClient;
+import com.example.snwbackend.repository.httpclient.OutboundUserClient;
+import com.example.snwbackend.request.*;
 import com.example.snwbackend.response.LoginResponse;
 import com.example.snwbackend.response.StatusResponse;
-import com.example.snwbackend.response.TokenRefreshResponse;
 import com.example.snwbackend.security.JwtTokenUtil;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
-import org.aspectj.apache.bcel.classfile.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -82,8 +80,63 @@ public class AuthService {
     @Autowired
     private TemplateEngine templateEngine;
 
+    @Autowired
+    private OutboundIdentityClient outboundIdentityClient;
+
+    @Autowired
+    private OutboundUserClient outboundUserClient;
+
+
+    @Value("${gg.client-id}")
+    private String CLIENT_ID;
+
+    @Value("${gg.client-secret}")
+    private String CLIENT_SECRET;
+
+    @Value("${gg.redirect-uri}")
+    private String REDIRECT_URI;
+
+    private final String GRANT_TYPE = "authorization_code";
+
+    public LoginResponse outboundGgAuthenticate(String code) {
+        log.info("code: ", code);
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        log.info("TOKEN RESPONSE {}", response);
+
+        // Get user info
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        log.info("User Info {}", userInfo);
+
+        // Onboard user
+        var user = userRepository.findByEmail(userInfo.getEmail()).orElseGet(
+                () -> userRepository.save(User.builder()
+                        .name(userInfo.getName())
+                        .email(userInfo.getEmail())
+                        .role("USER")
+                        .gender("")
+                        .phone("")
+                        .address("")
+                        .biography("")
+                        .enabled(true)
+                        .build()));
+
+        // Generate token
+        String tokenJwt = jwtTokenUtil.generateToken(userDetailsService.loadUserByUsername(user.getEmail()));
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        return new LoginResponse(userMapper.toUserDto(user), tokenJwt, refreshToken.getToken(), true);
+    }
+
     public LoginResponse login(LoginRequest request) {
-        log.info("Request : {}", request);
+//        log.info("Request : {}", request);
         // Tạo đối tượng
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
@@ -111,7 +164,7 @@ public class AuthService {
         return loginResponse;
     }
 
-    public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
+    public LoginResponse refreshToken(TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
         RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
                 .orElseThrow(() -> new NotFoundException("Not found refresh token"));
@@ -121,7 +174,8 @@ public class AuthService {
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(refreshToken.getUser().getEmail());
         String tokenJwt = jwtTokenUtil.generateToken(userDetails);
-        return new TokenRefreshResponse(tokenJwt, requestRefreshToken);
+
+        return new LoginResponse(userMapper.toUserDto(refreshToken.getUser()), tokenJwt, refreshToken.getToken(), true);
     }
 
     public String logOut(TokenRefreshRequest request) {

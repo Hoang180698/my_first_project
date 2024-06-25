@@ -21,6 +21,8 @@ import PostDetailPage from "./pages/post-detail/PostDetailPage";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import userImg from "../public/user.jpg";
 import Call from "./pages/call/Call";
+import Explore from "./pages/explore/Explore";
+import Authenticate from "./pages/auth/Authenticate";
 
 // export var baseUrl = "https://hoagramspring-production-8c94.up.railway.app";
 export var baseUrl = "http://localhost:8080";
@@ -37,6 +39,7 @@ function App() {
             <Route path="/search" element={<Search />}>
               <Route path="/search/:key" element={<Search />}></Route>
             </Route>
+            <Route path="/explore" element={<Explore />}></Route>
             <Route path="/messenge" element={<Messenge />}>
               <Route path="" element={<MessageBox />}></Route>
               <Route path="inbox/:conversationId" element={<Inbox />}></Route>
@@ -59,6 +62,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/authenticate" element={<Authenticate />}/>
       </Routes>
       <ToastContainer
         position="top-right"

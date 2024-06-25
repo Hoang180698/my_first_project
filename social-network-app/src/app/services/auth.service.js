@@ -8,6 +8,12 @@ export const authApi = createApi({
         { baseUrl: "http://localhost:8080/api/auth" }
     ),
     endpoints: (builder) => ({
+        loginWithGg: builder.mutation({
+            query: (code) => ({
+                url: `outbound/gg?code=${code}`,
+                method: "POST",
+            }),
+        }),
         login: builder.mutation({
             query: (data) => ({
                 url: "login",
@@ -56,7 +62,7 @@ export const authApi = createApi({
                 method: "POST",
                 body: data,
             })
-        })
+        }),
     }),
 });
 
@@ -64,5 +70,5 @@ export const authApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
     useLoginMutation, useRegisterMutation,useCheckEmailExistMutation, useResendEmailActivationMutation,
-    useForgotPasswordMutation, useRefreshTokenMutation, useLogOutMutation,
+    useForgotPasswordMutation, useRefreshTokenMutation, useLogOutMutation,useLoginWithGgMutation,
 } = authApi;

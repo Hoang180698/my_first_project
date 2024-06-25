@@ -1,28 +1,57 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
-import { useChangePassWordMutation } from "../../app/services/user.service";
+import {
+  useChangePassWordMutation,
+  useCreatePassWordMutation,
+  useLazyCheckHavePasswordQuery,
+} from "../../app/services/user.service";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 function EditPassword() {
-  // const [oldPass, setOldPass] = useState("");
+  const [oldPass, setOldPass] = useState("");
   // const [newPass, setNewPass] = useState("");
   // const [newPassAgain, setNewPassAgain] = useState("");
+  const [oldPassError, setOldPassEror] = useState(false);
 
   const [showOldPass, setShowOldPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showNewPassAgain, setShowNewPassAgain] = useState(false);
 
+  const [havePassword, setHavePassword] = useState(true);
+
   const [changePassWord] = useChangePassWordMutation();
+  const [checkHavePassword] = useLazyCheckHavePasswordQuery();
+  const [createPassword] = useCreatePassWordMutation();
+
+  useEffect(() => {
+    checkHavePassword()
+      .unwrap()
+      .then((result) => {
+        setHavePassword(result.havePassword);
+      })
+      .catch((e) => {
+        toast.error("Somthing went wrong!");
+      });
+  }, []);
 
   const schema = yup
     .object({
-      oldPass: yup.string().required("Old password is not empty"),
-      newPass: yup.string().required("Password is not empty").min(3, "Password must have at least 3 characters")
-      .notOneOf([yup.ref("oldPass")],"The new password must be different from the old password"),
-      retypeNewPass: yup.string().required("Password is not empty").oneOf([yup.ref('newPass'), null], "Passwords do not match"),
+      // oldPass: yup.string().required("Old password is not empty"),
+      newPass: yup
+        .string()
+        .required("Password is not empty")
+        .min(3, "Password must have at least 3 characters")
+        .notOneOf(
+          [yup.ref("oldPass"), oldPass],
+          "The new password must be different from the old password"
+        ),
+      retypeNewPass: yup
+        .string()
+        .required("Password is not empty")
+        .oneOf([yup.ref("newPass"), null], "Passwords do not match"),
     })
     .required();
 
@@ -41,7 +70,7 @@ function EditPassword() {
     if (e.key === "Enter") {
       e.preventDefault();
     }
-  }
+  };
 
   const handleChangePassword = (data) => {
     // e.preventDefault();
@@ -49,17 +78,47 @@ function EditPassword() {
     //   toast.error("The password does not match");
     //   return;
     // }
-    const newData = { oldPassword: data.oldPass, newPassword: data.newPass };
-    changePassWord(newData)
+    if(havePassword) {
+      if(!oldPass) {
+        setOldPassEror(true);
+        return;
+      }
+      const newData = { oldPassword: oldPass, newPassword: data.newPass };
+      changePassWord(newData)
+        .unwrap()
+        .then(() => {
+          toast.success("The password change is successful.");
+          setValue("newPass", "");
+          // setValue("oldPass", "");
+          setValue("retypeNewPass", "");
+          setOldPass("");
+        })
+        .catch((err) => {
+          toast.error("Enter a valid password and try again.", {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+          // setFocus("oldPass");
+          console.log(err);
+        });
+    } else {
+      const newData = { oldPassword: "", newPassword: data.newPass };
+      createPassword(newData)
       .unwrap()
       .then(() => {
         toast.success("The password change is successful.");
-        setValue("newPass","");
-        setValue("oldPass","");
-        setValue("retypeNewPass","");
+        setValue("newPass", "");
+        setValue("retypeNewPass", "");
+        setHavePassword(true);
       })
       .catch((err) => {
-        toast.error("Enter a valid password and try again.",  {
+        toast.error("Try again.", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: true,
@@ -68,10 +127,11 @@ function EditPassword() {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          });
-        setFocus("oldPass");
+        });
         console.log(err);
       });
+    }
+   
   };
 
   return (
@@ -84,7 +144,7 @@ function EditPassword() {
       >
         <h3 className="mb-4">Password Settings</h3>
         <form onSubmit={handleSubmit(handleChangePassword)}>
-          <div className="row" style={{height:"114px"}}>
+          {havePassword && (<div className="row" style={{ height: "114px" }}>
             <div className="col-md-6">
               <div className="form-group">
                 <label>Old password</label>
@@ -92,9 +152,8 @@ function EditPassword() {
                   <input
                     type={showOldPass ? "text" : "password"}
                     className="me-2"
-                    // value={oldPass}
-                    // onChange={(e) => setOldPass(e.target.value)}
-                    {...register("oldPass")}
+                    value={oldPass}
+                    onChange={(e) => {setOldPass(e.target.value), setOldPassEror(false)}}
                     maxLength={20}
                   />
                   {(!showOldPass && (
@@ -111,12 +170,14 @@ function EditPassword() {
                     ></i>
                   )}
                 </div>
-                <span style={{ color: "red", fontSize: "12px" }}>
-                            {errors.oldPass?.message}
-                        </span>
+                {oldPassError && <span style={{ color: "red", fontSize: "12px" }}>
+                   Old password is not empty
+                </span>}
+                
               </div>
             </div>
-          </div>
+          </div>)}
+          
           <div className="row">
             <div className="col-md-6">
               <div className="form-group mt-2">
@@ -146,8 +207,8 @@ function EditPassword() {
                   )}
                 </div>
                 <span style={{ color: "red", fontSize: "12px" }}>
-                            {errors.newPass?.message}
-                        </span>
+                  {errors.newPass?.message}
+                </span>
               </div>
             </div>
             <div className="col-md-6">
@@ -178,8 +239,8 @@ function EditPassword() {
                   )}
                 </div>
                 <span style={{ color: "red", fontSize: "12px" }}>
-                            {errors.retypeNewPass?.message}
-                        </span>
+                  {errors.retypeNewPass?.message}
+                </span>
               </div>
             </div>
           </div>

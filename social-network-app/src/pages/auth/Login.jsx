@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useLoginMutation, useResendEmailActivationMutation } from "../../app/services/auth.service";
+import {
+  useLoginMutation,
+  useResendEmailActivationMutation,
+} from "../../app/services/auth.service";
 import style from "./Auth.module.css";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import { Modal } from "react-bootstrap";
+import { OAuthConfig } from "../../configuration/configuration";
 
 function Login() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -21,20 +25,34 @@ function Login() {
   const handleHide = () => {
     setShow(false);
   };
+  const handleLoginGoogle = () => {
+    const callbackUrl = OAuthConfig.redirectUri;
+    const authUrl = OAuthConfig.authUri;
+    const googleClientId = OAuthConfig.clientId;
+
+    const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+      callbackUrl
+    )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+    console.log(targetUrl);
+
+    window.location.href = targetUrl;
+  };
   const handleResendMail = () => {
     setLoadingResend(true);
-    resendMail({email: email}).unwrap()
-    .then(() => {
-      toast.success("Resend successfully. Check your email");
-    })
-    .catch(err => {
-      console.log(err);
-      toast.error("Try again.");
-    })
-    .finally(() => {
-      setLoadingResend(false);
-    })
-  }
+    resendMail({ email: email })
+      .unwrap()
+      .then(() => {
+        toast.success("Resend successfully. Check your email");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Try again.");
+      })
+      .finally(() => {
+        setLoadingResend(false);
+      });
+  };
 
   const handleSubmit = (e) => {
     setLoading(true);
@@ -48,22 +66,20 @@ function Login() {
         if (err.data?.message === "User is disabled") {
           setShow(true);
         } else {
-          toast.error(
-            "Please check your password and email and try again.",
-            {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "colored",
-            }
-          );
+          toast.error("Please check your password and email and try again.", {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
           console.log(err);
         }
-      }).finally(() => {
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -86,9 +102,9 @@ function Login() {
           style={{ height: "400px" }}
         >
           <div className="text-center">
-          <h1 className={`${style.h1} text-center text-upercase mb-4`}>
-                Hoagram
-              </h1>
+            <h1 className={`${style.h1} text-center text-upercase mb-4`}>
+              Hoagram
+            </h1>
             <h4 className="mt-2" style={{ fontWeight: "bold" }}>
               Couldn't sign you in!
             </h4>
@@ -99,10 +115,13 @@ function Login() {
           </div>
         </div>
         <div className="ms-auto mb-2 me-2" onClick={handleResendMail}>
-          <button className="btn btn-primary">  {(loadingResend && (
-                    <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
-                  )) ||
-                    "Resend email"}</button>
+          <button className="btn btn-primary">
+            {" "}
+            {(loadingResend && (
+              <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
+            )) ||
+              "Resend email"}
+          </button>
         </div>
       </Modal>
       <div id="wrapper">
@@ -148,8 +167,12 @@ function Login() {
                 </div>
               </div>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-dark" type="submit" disabled={loading}>
-                {(loading && (
+                <button
+                  className="btn btn-dark"
+                  type="submit"
+                  disabled={loading}
+                >
+                  {(loading && (
                     <i className="fa-solid fa-circle-notch fa-spin mx-3"></i>
                   )) ||
                     "Log in"}
@@ -157,6 +180,16 @@ function Login() {
               </div>
               <hr className="mx-5 mt-4" />
               <div className="d-flex justify-content-center">
+                <div
+                  className="btn"
+                  style={{color:"#DB4437", fontWeight:"bold", fontSize:"16px"}}
+                  onClick={handleLoginGoogle}
+                  role="button"
+                >
+                  <i className="fab fa-google me-2"></i> Sign in with google
+                </div>
+              </div>
+              <div className="d-flex justify-content-center mt-2">
                 <h3 className={`${style.h3}`}>
                   <Link to={"/forgot-password"} className={`${style.fp}`}>
                     Forgot password?

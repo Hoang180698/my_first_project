@@ -24,6 +24,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "where p.id = s.post.id order by s.createdAt DESC")
     Page<Post> getSavedPosts(Integer userId, Pageable pageable);
 
+    Page<Post> findAllByUserNotOrderByCreatedAtDesc(User user, Pageable pageable);
+
     Set<Post> findByIdIn(List<Integer> ids);
 
     @Query("select new com.example.snwbackend.dto.PostDto" +

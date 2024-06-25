@@ -10,6 +10,7 @@ import com.example.snwbackend.mapper.UserMapper;
 import com.example.snwbackend.repository.*;
 import com.example.snwbackend.request.PasswordRequest;
 import com.example.snwbackend.request.UpdateInfoUserRequest;
+import com.example.snwbackend.response.CheckHavePasswordResponse;
 import com.example.snwbackend.response.ImageResponse;
 import com.example.snwbackend.response.StatusResponse;
 import jakarta.transaction.Transactional;
@@ -338,7 +339,7 @@ public class UserService {
 
     // thay doi password
     public StatusResponse changePassword(PasswordRequest request) {
-        if (request.getOldPassword() == request.getNewPassword()) {
+        if (request.getOldPassword().equals(request.getNewPassword())) {
             throw new BadRequestException("The new password must be different from the old password");
         }
         if (request.getNewPassword().length() > 20 || request.getNewPassword().length() < 3) {
@@ -358,4 +359,32 @@ public class UserService {
         }
     }
 
+    public CheckHavePasswordResponse changeHavePassword() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        if(user.getPassword() == null) {
+            return new CheckHavePasswordResponse(false);
+        };
+        boolean havePassword = !user.getPassword().isEmpty();
+        return new CheckHavePasswordResponse(havePassword);
+    }
+
+    public StatusResponse createPassword(PasswordRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        if (request.getNewPassword().length() > 20 || request.getNewPassword().length() < 3) {
+            throw new BadRequestException("Password mismatch");
+        }
+        if(user.getPassword() == null || user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            return new StatusResponse("ok");
+        } else {
+            throw new BadRequestException("Account already have password");
+        }
+    }
 }

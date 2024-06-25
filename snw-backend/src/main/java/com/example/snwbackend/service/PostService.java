@@ -353,4 +353,16 @@ public class PostService {
                 .toList();
         return postDtos;
     }
+
+    public Page<PostDto> getPostsExplore(Integer page, Integer pageSize) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+        Page<Post> posts = postRepository.findAllByUserNotOrderByCreatedAtDesc(user, PageRequest.of(page, pageSize));
+        Page<PostDto> postDtos = posts.map((post -> new PostDto(post,
+                likeRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId()), saveRepository.existsByPost_IdAndUser_Id(post.getId(), user.getId()))));
+        return postDtos;
+    }
+
 }

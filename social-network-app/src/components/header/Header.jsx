@@ -181,9 +181,16 @@ function Header() {
                   <NavLink
                     to={"/search"}
                     className="nav-link"
-                    onDoubleClick={refreshPage}
                   >
                     <i className="fa-solid fa-magnifying-glass"></i>
+                  </NavLink>
+                </li>
+                <li className="nav-item mx-3">
+                  <NavLink
+                    to={"/explore"}
+                    className="nav-link"
+                  >
+                    <i className="fa-regular fa-compass"></i>
                   </NavLink>
                 </li>
                 <li className="nav-item mx-3">

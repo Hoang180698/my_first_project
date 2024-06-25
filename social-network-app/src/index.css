@@ -634,7 +634,7 @@ textarea {
 /* post list */
 .list-post-img {
 	width: 250px;
-	height: 300px;
+	height: 100%;
 	object-fit: cover;
 	display: block;
 }
@@ -661,6 +661,15 @@ textarea {
 	-ms-transform: translate(-60%, -60%);
 	top: 50%;
 	left: 50%;
+}
+.post-list-video-icon {
+	transition: .5s ease;
+	position: absolute;
+	text-align: center;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-60%, -60%);
+	top: 5%;
+	right: -3%;
 }
 .successful-register {
 	word-wrap: break-word;

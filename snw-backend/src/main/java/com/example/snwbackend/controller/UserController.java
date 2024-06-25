@@ -149,4 +149,14 @@ public class UserController {
     public ResponseEntity<?> changePassword(@RequestBody PasswordRequest request) {
         return ResponseEntity.ok(userService.changePassword(request));
     }
+
+    @GetMapping("check-have-password")
+    public ResponseEntity<?> changeHavePassword() {
+        return ResponseEntity.ok(userService.changeHavePassword());
+    }
+
+    @PutMapping("create-password")
+    public ResponseEntity<?> createPassword(@RequestBody PasswordRequest request) {
+        return ResponseEntity.ok(userService.createPassword(request));
+    }
 }

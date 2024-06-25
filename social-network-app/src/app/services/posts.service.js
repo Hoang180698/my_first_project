@@ -19,6 +19,9 @@ export const postApi = createApi({
     getPosts: builder.query({
       query: ({ page, pageSize }) => `post?page=${page}&pageSize=${pageSize}`,
     }),
+    getPostsExplore: builder.query({
+      query: ({ page, pageSize }) => `post/explore?page=${page}&pageSize=${pageSize}`,
+    }),
     getPostById: builder.query({
       query: (id) => `post/${id}`,
       providesTags: ["Post"],
@@ -101,4 +104,5 @@ export const {
   useLazyGetPostsQuery,
   useLazyGetAllSavedPostQuery,
   useLazyGetPostByListIdQuery,
+  useLazyGetPostsExploreQuery
 } = postApi;

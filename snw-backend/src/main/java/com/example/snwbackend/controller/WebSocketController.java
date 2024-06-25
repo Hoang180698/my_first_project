@@ -1,7 +1,6 @@
 package com.example.snwbackend.controller;
 
 import com.example.snwbackend.entity.Message;
-import com.example.snwbackend.request.MessageFile;
 import com.example.snwbackend.request.MessageRequest;
 import com.example.snwbackend.request.NamedGroupChatRequest;
 import com.example.snwbackend.request.UpsertConversationRequest;
@@ -10,12 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

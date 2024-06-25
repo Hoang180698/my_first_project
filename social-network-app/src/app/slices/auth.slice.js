@@ -39,6 +39,17 @@ const authSlice = createSlice({
       }
     );
     builder.addMatcher(
+      authApi.endpoints.loginWithGg.matchFulfilled,
+      (state, action) => {
+        state.auth = action.payload.auth;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+        state.isAuthenticated = action.payload.isAuthenticated;
+
+        setDataToLocalStorage("authSnw", state);
+      }
+    );
+    builder.addMatcher(
       userApi.endpoints.updateUser.matchFulfilled,
       (state, action) => {
         // console.log(action.payload)
@@ -66,7 +77,10 @@ const authSlice = createSlice({
       authApi.endpoints.refreshToken.matchFulfilled,
       (state, action) => {
         // console.log(action.payload)
-        state.token = action.payload.accessToken;
+        state.auth = action.payload.auth;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+        state.isAuthenticated = action.payload.isAuthenticated;
         setDataToLocalStorage("authSnw", state);
       },
     );

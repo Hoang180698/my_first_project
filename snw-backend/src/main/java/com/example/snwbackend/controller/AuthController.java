@@ -27,6 +27,11 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
+    @PostMapping("outbound/gg")
+    public ResponseEntity<?> outboundGgAuthenticate(@RequestParam String code) {
+        return ResponseEntity.ok(authService.outboundGgAuthenticate(code));
+    }
+
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
