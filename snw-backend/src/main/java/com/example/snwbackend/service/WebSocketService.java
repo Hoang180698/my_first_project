@@ -8,6 +8,7 @@ import com.example.snwbackend.request.MessageFile;
 import com.example.snwbackend.request.MessageRequest;
 import com.example.snwbackend.request.NamedGroupChatRequest;
 import com.example.snwbackend.request.UpsertConversationRequest;
+import com.example.snwbackend.response.AudioUploadResponse;
 import com.example.snwbackend.security.JwtTokenUtil;
 import com.example.snwbackend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Set;
 
@@ -45,10 +47,16 @@ public class WebSocketService {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
+    private AudioService audioService;
+
+    @Autowired
     private ChatImageRepository chatImageRepository;
 
     @Autowired
-    private ChatImgRepository chatImgRepository;
+    private CloudinaryService cloudinaryService;
+
+//    @Autowired
+//    private ChatImgRepository chatImgRepository;
 
     @Transactional
     public Message sendMessage(MessageRequest request, Integer conversationId, SimpMessageHeaderAccessor accessor) {
@@ -315,7 +323,7 @@ public class WebSocketService {
                     .user(user)
                     .type(header.substring(5, header.indexOf(";")))
                     .build();
-            chatImgRepository.saveImage(image);
+            chatImageRepository.saveAndFlush(image);
             return image.getId();
         } catch (Exception e) {
             throw new RuntimeException("Error on upload file: " +e.getMessage());
@@ -368,6 +376,45 @@ public class WebSocketService {
 
         for (User u: conversation.getUsers()) {
             simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/call", conversation);
+        }
+    }
+
+    @Transactional
+    public void sendVoice(Integer conversationId, MessageRequest request, SimpMessageHeaderAccessor accessor) {
+        Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> {
+            throw new NotFoundException("Not found contact with id = " + conversationId);
+        });
+
+        String email = accessor.getUser().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("Not found user with email = " + email);
+        });
+
+        if(!conversation.getUsers().contains(user)) {
+            throw new BadRequestException("You not in this conversation");
+        }
+
+        AudioUploadResponse audio = cloudinaryService.uploadAudio(request.getContent(), conversationId.toString());
+
+        Message message = Message.builder()
+                .content("sent a voice message")
+                .sender(user).type("VOICE")
+                .imageUrl(audio.getAudioUrl())
+                .audioDuration((audio.getDuration()))
+                .conversation(conversation)
+                .build();
+
+        messageRepository.save(message);
+
+        simpMessagingTemplate.convertAndSend("/topic/conversation/" + conversation.getId(), message);
+        for (User u: conversation.getUsers()) {
+            UserConversation userConversation = userConversationRepository.findByUserAndConversation(u, conversation).get();
+            if (u.getId() == user.getId()) {
+                simpMessagingTemplate.convertAndSendToUser(u.getEmail() ,"/topic/chat", userConversation);
+                continue;
+            }
+            userConversation.setUnreadCount(userConversation.getUnreadCount() + 1);
+            simpMessagingTemplate.convertAndSendToUser(u.getEmail(), "/topic/chat", userConversation);
         }
     }
 

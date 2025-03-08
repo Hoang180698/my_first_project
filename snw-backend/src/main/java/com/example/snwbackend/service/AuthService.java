@@ -98,8 +98,11 @@ public class AuthService {
 
     private final String GRANT_TYPE = "authorization_code";
 
+    @Value("${frontend.link}")
+    private String frontLink;
+
     public LoginResponse outboundGgAuthenticate(String code) {
-        log.info("code: ", code);
+        log.info("code: {}", code);
         var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
                 .code(code)
                 .clientId(CLIENT_ID)
@@ -128,6 +131,10 @@ public class AuthService {
                         .enabled(true)
                         .build()));
 
+        if(!user.isEnabled()) {
+            user.setEnabled(true);
+            userRepository.save(user);
+        }
         // Generate token
         String tokenJwt = jwtTokenUtil.generateToken(userDetailsService.loadUserByUsername(user.getEmail()));
 
@@ -219,6 +226,7 @@ public class AuthService {
     @Transactional
     public String activeUser(Integer userId, String token, Model model) {
         VerificationToken verificationToken = verificationTokenService.findByUser_idAndToken(userId, token);
+        model.addAttribute("link", frontLink);
         if(verificationToken == null) {
             model.addAttribute("messages","Your verification token is invalid!" +userId + "  " +token);
             return "verification-web";

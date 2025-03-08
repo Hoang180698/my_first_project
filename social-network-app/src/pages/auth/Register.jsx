@@ -89,6 +89,10 @@ function Register() {
             .unwrap()
             .then(() => {
               setShowSuccess(true);
+              setValue("email", "");
+              setValue("name", "");
+              setValue("password", "");
+              setValue("retypePassword", "");
             })
             .catch((err) => {
               toast.error("Try again.");

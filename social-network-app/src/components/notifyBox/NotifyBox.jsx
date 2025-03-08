@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { baseUrl, userImage } from "../../App";
 
 function NotifyBox({ n, deleteNotify }) {
+
+  const imagePost = n.post.imageUrls[0];
   
   const [showModal, setShowModal] = useState(false);
 
@@ -100,12 +102,12 @@ function NotifyBox({ n, deleteNotify }) {
           </div>
         </div>
         <div className="notification-list_feature-img my-auto">
-          {n.type !== "follow" && n.post.imageUrls.length > 0 && (
+          {n.type !== "follow" && imagePost && (
             <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
-             <img
-              src={`${baseUrl}${n.post.imageUrls[0]}`}
-              alt="post img"
-            /></Link>      
+             {imagePost.includes("api/images") && <img src={`${baseUrl}${imagePost}`} alt="post img"></img>} 
+             {imagePost.includes("api/videos") && <video  src={`${baseUrl}${imagePost}`} alt="post img"></video>}
+             {imagePost.includes("res.cloudinary") && <video src={imagePost} alt="post img"></video>}   
+          </Link>      
           )}
         </div>
       </div>

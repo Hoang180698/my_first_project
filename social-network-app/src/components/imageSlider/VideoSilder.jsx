@@ -29,7 +29,7 @@ function VideoSilder({ url }) {
         };
       }, [options, videoRef]);
   return (
-    <video ref={videoRef} src={`${baseUrl}${url}`} controls loop/>
+    <video ref={videoRef} src={`${url.includes("api/videos") ? `${baseUrl}${url}` : url}`} controls loop/>
   )
 }
 

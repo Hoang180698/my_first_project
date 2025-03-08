@@ -51,6 +51,11 @@ public class WebSocketController {
         webSocketService.sendImage(conversationId, file, accessor);
     }
 
+    @MessageMapping("/message/send-voice/{conversationId}")
+    public void sendVoice(@DestinationVariable Integer conversationId, MessageRequest file, SimpMessageHeaderAccessor accessor) throws IOException {
+        webSocketService.sendVoice(conversationId, file, accessor);
+    }
+
     // JoinCall
     @MessageMapping("/call/join/{conversationId}")
     public void joinCall(@DestinationVariable Integer conversationId, SimpMessageHeaderAccessor accessor) {

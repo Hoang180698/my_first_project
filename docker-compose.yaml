@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:latest
+    # restart: always
+    container_name: hoagram_db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    networks:
+      - backend
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    container_name: hoagram_phpmyadmin
+    # restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "83:80"
+    networks:
+      - backend
+
+  # Java Spring Boot Backend Service
+  backend:
+    # image: hoagram-backend:1.0.0
+    build: 
+      context: ./snw-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    # restart: always
+    container_name: hoagram_backend
+    ports:
+      - "8080:8080"
+    environment:
+      DBMS_CONNECTION: jdbc:mysql://hoagram_db/social-network-db?createDatabaseIfNotExist=true
+      FRONT_LINK: http://localhost:3000
+      GG_REDIRECT_URI: http://localhost:3000/authenticate
+    networks:
+      - backend
+
+  # ReactJS Vite Frontend Service
+  frontend:
+    # image: hoagram-app:1.0.0
+    build: 
+      context: ./social-network-app
+      dockerfile: Dockerfile
+    container_name: hoagram_frontend
+    ports:
+      - "3000:80"
+volumes:
+  mysql-volume:
+    external: true
+
+networks:
+  backend:
+    driver: bridge
+    name: hoagram-network-backend

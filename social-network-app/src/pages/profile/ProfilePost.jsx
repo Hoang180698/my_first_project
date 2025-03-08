@@ -191,8 +191,8 @@ function ProfilePost() {
         <div className="container">
           <div className="row">
             <h1>
-              <h1 className="text-center">No have post</h1>
-              <p className="text-center">When you share photos, they will appear on your profile.</p>
+              <h3 className="text-center">No have post</h3>
+              <p className="text-center" style={{fontSize:"16px"}}>When you share photos, they will appear on your profile.</p>
             </h1>
           </div>
         </div>

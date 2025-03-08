@@ -76,6 +76,12 @@ body{
 				border-radius:50px;
 				margin-right:20px;
 			}
+			video{
+				height:48px;
+				width:48px;
+				border-radius:50px;
+				margin-right:20px;
+			}
 		}
 		.notification-list_detail{
 			p{
@@ -86,6 +92,12 @@ body{
 	}
 	.notification-list_feature-img{
 		img{
+			height:48px;
+			width:48px;
+			border-radius:5px;
+			margin-left:20px;
+		} 
+		video {
 			height:48px;
 			width:48px;
 			border-radius:5px;

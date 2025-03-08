@@ -19,13 +19,13 @@ import Inbox from "./pages/messenge/Inbox";
 import { ToastContainer } from "react-toastify";
 import PostDetailPage from "./pages/post-detail/PostDetailPage";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-import userImg from "../public/user.jpg";
+import userImg from "../src/assets/images/user.jpg";
 import Call from "./pages/call/Call";
 import Explore from "./pages/explore/Explore";
 import Authenticate from "./pages/auth/Authenticate";
 
 // export var baseUrl = "https://hoagramspring-production-8c94.up.railway.app";
-export var baseUrl = "http://localhost:8080";
+export var baseUrl = import.meta.env.VITE_API_URL;
 export var userImage = userImg;
 
 function App() {

@@ -20,10 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -65,6 +63,9 @@ public class PostService {
     @Autowired
     private VideoService videoService;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
 
     // Lấy post theo id
     public PostDto getPostById(Integer id) {
@@ -102,6 +103,7 @@ public class PostService {
                videoService.deleteVideo(user.getId().toString(), videoId);
            }
         }
+
         likeCommentRepository.deleteAllByComment_Post(post);
         likeReplyCommentRepository.deleteAllByReplyComment_Comment_Post(post);
         likeRepository.deleteAllByPost(post);
@@ -110,7 +112,11 @@ public class PostService {
         commentRepository.deleteAllByPost(post);
         saveRepository.deleteAllByPost(post);
 
+        cloudinaryService.deleteVideo(id.toString());
+
         postRepository.delete(post);
+
+
 
         return new StatusResponse("removed");
     }
@@ -304,13 +310,23 @@ public class PostService {
         }
 
         try {
+            Post post = postRepository.save(Post.builder()
+                    .user(user)
+                    .content(request.getContent())
+                    .build());
+
             List<String> urls = new ArrayList<>();
             if (files.length > 0) {
                 for (MultipartFile file: files) {
                     if(file.getContentType().startsWith("video")) {
-                        String url = videoService.uploadVideo(user, file);
+                        // luu video vao sever
+                        // String url = videoService.uploadVideo(user, file);
+                       //  urls.add(url);
+                       //  log.info(url);
+
+                        // luu video tren cloudinary
+                        String url = cloudinaryService.uploadVideo(file, post.getId().toString());
                         urls.add(url);
-                        log.info(url);
                         continue;
                     }
                     imageUtils.validateFile(file);
@@ -326,12 +342,9 @@ public class PostService {
                     urls.add(url);
                 }
             }
+            post.setImageUrls(urls);
+            post.setCreatedAt(LocalDateTime.now());
 
-            Post post = Post.builder()
-                    .imageUrls(urls)
-                    .user(user)
-                    .content(request.getContent())
-                    .build();
             return postRepository.save(post);
         } catch (Exception e) {
             log.error(e.getMessage());

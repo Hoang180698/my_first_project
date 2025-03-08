@@ -22,6 +22,7 @@ import Loading3dot from "../../components/loading/Loading3dot";
 import { toast } from "react-toastify";
 import ImageBox from "../../components/chat/ImageBox";
 import { baseUrl, userImage } from "../../App";
+import VoiceMessageBox from "../../components/chat/VoiceMessageBox";
 const InboxHeader = React.lazy(() =>
   import("../../components/chat/InboxHeader")
 );
@@ -217,7 +218,7 @@ function Inbox() {
             key={index}
           >
             {/* Thoi gian cua message */}
-            {((["MESSAGE", "IMAGE"].includes(m.type) &&
+            {((["MESSAGE", "IMAGE", "VOICE"].includes(m.type) &&
               (calDistanceTimeMinute(
                 m.createdAt,
                 messages[index + 1]?.createdAt
@@ -226,7 +227,7 @@ function Inbox() {
               m.type === "START" ||
               index === messages.length - 1) && (
               <span
-                className="mx-auto mt-4 mb-1"
+                className="mx-auto mt-4 mb-1 mb-3"
                 style={{
                   color: "#65676B",
                   fontSize: "12px",
@@ -239,13 +240,13 @@ function Inbox() {
 
             {m.sender.id !== auth.id &&
               conversation.groupChat &&
-              ["MESSAGE", "IMAGE"].includes(m.type) &&
+              ["MESSAGE", "IMAGE", "VOICE"].includes(m.type) &&
               (m.sender.id !== messages[index + 1]?.sender.id ||
                 calDistanceTimeMinute(
                   m.createdAt,
                   messages[index + 1]?.createdAt
                 ) > 20 ||
-                !["MESSAGE", "IMAGE"].includes(messages[index + 1]?.type)) && (
+                !["MESSAGE", "IMAGE", "VOICE"].includes(messages[index + 1]?.type)) && (
                 <>
                   <span
                     className="ms-5 mt-3"
@@ -256,12 +257,12 @@ function Inbox() {
                 </>
               )}
 
-            {["MESSAGE", "IMAGE"].includes(m.type) && (
+            {["MESSAGE", "IMAGE", "VOICE"].includes(m.type) && (
               <div
                 className={
                   m.sender.id === auth.id
                     ? "d-flex flex-row-reverse message-content-box own-message"
-                    : "d-flex message-content-box"
+                    : "d-flex message-content-box their-message"
                 }
               >
                 {m.sender.id !== auth.id && (
@@ -271,7 +272,7 @@ function Inbox() {
                         m.createdAt,
                         messages[index - 1]?.createdAt
                       ) > 20 ||
-                      !["MESSAGE", "IMAGE"].includes(
+                      !["MESSAGE", "IMAGE", "VOICE"].includes(
                         messages[index - 1]?.type
                       )) && (
                       <>
@@ -291,7 +292,7 @@ function Inbox() {
                 {m.type === "MESSAGE" && (
                   <p
                     className={
-                      m.sender.id === auth.id ? "mb-1" : " border mb-1"
+                      m.sender.id === auth.id ? "mb-1" : "mb-1"
                     }
                     data-bs-toggle="tooltip"
                     data-placement="bottom"
@@ -301,6 +302,14 @@ function Inbox() {
                   </p>
                 )}
                 {m.type === "IMAGE" && <ImageBox imageUrl={m.imageUrl} createAt={m.createdAt} />}
+                {m.type === "VOICE" &&  <div
+                    className="voice-message"
+                    data-bs-toggle="tooltip"
+                    data-placement="bottom"
+                    title={formatDateTime(m.createdAt)}
+                  >
+                    <VoiceMessageBox audioUrl={m.imageUrl} preDuration={m.audioDuration} />
+                  </div>}
               </div>
             )}
             {m.type === "START" && (

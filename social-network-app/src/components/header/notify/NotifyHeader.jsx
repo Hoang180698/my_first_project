@@ -99,17 +99,17 @@ function NotifyHeader() {
   return (
     <>
       <a
-       className="nav-link dropdown-toggle notification-ui_icon"
-       href=""
-       id="navbarDropdown"
-       role="button"
-       data-bs-toggle="dropdown"
-       aria-haspopup="true"
-       aria-expanded="false"
-       onClick={handleClick}
+        className="nav-link dropdown-toggle notification-ui_icon"
+        href=""
+        id="navbarDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+        onClick={handleClick}
       >
         <i className="fa fa-bell"></i>
-        {(notifications.length > 0 && !notifications[0].seen) && (
+        {notifications.length > 0 && !notifications[0].seen && (
           <span className="unread-notification"></span>
         )}
       </a>
@@ -171,25 +171,33 @@ function NotifyHeader() {
                         </small>
                       </span>
                     )}
-                    {n.type !== "follow" &&(
-                       <Link
-                       to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}
-                       className="ms-2 d-block pt-2"
-                     >
-                       <span className="text-dark">
-                         <small
-                           className="fw-bold"
-                           style={{ fontSize: "14px" }}
-                         >
-                           {n.sender.name}
-                         </small>
-                         {` ${n.content}`}
-                         {(n.comment && !n.replyComment)? `: ${n.comment.content.substring(0, 24)}`: ""}
-                         {(n.comment?.content?.length > 25 && !n.replyComment) ? "..." : ""}
-                         {n.replyComment? `: ${n.replyComment.content.substring(0, 24)}`: ""}
-                         {n.replyComment?.content.lenth > 25? "..." : ""}
-                       </span>
-                     </Link>
+                    {n.type !== "follow" && (
+                      <Link
+                        to={`/p/${n.post.id}${
+                          n.comment ? "/" + n.comment.id : ""
+                        }${n.replyComment ? "/" + n.replyComment.id : ""}`}
+                        className="ms-2 d-block pt-2"
+                      >
+                        <span className="text-dark">
+                          <small
+                            className="fw-bold"
+                            style={{ fontSize: "14px" }}
+                          >
+                            {n.sender.name}
+                          </small>
+                          {` ${n.content}`}
+                          {n.comment && !n.replyComment
+                            ? `: ${n.comment.content.substring(0, 24)}`
+                            : ""}
+                          {n.comment?.content?.length > 25 && !n.replyComment
+                            ? "..."
+                            : ""}
+                          {n.replyComment
+                            ? `: ${n.replyComment.content.substring(0, 24)}`
+                            : ""}
+                          {n.replyComment?.content.lenth > 25 ? "..." : ""}
+                        </span>
+                      </Link>
                     )}
                     {/* {n.type === "like" && (
                       <Link
@@ -272,12 +280,29 @@ function NotifyHeader() {
                 {n.post && (
                   <div className="notification-list_feature-img me-2 my-auto">
                     {n.post.imageUrls.length > 0 && (
-                      <Link to={`/p/${n.post.id}${n.comment? "/" + n.comment.id : ""}${n.replyComment? "/" + n.replyComment.id : ""}`}>
-                        <img
-                          src={`${baseUrl}${n.post.imageUrls[0]}`}
-                          alt="post img"
-                          style={{ width: "50px", height: "50px" }}
-                        />
+                      <Link
+                        to={`/p/${n.post.id}${
+                          n.comment ? "/" + n.comment.id : ""
+                        }${n.replyComment ? "/" + n.replyComment.id : ""}`}
+                      >
+                        {n.post.imageUrls[0].includes("api/images") && (
+                          <img
+                            style={{ width: "50px", height: "50px" }}
+                            src={`${baseUrl}${n.post.imageUrls[0]}`}
+                          ></img>
+                        )}
+                        {n.post.imageUrls[0].includes("api/videos") && (
+                          <video
+                            style={{ width: "50px", height: "50px" }}
+                            src={`${baseUrl}${n.post.imageUrls[0]}`}
+                          ></video>
+                        )}
+                        {n.post.imageUrls[0].includes("res.cloudinary") && (
+                          <video
+                            style={{ width: "50px", height: "50px" }}
+                            src={n.post.imageUrls[0]}
+                          ></video>
+                        )}
                       </Link>
                     )}
                   </div>

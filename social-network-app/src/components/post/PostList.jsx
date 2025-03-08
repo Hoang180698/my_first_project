@@ -2,7 +2,7 @@ import Modal from "react-bootstrap/Modal";
 import React, { useState } from "react";
 import PostModal from "../PostModal/PostModal";
 import { baseUrl } from "../../App";
-import noImg from "../../../public/no-image.png"
+import noImg from "../../../src/assets/images/noImage.png"
 
 function PostList({ post, likePost, savePost, deletePost, isBigSize }) {
     const [showPostModal, setShowPostModal] = useState(false);
@@ -38,7 +38,8 @@ function PostList({ post, likePost, savePost, deletePost, isBigSize }) {
         {(post.post.imageUrls?.length > 0 && (
           <>
              {post.post.imageUrls[0].includes("api/images") && <img className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></img>} 
-             {post.post.imageUrls[0].includes("api/videos") && <video className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></video>}     
+             {post.post.imageUrls[0].includes("api/videos") && <video className="list-post-img" src={`${baseUrl}${post.post.imageUrls[0]}`}></video>}
+             {post.post.imageUrls[0].includes("res.cloudinary") && <video className="list-post-img" src={post.post.imageUrls[0]}></video>}     
           </>
          
         )) || <img className="list-post-img" src={noImg}></img>}
@@ -52,7 +53,7 @@ function PostList({ post, likePost, savePost, deletePost, isBigSize }) {
             </span>
           </div>
         </div>
-        { post.post.imageUrls[0]?.includes("api/videos") && 
+        { post.post.imageUrls[0] && !post.post.imageUrls[0]?.includes("api/images")  && 
             <div className="post-list-video-icon">
               <span style={{ fontWeight: "bold", color:"white", fontSize:"16px"}}>
               <i className="fa-solid fa-video"></i>

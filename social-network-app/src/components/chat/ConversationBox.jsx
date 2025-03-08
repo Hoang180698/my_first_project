@@ -63,7 +63,7 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
 
     return (
       <OverlayTrigger placement="right"
-      delay={{ show: 100, hide: 200 }}
+      delay={{ show: 30, hide: 50 }}
       overlay={renderTooltipGroup}>
         <div className="user-chat-box">
           <NavLink
@@ -74,6 +74,7 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
             }
             to={`/messenge/inbox/${data.id.conversationId}`}
           >
+            {data.isOnSound === false && <span><i className="message-badge-mute fa-regular fa-bell-slash"></i></span>}
             {data.unreadCount > 0 && <span className="message-badge"></span>}
             {(users.length > 1 && (
               <div className="avatar-group-chat">
@@ -218,7 +219,7 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
 
   return (
     <OverlayTrigger  placement="right"
-    delay={{ show: 100, hide: 120 }}
+    delay={{ show: 30, hide: 50 }}
     overlay={renderTooltip}>
       <div className="user-chat-box">
         <NavLink
@@ -229,6 +230,7 @@ function ConversationBox({ data, toggleArchiveChat, toggleSetSoundNotice }) {
           }
           to={`/messenge/inbox/${data.id.conversationId}`}
         >
+            {data.isOnSound === false && <span><i className="message-badge-mute fa-regular fa-bell-slash"></i></span>}
           {data.unreadCount > 0 && <span className="message-badge"></span>}
           <div className="position-relative">
           <img

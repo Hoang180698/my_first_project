@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useRef } from "react";
 import { toast } from "react-toastify";
 import { baseUrl, userImage } from "../../App";
+import AudioPlayer from "../../components/chat/AudioPlayer";
 
 function HomePage() {
   const { auth } = useSelector((state) => state.auth);
@@ -115,6 +116,7 @@ function HomePage() {
           );
         });
         setPosts([ ...posts, ...filterData ]);
+        setIsLast(data.last);
       } catch (error) {
         console.log(error);
         toast.error("Error on page load.");

@@ -24,6 +24,8 @@ public class Message {
 
     private String imageUrl;
 
+    private double audioDuration;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -23,16 +23,16 @@ function Authenticate() {
               console.log(1)
               setLoginStatus(1);
               navigate("/login");
-              toast.error("Login fail", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-              });
+              // toast.error("Login fail", {
+              //   position: "top-center",
+              //   autoClose: 3000,
+              //   hideProgressBar: true,
+              //   closeOnClick: true,
+              //   pauseOnHover: true,
+              //   draggable: true,
+              //   progress: undefined,
+              //   theme: "colored",
+              // });
             } 
             else {
               toast.success("Login success");
@@ -43,16 +43,16 @@ function Authenticate() {
             console.log(e);
             setLoginStatus(1);
             navigate("/login");
-            toast.error("Login fail", {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "colored",
-            });
+            // toast.error("Login fail", {
+            //   position: "top-center",
+            //   autoClose: 3000,
+            //   hideProgressBar: true,
+            //   closeOnClick: true,
+            //   pauseOnHover: true,
+            //   draggable: true,
+            //   progress: undefined,
+            //   theme: "colored",
+            // });
           })
       }
     }, []);

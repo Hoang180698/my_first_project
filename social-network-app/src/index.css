@@ -637,6 +637,7 @@ textarea {
 	height: 100%;
 	object-fit: cover;
 	display: block;
+	outline: #555;
 }
 .post-list-box:hover img{
 	opacity: 0.8;
@@ -669,7 +670,7 @@ textarea {
 	transform: translate(-50%, -50%);
 	-ms-transform: translate(-60%, -60%);
 	top: 5%;
-	right: -3%;
+	right: -2%;
 }
 .successful-register {
 	word-wrap: break-word;

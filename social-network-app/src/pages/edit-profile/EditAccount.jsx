@@ -126,20 +126,21 @@ function EditAccount() {
                 aria-label="Default select example"
                 onChange={(e) => setGender(e.target.value)}
                 defaultValue={""}
+                value={gender}
               >
-                <option value="male" selected={gender === "male"}>
+                <option value="male" >
                   Male
                 </option>
-                <option value="female" selected={gender === "female"}>
+                <option value="female" >
                   Female
                 </option>
-                <option value="gay" selected={gender === "gay"}>
+                <option value="gay" >
                   Gay
                 </option>
-                <option value="les" selected={gender === "les"}>
+                <option value="les" >
                   Les
                 </option>
-                <option value={""} selected={!gender}>
+                <option value="">
                   Prefer not to say
                 </option>
               </select>

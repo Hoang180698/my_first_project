@@ -23,7 +23,7 @@ function imageSlider({ data }) {
     return (
       <div className="post-image d-flex position-relative">
         {url.includes("api/images") && <img src={`${baseUrl}${data[0]}`} />}
-        {url.includes("api/videos") && <VideoSilder url={url}/>}
+        {!url.includes("api/images") && <VideoSilder url={url}/>}
       </div>
     );
   }
@@ -38,7 +38,7 @@ function imageSlider({ data }) {
                 className={slide === idx ? "" : "d-none"}
               />
             )}
-              {item.includes("api/videos") && (
+             {(item.includes("api/videos") || item.includes("res.cloudinary")) && (
               <VideoSilder url={item}/>
             )}
           </div>
